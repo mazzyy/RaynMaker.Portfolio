@@ -25,6 +25,7 @@ let main argv =
                     path "/" >=> Files.file "Content/index.html"
                     pathScan "/Content/%s" (fun f -> Files.file (sprintf "%s/Content/%s" home f))
                     pathScan "/Scripts/%s" (fun f -> Files.file (sprintf "%s/Scripts/%s" home f))
+                    path "/api/hello" >=> OK "{ \"message\" : \"pong\" }"
                 ]
         ]
 
