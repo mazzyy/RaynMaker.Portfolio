@@ -1,0 +1,15 @@
+**/bin/**
+**/obj/**
+.vs/**
+/*.suo
+/TestResult.xml
+/TestResults/**
+/RaynMaker.Portfolio.gc.*
+/packages/Argu.*
+/packages/DotLiquid.*
+/packages/Expecto.*
+/packages/FSharp.Core.*
+/packages/Microsoft.AspNet.Razor.*
+/packages/Mono.Cecil.*
+/packages/RazorEngine.*
+/packages/Suave.*
