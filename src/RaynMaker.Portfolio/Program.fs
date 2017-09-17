@@ -18,6 +18,12 @@ let main argv =
 
     let home = Path.GetDirectoryName( Assembly.GetExecutingAssembly().Location )
 
+    let sayHello =
+        request (fun r ->
+            match r.queryParam "message" with
+            | Choice1Of2 msg -> OK (sprintf "{ \"message\" : \"%s - pong\" }" msg)
+            | Choice2Of2 msg -> RequestErrors.BAD_REQUEST msg)
+
     let app : WebPart =
         choose [ 
             GET >=> choose
@@ -25,7 +31,7 @@ let main argv =
                     path "/" >=> Files.file "Content/index.html"
                     pathScan "/Content/%s" (fun f -> Files.file (sprintf "%s/Content/%s" home f))
                     pathScan "/Scripts/%s" (fun f -> Files.file (sprintf "%s/Scripts/%s" home f))
-                    path "/api/hello" >=> OK "{ \"message\" : \"pong\" }"
+                    path "/api/hello" >=> sayHello
                 ]
         ]
 
