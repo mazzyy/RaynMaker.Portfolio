@@ -13,3 +13,5 @@
 /packages/Mono.Cecil.*
 /packages/RazorEngine.*
 /packages/Suave.*
+/packages/jQuery.*
+/packages/vue.*

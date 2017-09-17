@@ -16,14 +16,18 @@ open System.IO
 let main argv = 
     printfn "Starting ..."
 
+    let home = Path.GetDirectoryName( Assembly.GetExecutingAssembly().Location )
+
     let app : WebPart =
         choose [ 
-            //path "/" >=> OK (home ()) 
-            path "/" >=> Redirection.redirect "/index.html"
-            Files.browseHome
+            GET >=> choose
+                [
+                    path "/" >=> Files.file "Content/index.html"
+                    pathScan "/Content/%s" (fun f -> Files.file (sprintf "%s/Content/%s" home f))
+                    pathScan "/Scripts/%s" (fun f -> Files.file (sprintf "%s/Scripts/%s" home f))
+                ]
         ]
 
-    let home = Path.Combine( Path.GetDirectoryName( Assembly.GetExecutingAssembly().Location ), "html" )
     let local = HttpBinding.create HTTP IPAddress.Loopback 2525us
                 
     let cts = new CancellationTokenSource()
