@@ -29,4 +29,34 @@ module WebApp =
                 ]
         ]
 
+module EventStore =
+    open System
+    open FSharp.ExcelProvider
+    open RaynMaker.Portfolio
+    open RaynMaker.Portfolio.Entities
 
+    [<Literal>] 
+    let private template = @"../../etc/Portfolio.Events.xlsx"
+
+    type private EventsSheet = ExcelFile<template>
+
+    type ParsedEvent = 
+        | Event of DomainEvent
+        | Unknown of string * DateTime
+
+    let load path =
+        let sheet = new EventsSheet(path)
+
+        sheet.Data
+        |> Seq.map(fun r -> 
+            match r.Event with
+            | EqualsI "StockBought" _ -> 
+                { StockBought.Date = r.Date
+                  Isin = r.ID
+                  Name = r.Name
+                  Count = r.Count |> int
+                  Price = r.Value
+                  Fee = r.Fee } |> StockBought |> Event
+            | x -> Unknown(r.Event,r.Date)
+        )
+        |> List.ofSeq

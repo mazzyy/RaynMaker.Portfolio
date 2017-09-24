@@ -6,7 +6,7 @@ type StockBought = {
     Date : DateTime
     Isin : string
     Name : string
-    Count : float
+    Count : int
     Price : float
     Fee : float
     }
@@ -15,7 +15,7 @@ type StockSold = {
     Date : DateTime
     Isin : string
     Name : string
-    Count : float
+    Count : int
     Price : float
     Fee : float
     }
@@ -48,14 +48,14 @@ type InterestReceived = {
     Value : float
     }
 
-type Event = 
-    | StockBought 
-    | StockSold 
-    | DividendReceived 
-    | DepositAccounted 
-    | SavingsPlanRateAccounted 
-    | DisbursementAccounted 
-    | InterestReceived 
+type DomainEvent = 
+    | StockBought of StockBought
+    | StockSold of StockSold
+    | DividendReceived of DividendReceived
+    | DepositAccounted of DepositAccounted
+    | SavingsPlanRateAccounted of SavingsPlanRateAccounted
+    | DisbursementAccounted of DisbursementAccounted
+    | InterestReceived of InterestReceived
 
 
 

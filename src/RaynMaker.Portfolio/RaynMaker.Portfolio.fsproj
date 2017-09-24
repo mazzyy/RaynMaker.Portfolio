@@ -13,6 +13,7 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFSharpCoreVersion>4.4.1.0</TargetFSharpCoreVersion>
     <Name>Portfolio</Name>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -83,6 +84,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="Foundation.fs" />
     <Compile Include="Entities.fs" />
     <Compile Include="UseCases.fs" />
     <Compile Include="Gateways.fs" />
@@ -98,11 +100,20 @@
     <Reference Include="DotLiquid">
       <HintPath>..\..\packages\DotLiquid.2.0.183\lib\net45\DotLiquid.dll</HintPath>
     </Reference>
+    <Reference Include="Excel">
+      <HintPath>..\..\packages\ExcelProvider.0.8.2\lib\Excel.dll</HintPath>
+    </Reference>
+    <Reference Include="ExcelProvider">
+      <HintPath>..\..\packages\ExcelProvider.0.8.2\lib\ExcelProvider.dll</HintPath>
+    </Reference>
     <Reference Include="Expecto">
       <HintPath>..\..\packages\Expecto.4.0.3\lib\net40\Expecto.dll</HintPath>
     </Reference>
     <Reference Include="FSharp.Core">
       <HintPath>..\..\packages\FSharp.Core.4.0.0.1\lib\net40\FSharp.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>..\..\packages\ExcelProvider.0.8.2\lib\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Cecil">
       <HintPath>..\..\packages\Mono.Cecil.0.9.6.4\lib\net45\Mono.Cecil.dll</HintPath>
