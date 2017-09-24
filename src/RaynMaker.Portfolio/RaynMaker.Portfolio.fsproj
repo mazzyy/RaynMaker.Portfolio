@@ -83,6 +83,10 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="Entities.fs" />
+    <Compile Include="UseCases.fs" />
+    <Compile Include="Gateways.fs" />
+    <Compile Include="Frameworks.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />
     <Content Include="packages.config" />
