@@ -23,5 +23,5 @@ module Httpd =
     open System.Diagnostics
 
     let start port = 
-        Process.Start(sprintf "http://localhost:%i" port) |> ignore
+        Process.Start(sprintf "http://localhost:%i/" port) |> ignore
 

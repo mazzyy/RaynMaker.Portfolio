@@ -2,13 +2,16 @@
 
 open System
 
+[<Measure>] type Currency
+[<Measure>] type Percentage
+
 type StockBought = {
     Date : DateTime
     Isin : string
     Name : string
     Count : int
-    Price : float
-    Fee : float
+    Price : decimal<Currency>
+    Fee : decimal<Currency>
     }
 
 type StockSold = {
@@ -16,36 +19,36 @@ type StockSold = {
     Isin : string
     Name : string
     Count : int
-    Price : float
-    Fee : float
+    Price : decimal<Currency>
+    Fee : decimal<Currency>
     }
 
 type DividendReceived = {
     Date : DateTime
     Isin : string
     Name : string
-    Price : float
-    Fee : float
+    Price : decimal<Currency>
+    Fee : decimal<Currency>
     }
 
 type DepositAccounted = {
     Date : DateTime
-    Value : float
+    Value : decimal<Currency>
     }
 
 type SavingsPlanRateAccounted = {
     Date : DateTime
-    Value : float
+    Value : decimal<Currency>
     }
 
 type DisbursementAccounted = {
     Date : DateTime
-    Value : float
+    Value : decimal<Currency>
     }
 
 type InterestReceived = {
     Date : DateTime
-    Value : float
+    Value : decimal<Currency>
     }
 
 type DomainEvent = 
