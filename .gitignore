@@ -17,3 +17,4 @@
 /packages/vue.*
 /packages/ExcelProvider.*
 /packages/bootstrap.*
+/packages/Newtonsoft.Json.*

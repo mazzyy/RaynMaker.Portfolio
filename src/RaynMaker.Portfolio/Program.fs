@@ -23,7 +23,7 @@ let main argv =
 
     printfn "Starting ..."
 
-    let app = WebApp.createApp home
+    let app = WebApp.createApp home store
     let port,cts = Httpd.start app
 
     Browser.start port

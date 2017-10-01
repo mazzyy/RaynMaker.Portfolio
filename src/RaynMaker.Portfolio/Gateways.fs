@@ -6,26 +6,36 @@ module WebApp =
     open Suave.Successful
     open Suave.Operators
     open Suave.Filters
+    open Newtonsoft.Json
+    open Newtonsoft.Json.Serialization
+
+    let JSON v =
+        let jsonSerializerSettings = new JsonSerializerSettings()
+        jsonSerializerSettings.ContractResolver <- new CamelCasePropertyNamesContractResolver()
+
+        JsonConvert.SerializeObject(v, jsonSerializerSettings)
+        |> OK
+        >=> Writers.setMimeType "application/json; charset=utf-8"
 
     module private Handlers =
         open RaynMaker.Portfolio.UseCases
+        open Suave.Writers
 
-        let sayHello =
-            request (fun r ->
-                match r.queryParam "message" with
-                | Choice1Of2 msg -> 
-                    let response = SayHelloInteractor.hello msg
-                    OK (sprintf "{ \"message\" : \"%s\" }" response )
-                | Choice2Of2 msg -> RequestErrors.BAD_REQUEST msg)
+        let getTransactions store (r:HttpRequest) =
+            match r.queryParam "lastNth" with
+            | Choice1Of2 msg -> msg |> int
+            | Choice2Of2 msg -> -1
+            |> TransactionsInteractor.list store
+            |> JSON
 
-    let createApp home =
+    let createApp home store =
         choose [ 
             GET >=> choose
                 [
                     path "/" >=> Files.file "Content/index.html"
                     pathScan "/Content/%s" (fun f -> Files.file (sprintf "%s/Content/%s" home f))
                     pathScan "/Scripts/%s" (fun f -> Files.file (sprintf "%s/Scripts/%s" home f))
-                    path "/api/hello" >=> Handlers.sayHello
+                    path "/api/transactions" >=> (request (Handlers.getTransactions store)) 
                 ]
         ]
 
