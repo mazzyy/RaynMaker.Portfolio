@@ -23,8 +23,8 @@ module WebApp =
 
         let getTransactions store (r:HttpRequest) =
             match r.queryParam "lastNth" with
-            | Choice1Of2 msg -> msg |> int
-            | Choice2Of2 msg -> -1
+            | Choice1Of2 msg -> msg |> int |> Some
+            | Choice2Of2 msg -> None
             |> TransactionsInteractor.list store
             |> JSON
 
@@ -39,11 +39,12 @@ module WebApp =
                 ]
         ]
 
-module EventStore =
+module ExcelEventStore =
     open System
     open FSharp.ExcelProvider
     open RaynMaker.Portfolio
     open RaynMaker.Portfolio.Entities
+    open RaynMaker.Portfolio.UseCases
 
     [<Literal>] 
     let private template = @"../../etc/Portfolio.Events.xlsx"
