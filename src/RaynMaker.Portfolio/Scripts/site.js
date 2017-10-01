@@ -2,7 +2,11 @@
     var app = new Vue({
         el: '#app',
         data: {
-            message: 'Vue'
+            message: 'Vue',
+            events: [
+                { date: '2017-01-01', name: "stock bought" },
+                { date: '2017-3-3', name: "stock sold" }
+            ]
         },
 
         created: function () {
