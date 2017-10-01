@@ -42,7 +42,7 @@ module EventStore =
 
     type ParsedEvent = 
         | Event of DomainEvent
-        | Unknown of string * DateTime
+        | Unknown of string * DateTime * payload:obj list
 
     let load path =
         let sheet = new EventsSheet(path)
@@ -57,6 +57,6 @@ module EventStore =
                   Count = r.Count |> int
                   Price = r.Value
                   Fee = r.Fee } |> StockBought |> Event
-            | x -> Unknown(r.Event,r.Date)
+            | x -> Unknown(r.Event,r.Date,[r.ID; r.Name; r.Value; r.Fee; r.Count; r.Comment])
         )
         |> List.ofSeq

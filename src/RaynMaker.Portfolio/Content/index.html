@@ -1,52 +1,28 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <title>Portfolio</title>
-    <script src="/Scripts/vue.min.js"></script>
-    <script src="/Scripts/jquery-3.2.1.min.js"></script>
+    <title>RaynMaker - Portfolio</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="/Content/bootstrap.min.css" />
 </head>
 <body>
     <div id="app">
-        Hello from '{{ message }}'
+        <div class="container">
+            <h1>Events</h1>
+            Hello from '{{ message }}'
+        </div>
     </div>
 
+    <script src="/Scripts/jquery-3.2.1.min.js"></script>
+    <script src="/Scripts/vue.min.js"></script>
+    <script src="/Scripts/bootstrap.min.js"></script>
+    <script src="/Scripts/site.js"></script>
     <script>
-    var app = new Vue({
-        el: '#app',
-        data: {
-            message: 'Vue'
-        },
-
-        created: function () {
-            this.fetchData();
-        },
-
-        methods: {
-            fetchData: function () {
-                var data = {
-                    message : 'ping'
-                };
-                var that = this
-                $.ajax({
-                    url: '/api/hello',
-                    data: data,
-                    dataType: 'json',
-                    method: 'GET'
-                }).then(function (response) {
-                    if (response.error) {
-                        console.err("There was an error " + response.error);
-                        that.message = 'Request failed :(';
-                    } else {
-                        that.message = response.message;
-                    }
-                }).catch(function (err) {
-                    console.error(err);
-                    that.message = "Fatal error :(";
-                });
-            }
-        }
-
-    })
+        $(function () {
+            init();
+        });
     </script>
 </body>
 </html> 
