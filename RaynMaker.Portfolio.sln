@@ -1,9 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.10
+VisualStudioVersion = 15.0.26730.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "RaynMaker.Portfolio", "src\RaynMaker.Portfolio\RaynMaker.Portfolio.fsproj", "{343E3582-F5D1-4A99-922A-A8129B4E19FD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DB33407C-7574-4BFC-90F7-30E147C5469B}"
+	ProjectSection(SolutionItems) = preProject
+		docs\Backlog.md = docs\Backlog.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

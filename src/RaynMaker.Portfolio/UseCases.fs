@@ -1,6 +1,6 @@
 ﻿namespace RaynMaker.Portfolio.UseCases
 
-module TransactionsInteractor =
+module PositionsInteractor =
     open RaynMaker.Portfolio.Entities
     open System
 
@@ -12,8 +12,7 @@ module TransactionsInteractor =
     let private strDate (date:DateTime) =
         date.ToString("yyyy-MM-dd")
 
-    let list store lastNth =
-        let nth = lastNth |> Option.map(fun n -> (store |> List.length) - n) |> defaultArg <| 0
+    let listClosed store =
         store
         |> Seq.map (function
             | StockBought e -> { date = e.Date |> strDate; name = "Buy" }
@@ -23,5 +22,4 @@ module TransactionsInteractor =
             | SavingsPlanRateAccounted e -> { date = e.Date |> strDate; name = "Savings plan" }
             | DisbursementAccounted e -> { date = e.Date |> strDate; name = "Disbursement" }
             | InterestReceived e -> { date = e.Date |> strDate; name = "Interests" })
-        |> Seq.skip nth
         |> List.ofSeq

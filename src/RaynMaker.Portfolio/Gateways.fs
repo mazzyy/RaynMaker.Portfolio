@@ -8,6 +8,7 @@ module WebApp =
     open Suave.Filters
     open Newtonsoft.Json
     open Newtonsoft.Json.Serialization
+    open RaynMaker.Portfolio.UseCases
 
     let JSON v =
         let jsonSerializerSettings = new JsonSerializerSettings()
@@ -18,15 +19,13 @@ module WebApp =
         >=> Writers.setMimeType "application/json; charset=utf-8"
 
     module private Handlers =
-        open RaynMaker.Portfolio.UseCases
-        open Suave.Writers
-
-        let getTransactions store (r:HttpRequest) =
-            match r.queryParam "lastNth" with
-            | Choice1Of2 msg -> msg |> int |> Some
-            | Choice2Of2 msg -> None
-            |> TransactionsInteractor.list store
-            |> JSON
+        //let closedPositions store (r:HttpRequest) =
+        //    match r.queryParam "lastNth" with
+        //    | Choice1Of2 msg -> msg |> int |> Some
+        //    | Choice2Of2 msg -> None
+        //    |> TransactionsInteractor.list store
+        //    |> JSON
+        let closedPositions store = store |> PositionsInteractor.listClosed |> JSON
 
     let createApp home store =
         choose [ 
@@ -35,7 +34,8 @@ module WebApp =
                     path "/" >=> Files.file "Content/index.html"
                     pathScan "/Content/%s" (fun f -> Files.file (sprintf "%s/Content/%s" home f))
                     pathScan "/Scripts/%s" (fun f -> Files.file (sprintf "%s/Scripts/%s" home f))
-                    path "/api/transactions" >=> (request (Handlers.getTransactions store)) 
+                    //path "/api/closedPositions" >=> (request (Handlers.closedPositions store)) 
+                    path "/api/closedPositions" >=> Handlers.closedPositions store
                 ]
         ]
 

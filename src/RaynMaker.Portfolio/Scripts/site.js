@@ -2,32 +2,31 @@
     var app = new Vue({
         el: '#app',
         data: {
-            events: []
+            closedPositions: []
         },
 
         created: function () {
-            this.fetchData();
+            this.get('/api/closedPositions', {}, function (that,response) {
+                that.closedPositions = response
+            });
         },
 
         methods: {
-            fetchData: function () {
-                var data = {
-                    lastNth: '25'
-                };
+            get: function (url, data, onDone) {
                 var that = this
                 $.ajax({
-                    url: '/api/transactions',
+                    url: url,
                     data: data,
                     dataType: 'json',
                     method: 'GET'
                 }).then(function (response) {
                     if (response.error) {
-                        console.err("There was an error " + response.error);
+                        console.err("ERROR: " + response.error);
                     } else {
-                        that.events = response;
+                        onDone(that, response);
                     }
                 }).catch(function (err) {
-                    console.error(err);
+                    console.error("EXCEPTION:" + err);
                 });
             }
         }
