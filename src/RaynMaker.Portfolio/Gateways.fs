@@ -105,7 +105,7 @@ module ExcelEventStore =
                 { DividendReceived.Date = r.Date
                   Isin = r.ID
                   Name = r.Name
-                  Price = (r.Value |> decimal) * 1.0M<Currency>
+                  Value = (r.Value |> decimal) * 1.0M<Currency>
                   Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> DividendReceived |> Event
             | EqualsI "DepositAccounted" _ -> 
                 { DepositAccounted.Date = r.Date

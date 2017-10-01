@@ -27,7 +27,7 @@ type DividendReceived = {
     Date : DateTime
     Isin : string
     Name : string
-    Price : decimal<Currency>
+    Value : decimal<Currency>
     Fee : decimal<Currency>
     }
 

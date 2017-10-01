@@ -1,10 +1,11 @@
 ﻿namespace RaynMaker.Portfolio.UseCases
 
 module PositionsInteractor =
+    open RaynMaker.Portfolio
     open RaynMaker.Portfolio.Entities
     open System
 
-    type Position = {
+    type PositionSummary = {
         Open : DateTime 
         Close : DateTime option
         Isin : string
@@ -17,24 +18,86 @@ module PositionsInteractor =
         DividendRoiAnual : float<Percentage>
         }
 
+    type Position = {
+        Open : DateTime 
+        Close : DateTime option
+        Isin : string
+        Name : string
+        Count : int
+        Invested : decimal<Currency> /// total invested profit
+        MarketProfit : decimal<Currency>  /// so far realized profit 
+        DividendProfit : decimal<Currency>  /// so far realized profit 
+        }
+
+    let createPosition date isin name =
+        { 
+            Open = date
+            Close = None
+            Isin = isin
+            Name = name
+            Count = 0
+            Invested = 0.0M<Currency>
+            MarketProfit = 0.0M<Currency>
+            DividendProfit = 0.0M<Currency>
+        }
+
     let listClosed store =
-        //store
-        //|> Seq.map (function
-        //    | StockBought e -> { date = e.Date |> strDate; name = "Buy" }
-        //    | StockSold e -> { date = e.Date |> strDate; name = "Sell" }
-        //    | DividendReceived e -> { date = e.Date |> strDate; name = "Dividend" }
-        //|> List.ofSeq
-        [
+        let getPosition positions isin = 
+            positions |> List.tryFind(fun p -> p.Isin = isin)
+
+        let buyStock positions (evt:StockBought) =
+            let p = evt.Isin |> getPosition positions |? createPosition evt.Date evt.Isin evt.Name
+            let newP =
+                { p with Invested = p.Invested + (decimal evt.Count) * evt.Price + evt.Fee
+                         Count = p.Count + evt.Count }
+            newP::(positions |> List.filter ((<>) p))
+
+        let sellStock positions (evt:StockSold) =
+            // TODO: position must exist
+            let p = evt.Isin |> getPosition positions |? createPosition evt.Date evt.Isin evt.Name
+            let count = p.Count - evt.Count
+            // TODO: count must not be zero
+            let newP =
+                { p with MarketProfit = p.MarketProfit + (decimal evt.Count) * evt.Price - evt.Fee
+                         Count = count
+                         Close = if count = 0 then evt.Date |> Some else None }
+            newP::(positions |> List.filter ((<>) p))
+
+        let receiveDividend positions (evt:DividendReceived) =
+            // TODO: position not found actually is an error
+            let p = evt.Isin |> getPosition positions |? createPosition evt.Date evt.Isin evt.Name
+            let newP =
+                { p with DividendProfit = p.DividendProfit + evt.Value - evt.Fee }
+            newP::(positions |> List.filter ((<>) p))
+
+        let processEvent positions evt =
+            match evt with
+            | StockBought evt -> evt |> buyStock positions
+            | StockSold evt  -> evt |> sellStock positions
+            | DividendReceived evt -> evt |> receiveDividend positions
+            | _ -> positions
+        
+        let summarizePosition position =
+            let close = Option.get position.Close
+            let investedDays = 365.0 / (close -  position.Open).TotalDays
+            let marketRoi = Convert.ToDouble(position.MarketProfit) / Convert.ToDouble(position.Invested) * 100.0<Percentage>
+            let dividendRoi = Convert.ToDouble(position.DividendProfit) / Convert.ToDouble(position.Invested) * 100.0<Percentage>
             { 
-                Open = new DateTime(2016,1,1)
-                Close = new DateTime(2017,6,1) |> Some
-                Isin = "DE1111111111"
-                Name = "Noname AG"
-                MarketProfit = 1200.54M<Currency>
-                DividendProfit = 231.12M<Currency>
-                MarketRoi = 12.00<Percentage>
-                DividendRoi = 3.19<Percentage>
-                MarketRoiAnual = (365.0 / (new DateTime(2017,6,1) -  DateTime(2016,1,1)).TotalDays) * 12.00<Percentage>
-                DividendRoiAnual = (365.0 / (new DateTime(2017,6,1) -  DateTime(2016,1,1)).TotalDays) * 3.19<Percentage>
+                Open = position.Open
+                Close = position.Close
+                Isin = position.Isin
+                Name = position.Name
+                MarketProfit = position.MarketProfit
+                DividendProfit = position.DividendProfit
+                MarketRoi = marketRoi
+                DividendRoi = dividendRoi
+                MarketRoiAnual = investedDays * marketRoi
+                DividendRoiAnual = investedDays * dividendRoi
             }
-        ]
+
+        store
+        |> Seq.fold processEvent []
+        |> Seq.filter(fun p -> p.Close |> Option.isSome)
+        |> Seq.map summarizePosition
+        |> List.ofSeq
+
