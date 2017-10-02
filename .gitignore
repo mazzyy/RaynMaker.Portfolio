@@ -19,3 +19,5 @@
 /packages/bootstrap.*
 /packages/Newtonsoft.Json.*
 /packages/System.ValueTuple.*
+/packages/FsUnit.*
+/packages/NUnit.*
