@@ -24,9 +24,9 @@ module PositionsInteractor =
         Isin : string
         Name : string
         Count : int
-        Invested : decimal<Currency> /// total invested profit
-        MarketProfit : decimal<Currency>  /// so far realized profit 
-        DividendProfit : decimal<Currency>  /// so far realized profit 
+        Invested : decimal<Currency> 
+        Payouts : decimal<Currency>  
+        Dividends : decimal<Currency>  
         }
 
     let createPosition date isin name =
@@ -37,8 +37,8 @@ module PositionsInteractor =
             Name = name
             Count = 0
             Invested = 0.0M<Currency>
-            MarketProfit = 0.0M<Currency>
-            DividendProfit = 0.0M<Currency>
+            Payouts = 0.0M<Currency>
+            Dividends = 0.0M<Currency>
         }
 
     let listClosed store =
@@ -58,7 +58,7 @@ module PositionsInteractor =
             let count = p.Count - evt.Count
             // TODO: count must not be zero
             let newP =
-                { p with MarketProfit = p.MarketProfit + (decimal evt.Count) * evt.Price - evt.Fee
+                { p with Payouts = p.Payouts + (decimal evt.Count) * evt.Price - evt.Fee
                          Count = count
                          Close = if count = 0 then evt.Date |> Some else None }
             newP::(positions |> List.filter ((<>) p))
@@ -67,7 +67,7 @@ module PositionsInteractor =
             // TODO: position not found actually is an error
             let p = evt.Isin |> getPosition positions |? createPosition evt.Date evt.Isin evt.Name
             let newP =
-                { p with DividendProfit = p.DividendProfit + evt.Value - evt.Fee }
+                { p with Dividends = p.Dividends + evt.Value - evt.Fee }
             newP::(positions |> List.filter ((<>) p))
 
         let processEvent positions evt =
@@ -77,18 +77,18 @@ module PositionsInteractor =
             | DividendReceived evt -> evt |> receiveDividend positions
             | _ -> positions
         
-        let summarizePosition position =
-            let close = Option.get position.Close
-            let investedDays = 365.0 / (close -  position.Open).TotalDays
-            let marketRoi = Convert.ToDouble(position.MarketProfit) / Convert.ToDouble(position.Invested) * 100.0<Percentage>
-            let dividendRoi = Convert.ToDouble(position.DividendProfit) / Convert.ToDouble(position.Invested) * 100.0<Percentage>
+        let summarizePosition p =
+            let close = Option.get p.Close
+            let investedDays = 365.0 / (close -  p.Open).TotalDays
+            let marketRoi = Convert.ToDouble(p.Payouts) / Convert.ToDouble(p.Invested) * 100.0<Percentage>
+            let dividendRoi = Convert.ToDouble(p.Dividends) / Convert.ToDouble(p.Invested) * 100.0<Percentage>
             { 
-                Open = position.Open
-                Close = position.Close
-                Isin = position.Isin
-                Name = position.Name
-                MarketProfit = position.MarketProfit
-                DividendProfit = position.DividendProfit
+                Open = p.Open
+                Close = p.Close
+                Isin = p.Isin
+                Name = p.Name
+                MarketProfit = p.Payouts - p.Invested
+                DividendProfit = p.Dividends
                 MarketRoi = marketRoi
                 DividendRoi = dividendRoi
                 MarketRoiAnual = investedDays * marketRoi

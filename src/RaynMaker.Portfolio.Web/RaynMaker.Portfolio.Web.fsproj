@@ -8,7 +8,7 @@
     <ProjectGuid>343e3582-f5d1-4a99-922a-a8129b4e19fd</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>RaynMaker.Portfolio</RootNamespace>
-    <AssemblyName>RaynMaker.Portfolio</AssemblyName>
+    <AssemblyName>RaynMaker.Portfolio.Web</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFSharpCoreVersion>4.4.1.0</TargetFSharpCoreVersion>
