@@ -8,7 +8,7 @@ module WebApp =
     open Suave.Filters
     open Newtonsoft.Json
     open Newtonsoft.Json.Serialization
-    open RaynMaker.Portfolio.UseCases
+    open RaynMaker.Portfolio.Interactors
 
     let JSON v =
         let jsonSerializerSettings = new JsonSerializerSettings()

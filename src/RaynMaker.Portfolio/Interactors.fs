@@ -1,4 +1,4 @@
-﻿namespace RaynMaker.Portfolio.UseCases
+﻿namespace RaynMaker.Portfolio.Interactors
 
 module PositionsInteractor =
     open RaynMaker.Portfolio
