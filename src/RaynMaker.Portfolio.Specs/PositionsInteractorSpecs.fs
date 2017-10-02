@@ -21,11 +21,12 @@ module internal Broker =
           Fee = fee
         } |> StockBought
 
+
 [<TestFixture>]
 module ``Given buy and sell events`` =
     
     [<Test>]
-    let ``<When> only buy events given <Then> position is open and full invest is sumed up`` =
+    let ``<When> only buy events given <Then> position is open and full invest is sumed up``() =
         let positions =
             [
                 at 2016 10 10 |> buy "Joe Inc" 10 10.0
@@ -38,7 +39,7 @@ module ``Given buy and sell events`` =
         positions.[0].Open |> should equal (at 2016 10 10)
         positions.[0].Close |> should equal None
         positions.[0].Count |> should equal 15
-        positions.[0].Invested |> should equal (10.0M * 10.0M<Currency> + fee)
+        positions.[0].Invested |> should equal ((10.0M * 10.0M<Currency> + fee) + (5.0M * 15.0M<Currency> + fee))
         positions.[0].Payouts |> should equal 0.0M<Currency>
         positions.[0].Dividends |> should equal 0.0M<Currency>
 

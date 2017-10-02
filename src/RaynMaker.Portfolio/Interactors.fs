@@ -78,9 +78,7 @@ module PositionsInteractor =
             | _ -> positions
 
         store
-        |> Seq.fold processEvent []
-        |> Seq.filter(fun p -> p.Close |> Option.isSome)
-        |> List.ofSeq
+        |> List.fold processEvent []
 
     let sumarizeClosedPositions positions =
         let summarizePosition p =
