@@ -34,7 +34,8 @@ module WebApp =
 
         let closedPositions store = 
             store 
-            |> PositionsInteractor.listClosed
+            |> PositionsInteractor.getPositions
+            |> PositionsInteractor.sumarizeClosedPositions
             |> List.map(fun p ->
                 dict [
                     "name" => p.Name

@@ -41,7 +41,7 @@ module PositionsInteractor =
             Dividends = 0.0M<Currency>
         }
 
-    let listClosed store =
+    let getPositions store =
         let getPosition positions isin = 
             positions |> List.tryFind(fun p -> p.Isin = isin)
 
@@ -76,7 +76,13 @@ module PositionsInteractor =
             | StockSold evt  -> evt |> sellStock positions
             | DividendReceived evt -> evt |> receiveDividend positions
             | _ -> positions
-        
+
+        store
+        |> Seq.fold processEvent []
+        |> Seq.filter(fun p -> p.Close |> Option.isSome)
+        |> List.ofSeq
+
+    let sumarizeClosedPositions positions =
         let summarizePosition p =
             let close = Option.get p.Close
             let investedDays = 365.0 / (close -  p.Open).TotalDays
@@ -95,8 +101,7 @@ module PositionsInteractor =
                 DividendRoiAnual = investedDays * dividendRoi
             }
 
-        store
-        |> Seq.fold processEvent []
+        positions
         |> Seq.filter(fun p -> p.Close |> Option.isSome)
         |> Seq.map summarizePosition
         |> List.ofSeq
