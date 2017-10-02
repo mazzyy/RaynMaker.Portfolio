@@ -16,7 +16,7 @@ let main argv =
     let storeLocation = 
         match argv with
         | [|path|] -> path
-        | x -> Path.GetFullPath( Path.Combine(home, "..", "..", "..", "..", "etc", "Portfolio.Events.xlsx") )
+        | x -> Path.GetFullPath( Path.Combine(home, "..", "..", "etc", "Portfolio.Events.xlsx") )
 
     let store = ExcelEventStore.load storeLocation
 
