@@ -4,6 +4,7 @@ module Httpd =
     open Suave
     open System.Net
     open System.Threading
+    open Suave.Logging
     
     let start app =
         let port = 2525us

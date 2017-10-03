@@ -1,4 +1,6 @@
 ﻿function init() {
+    $.ajaxSetup({ cache: false });
+
     var app = new Vue({
         el: '#app',
         data: {

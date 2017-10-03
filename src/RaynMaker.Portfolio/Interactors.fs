@@ -12,10 +12,10 @@ module PositionsInteractor =
         Name : string
         MarketProfit : decimal<Currency>
         DividendProfit : decimal<Currency>
-        MarketRoi : float<Percentage>
-        DividendRoi : float<Percentage>
-        MarketRoiAnual : float<Percentage>
-        DividendRoiAnual : float<Percentage>
+        MarketRoi : decimal<Percentage>
+        DividendRoi : decimal<Percentage>
+        MarketRoiAnual : decimal<Percentage>
+        DividendRoiAnual : decimal<Percentage>
         }
 
     type Position = {
@@ -83,9 +83,9 @@ module PositionsInteractor =
     let sumarizeClosedPositions positions =
         let summarizePosition p =
             let close = Option.get p.Close
-            let investedDays = 365.0 / (close -  p.Open).TotalDays
-            let marketRoi = Convert.ToDouble(p.Payouts) / Convert.ToDouble(p.Invested) * 100.0<Percentage>
-            let dividendRoi = Convert.ToDouble(p.Dividends) / Convert.ToDouble(p.Invested) * 100.0<Percentage>
+            let investedYears = (close -  p.Open).TotalDays / 365.0 |> decimal
+            let marketRoi = (p.Payouts - p.Invested) / p.Invested * 100.0M<Percentage>
+            let dividendRoi = p.Dividends / p.Invested * 100.0M<Percentage>
             { 
                 Open = p.Open
                 Close = p.Close
@@ -95,12 +95,13 @@ module PositionsInteractor =
                 DividendProfit = p.Dividends
                 MarketRoi = marketRoi
                 DividendRoi = dividendRoi
-                MarketRoiAnual = investedDays * marketRoi
-                DividendRoiAnual = investedDays * dividendRoi
+                MarketRoiAnual = marketRoi / investedYears 
+                DividendRoiAnual = dividendRoi / investedYears
             }
 
         positions
         |> Seq.filter(fun p -> p.Close |> Option.isSome)
         |> Seq.map summarizePosition
+        |> Seq.sortByDescending(fun p -> p.MarketRoiAnual + p.DividendRoiAnual)
         |> List.ofSeq
 

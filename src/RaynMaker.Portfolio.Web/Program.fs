@@ -10,13 +10,14 @@ open RaynMaker.Portfolio.Gateways
 [<EntryPoint>]
 let main argv = 
     let home = Path.GetDirectoryName( Assembly.GetExecutingAssembly().Location )
+    printfn "Home: %s" home
 
     printfn "Loading events ..."
 
     let storeLocation = 
         match argv with
         | [|path|] -> path
-        | x -> Path.GetFullPath( Path.Combine(home, "..", "..", "etc", "Portfolio.Events.xlsx") )
+        | x -> Path.GetFullPath( Path.Combine(home, "..", "..", "etc", "Events.xlsx") )
 
     let store = ExcelEventStore.load storeLocation
 

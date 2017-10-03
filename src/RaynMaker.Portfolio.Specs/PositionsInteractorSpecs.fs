@@ -21,12 +21,21 @@ module internal Broker =
           Fee = fee
         } |> StockBought
 
+    let sell company count price date =
+        { StockSold.Date = date 
+          Name = company
+          Isin = sprintf "US%i" (company.GetHashCode())
+          Count = count 
+          Price = 1.0M<Currency> * (price |> decimal)
+          Fee = fee
+        } |> StockSold
+
 
 [<TestFixture>]
-module ``Given buy and sell events`` =
+module ``Given some stock transactions`` =
     
     [<Test>]
-    let ``<When> only buy events given <Then> position is open and full invest is sumed up``() =
+    let ``<When> stock only bought <Then> position is open and full invest is sumed up``() =
         let positions =
             [
                 at 2016 10 10 |> buy "Joe Inc" 10 10.0
@@ -42,5 +51,27 @@ module ``Given buy and sell events`` =
         positions.[0].Invested |> should equal ((10.0M * 10.0M<Currency> + fee) + (5.0M * 15.0M<Currency> + fee))
         positions.[0].Payouts |> should equal 0.0M<Currency>
         positions.[0].Dividends |> should equal 0.0M<Currency>
+
+    [<Test>]
+    let ``<When> an open position is closed <Then> position summary shows profits and ROIs``() =
+        let summary =
+            [
+                at 2014 01 01 |> buy "Joe Inc" 10 10.0
+                at 2015 01 01 |> buy "Joe Inc" 5 15.0
+                at 2016 01 01 |> sell "Joe Inc" 15 20.0
+            ]
+            |> PositionsInteractor.getPositions
+            |> PositionsInteractor.sumarizeClosedPositions
+
+        summary |> should haveLength 1
+
+        let investedMoney = 175.0M<Currency> + (2.0M * fee)
+        let profit = 300.0M<Currency> - fee - investedMoney
+        let roi = profit / investedMoney * 100.0M<Percentage>
+
+        summary.[0].Close |> should equal (at 2016 01 01 |> Some)
+        summary.[0].MarketProfit |> should equal profit
+        summary.[0].MarketRoi |> should equal roi
+        summary.[0].MarketRoiAnual |> should equal (roi / 2.0M)
 
 

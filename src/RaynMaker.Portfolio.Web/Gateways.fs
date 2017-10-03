@@ -9,6 +9,7 @@ module WebApp =
     open Newtonsoft.Json
     open Newtonsoft.Json.Serialization
     open RaynMaker.Portfolio.Interactors
+    open Suave.Redirection
 
     let JSON v =
         let jsonSerializerSettings = new JsonSerializerSettings()
@@ -30,7 +31,7 @@ module WebApp =
             | x when x > 90.0 -> sprintf "%.2f months" (span.TotalDays / 30.0)
             | x -> sprintf "%.0f days" span.TotalDays
         let formatMoney = sprintf "%.2f"
-        let formatPercentage = sprintf "%.2f"
+        let formatPercentage = sprintf "%.2f%%"
 
         let closedPositions store = 
             store 
@@ -56,10 +57,12 @@ module WebApp =
             |> JSON
 
     let createApp home store =
+        let log = request (fun r -> printfn "%s" r.path; succeed)
+
         choose [ 
-            GET >=> choose
+            GET >=> log >=> choose
                 [
-                    path "/" >=> Files.file "Content/index.html"
+                    path "/" >=> redirect "/Content/index.html"
                     pathScan "/Content/%s" (fun f -> Files.file (sprintf "%s/Content/%s" home f))
                     pathScan "/Scripts/%s" (fun f -> Files.file (sprintf "%s/Scripts/%s" home f))
                     path "/api/closedPositions" >=> Handlers.closedPositions store
@@ -73,7 +76,7 @@ module ExcelEventStore =
     open RaynMaker.Portfolio.Entities
 
     [<Literal>] 
-    let private template = @"../../etc/Portfolio.Events.xlsx"
+    let private template = @"../../etc/Events.xlsx"
 
     type private EventsSheet = ExcelFile<template>
 
@@ -87,39 +90,42 @@ module ExcelEventStore =
         sheet.Data
         |> Seq.filter(fun r -> String.IsNullOrEmpty(r.Event) |> not)
         |> Seq.map(fun r -> 
-            match r.Event with
-            | EqualsI "StockBought" _ -> 
-                { StockBought.Date = r.Date
-                  Isin = r.ID
-                  Name = r.Name
-                  Count = r.Count |> int
-                  Price = (r.Value |> decimal) * 1.0M<Currency>
-                  Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> StockBought |> Event
-            | EqualsI "StockSold" _ -> 
-                { StockSold.Date = r.Date
-                  Isin = r.ID
-                  Name = r.Name
-                  Count = r.Count |> int
-                  Price = (r.Value |> decimal) * 1.0M<Currency>
-                  Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> StockSold |> Event
-            | EqualsI "DividendReceived" _ -> 
-                { DividendReceived.Date = r.Date
-                  Isin = r.ID
-                  Name = r.Name
-                  Value = (r.Value |> decimal) * 1.0M<Currency>
-                  Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> DividendReceived |> Event
-            | EqualsI "DepositAccounted" _ -> 
-                { DepositAccounted.Date = r.Date
-                  Value = (r.Value |> decimal) * 1.0M<Currency>} |> DepositAccounted |> Event
-            | EqualsI "SavingsPlanRateAccounted" _ -> 
-                { SavingsPlanRateAccounted.Date = r.Date
-                  Value = (r.Value |> decimal) * 1.0M<Currency>} |> SavingsPlanRateAccounted |> Event
-            | EqualsI "DisbursementAccounted" _ -> 
-                { DisbursementAccounted.Date = r.Date
-                  Value = (r.Value |> decimal) * 1.0M<Currency>} |> DisbursementAccounted |> Event
-            | EqualsI "InterestReceived" _ -> 
-                { InterestReceived.Date = r.Date
-                  Value = (r.Value |> decimal) * 1.0M<Currency>} |> InterestReceived |> Event
-            | x -> Unknown(r.Event,r.Date,[r.ID; r.Name; r.Value; r.Fee; r.Count; r.Comment])
+            try
+                match r.Event with
+                | EqualsI "StockBought" _ -> 
+                    { StockBought.Date = r.Date
+                      Isin = r.ID
+                      Name = r.Name
+                      Count = r.Count |> int
+                      Price = (r.Value |> decimal) * 1.0M<Currency>
+                      Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> StockBought |> Event
+                | EqualsI "StockSold" _ -> 
+                    { StockSold.Date = r.Date
+                      Isin = r.ID
+                      Name = r.Name
+                      Count = r.Count |> int
+                      Price = (r.Value |> decimal) * 1.0M<Currency>
+                      Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> StockSold |> Event
+                | EqualsI "DividendReceived" _ -> 
+                    { DividendReceived.Date = r.Date
+                      Isin = r.ID
+                      Name = r.Name
+                      Value = (r.Value |> decimal) * 1.0M<Currency>
+                      Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> DividendReceived |> Event
+                | EqualsI "DepositAccounted" _ -> 
+                    { DepositAccounted.Date = r.Date
+                      Value = (r.Value |> decimal) * 1.0M<Currency>} |> DepositAccounted |> Event
+                | EqualsI "SavingsPlanRateAccounted" _ -> 
+                    { SavingsPlanRateAccounted.Date = r.Date
+                      Value = (r.Value |> decimal) * 1.0M<Currency>} |> SavingsPlanRateAccounted |> Event
+                | EqualsI "DisbursementAccounted" _ -> 
+                    { DisbursementAccounted.Date = r.Date
+                      Value = (r.Value |> decimal) * 1.0M<Currency>} |> DisbursementAccounted |> Event
+                | EqualsI "InterestReceived" _ -> 
+                    { InterestReceived.Date = r.Date
+                      Value = (r.Value |> decimal) * 1.0M<Currency>} |> InterestReceived |> Event
+                | x -> Unknown(r.Event,r.Date,[r.ID; r.Name; r.Value; r.Fee; r.Count; r.Comment])
+            with 
+                | ex -> failwithf "Failed reading event store at %s with %A" r.Event ex 
         )
         |> List.ofSeq
