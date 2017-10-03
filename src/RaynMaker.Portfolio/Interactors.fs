@@ -54,13 +54,22 @@ module PositionsInteractor =
 
         let sellStock positions (evt:StockSold) =
             // TODO: position must exist
-            let p = evt.Isin |> getPosition positions |? createPosition evt.Date evt.Isin evt.Name
+            let p = evt.Isin |> getPosition positions |> Option.get
             let count = p.Count - evt.Count
             // TODO: count must not be zero
             let newP =
                 { p with Payouts = p.Payouts + (decimal evt.Count) * evt.Price - evt.Fee
                          Count = count
                          Close = if count = 0 then evt.Date |> Some else None }
+            newP::(positions |> List.filter ((<>) p))
+
+        let closePosition positions (evt:PositionClosed) =
+            // TODO: position must exist
+            let p = evt.Isin |> getPosition positions |> Option.get
+            // TODO: count must not be zero
+            let newP =
+                { p with Payouts = p.Payouts + (decimal p.Count) * evt.Price - evt.Fee
+                         Count = 0 }
             newP::(positions |> List.filter ((<>) p))
 
         let receiveDividend positions (evt:DividendReceived) =
@@ -74,16 +83,16 @@ module PositionsInteractor =
             match evt with
             | StockBought evt -> evt |> buyStock positions
             | StockSold evt  -> evt |> sellStock positions
+            | PositionClosed evt  -> evt |> closePosition positions
             | DividendReceived evt -> evt |> receiveDividend positions
             | _ -> positions
 
         store
         |> List.fold processEvent []
 
-    let summarizeClosedPositions positions =
+    let summarizePositions getInvestedDays positions =
         let summarizePosition p =
-            let close = Option.get p.Close
-            let investedYears = (close -  p.Open).TotalDays / 365.0 |> decimal
+            let investedYears = (p |> getInvestedDays) / 365.0 |> decimal
             let marketRoi = (p.Payouts - p.Invested) / p.Invested * 100.0M<Percentage>
             let dividendRoi = p.Dividends / p.Invested * 100.0M<Percentage>
             { 
@@ -100,33 +109,17 @@ module PositionsInteractor =
             }
 
         positions
-        |> Seq.filter(fun p -> p.Close |> Option.isSome)
         |> Seq.map summarizePosition
         |> Seq.sortByDescending(fun p -> p.MarketRoiAnual + p.DividendRoiAnual)
         |> List.ofSeq
+
+    let summarizeClosedPositions positions =
+        positions
+        |> Seq.filter(fun p -> p.Close |> Option.isSome)
+        |> summarizePositions (fun p -> ((p.Close |> Option.get) - p.Open).TotalDays)
 
     let summarizeOpenPositions positions =
-        let summarizePosition p =
-            let close = DateTime.Now
-            let investedYears = (close -  p.Open).TotalDays / 365.0 |> decimal
-            let marketRoi = (p.Payouts - p.Invested) / p.Invested * 100.0M<Percentage>
-            let dividendRoi = p.Dividends / p.Invested * 100.0M<Percentage>
-            { 
-                Open = p.Open
-                Close = close |> Some
-                Isin = p.Isin
-                Name = p.Name
-                MarketProfit = p.Payouts - p.Invested
-                DividendProfit = p.Dividends
-                MarketRoi = marketRoi
-                DividendRoi = dividendRoi
-                MarketRoiAnual = marketRoi / investedYears 
-                DividendRoiAnual = dividendRoi / investedYears
-            }
-
         positions
         |> Seq.filter(fun p -> p.Close |> Option.isNone)
-        |> Seq.map summarizePosition
-        |> Seq.sortByDescending(fun p -> p.MarketRoiAnual + p.DividendRoiAnual)
-        |> List.ofSeq
+        |> summarizePositions (fun p -> (DateTime.Today - p.Open).TotalDays)
 

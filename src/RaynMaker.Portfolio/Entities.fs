@@ -36,11 +36,6 @@ type DepositAccounted = {
     Value : decimal<Currency>
     }
 
-type SavingsPlanRateAccounted = {
-    Date : DateTime
-    Value : decimal<Currency>
-    }
-
 type DisbursementAccounted = {
     Date : DateTime
     Value : decimal<Currency>
@@ -51,14 +46,22 @@ type InterestReceived = {
     Value : decimal<Currency>
     }
 
+/// Simulates that position is closed to get current performance
+type PositionClosed = {
+    Isin : string
+    Name : string
+    Price : decimal<Currency>
+    Fee : decimal<Currency>
+    }
+
 type DomainEvent = 
     | StockBought of StockBought
     | StockSold of StockSold
     | DividendReceived of DividendReceived
     | DepositAccounted of DepositAccounted
-    | SavingsPlanRateAccounted of SavingsPlanRateAccounted
     | DisbursementAccounted of DisbursementAccounted
     | InterestReceived of InterestReceived
+    | PositionClosed of PositionClosed
 
 
 

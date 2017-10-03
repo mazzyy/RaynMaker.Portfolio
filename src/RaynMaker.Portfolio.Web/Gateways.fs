@@ -116,15 +116,17 @@ module ExcelEventStore =
                 | EqualsI "DepositAccounted" _ -> 
                     { DepositAccounted.Date = r.Date
                       Value = (r.Value |> decimal) * 1.0M<Currency>} |> DepositAccounted |> Event
-                | EqualsI "SavingsPlanRateAccounted" _ -> 
-                    { SavingsPlanRateAccounted.Date = r.Date
-                      Value = (r.Value |> decimal) * 1.0M<Currency>} |> SavingsPlanRateAccounted |> Event
                 | EqualsI "DisbursementAccounted" _ -> 
                     { DisbursementAccounted.Date = r.Date
                       Value = (r.Value |> decimal) * 1.0M<Currency>} |> DisbursementAccounted |> Event
                 | EqualsI "InterestReceived" _ -> 
                     { InterestReceived.Date = r.Date
                       Value = (r.Value |> decimal) * 1.0M<Currency>} |> InterestReceived |> Event
+                | EqualsI "PositionClosed" _ -> 
+                    { PositionClosed.Isin = r.ID
+                      Name = r.Name
+                      Price = (r.Value |> decimal) * 1.0M<Currency>
+                      Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> PositionClosed |> Event
                 | x -> Unknown(r.Event,r.Date,[r.ID; r.Name; r.Value; r.Fee; r.Count; r.Comment])
             with 
                 | ex -> failwithf "Failed reading event store at %s with %A" r.Event ex 

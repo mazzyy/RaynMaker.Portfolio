@@ -1,7 +1,7 @@
 
+- over all performance
 
-- reports
-  - all open positions with current price and current value
-  - total profit and performance
+- vue templates for report tables
+- test and impl event invariants (e.g. cannot sell more than i have)
 
 - refactor to EventSourcing and CQRS with agents
