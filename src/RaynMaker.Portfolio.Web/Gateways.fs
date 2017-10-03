@@ -22,6 +22,7 @@ module WebApp =
     module private Handlers =
         open System
         open RaynMaker.Portfolio
+        open RaynMaker.Portfolio.Interactors.PositionsInteractor
 
         let (=>) k v = k,v |> box
         let formatDate (date:DateTime) = date.ToString("yyyy-MM-dd")
@@ -32,29 +33,28 @@ module WebApp =
             | x -> sprintf "%.0f days" span.TotalDays
         let formatMoney = sprintf "%.2f"
         let formatPercentage = sprintf "%.2f%%"
-
-        let closedPositions store = 
-            store 
-            |> PositionsInteractor.getPositions
-            |> PositionsInteractor.sumarizeClosedPositions
-            |> List.map(fun p ->
-                dict [
-                    "name" => p.Name
-                    "isin" => p.Isin
-                    "open" => (p.Open |> formatDate)
-                    "close" => (p.Close |> Option.map formatDate |? "-")
-                    "duration" => (p.Close |> Option.map(fun c -> (c - p.Open) |> formatTimespan) |? "-")
-                    "marketProfit" => (p.MarketProfit |> formatMoney)
-                    "dividendProfit" => (p.DividendProfit |> formatMoney)
-                    "totalProfit" => (p.MarketProfit + p.DividendProfit |> formatMoney)
-                    "marketRoi" => (p.MarketRoi |> formatPercentage)
-                    "dividendRoi" => (p.DividendRoi |> formatPercentage)
-                    "totalRoi" => (p.MarketRoi + p.DividendRoi |> formatPercentage)
-                    "marketRoiAnual" => (p.MarketRoiAnual |> formatPercentage)
-                    "dividendRoiAnual" => (p.DividendRoiAnual |> formatPercentage)
-                    "totalRoiAnual" => (p.MarketRoiAnual + p.DividendRoiAnual |> formatPercentage)
-                ])
-            |> JSON
+        
+        let createSummaryViewModel (p:PositionSummary) =
+            dict [
+                "name" => p.Name
+                "isin" => p.Isin
+                "open" => (p.Open |> formatDate)
+                "close" => (p.Close |> Option.map formatDate |? "-")
+                "duration" => ((p.Close |? DateTime.Today) - p.Open |> formatTimespan)
+                "marketProfit" => (p.MarketProfit |> formatMoney)
+                "dividendProfit" => (p.DividendProfit |> formatMoney)
+                "totalProfit" => (p.MarketProfit + p.DividendProfit |> formatMoney)
+                "marketRoi" => (p.MarketRoi |> formatPercentage)
+                "dividendRoi" => (p.DividendRoi |> formatPercentage)
+                "totalRoi" => (p.MarketRoi + p.DividendRoi |> formatPercentage)
+                "marketRoiAnual" => (p.MarketRoiAnual |> formatPercentage)
+                "dividendRoiAnual" => (p.DividendRoiAnual |> formatPercentage)
+                "totalRoiAnual" => (p.MarketRoiAnual + p.DividendRoiAnual |> formatPercentage)
+            ]
+        
+        let summarizePositions f = PositionsInteractor.getPositions >> f >> List.map createSummaryViewModel >> JSON
+        let closedPositions = summarizePositions PositionsInteractor.summarizeClosedPositions
+        let openPositions = summarizePositions PositionsInteractor.summarizeOpenPositions
 
     let createApp home store =
         let log = request (fun r -> printfn "%s" r.path; succeed)
@@ -66,6 +66,7 @@ module WebApp =
                     pathScan "/Content/%s" (fun f -> Files.file (sprintf "%s/Content/%s" home f))
                     pathScan "/Scripts/%s" (fun f -> Files.file (sprintf "%s/Scripts/%s" home f))
                     path "/api/closedPositions" >=> Handlers.closedPositions store
+                    path "/api/openPositions" >=> Handlers.openPositions store
                 ]
         ]
 

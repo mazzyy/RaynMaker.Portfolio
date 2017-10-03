@@ -80,7 +80,7 @@ module PositionsInteractor =
         store
         |> List.fold processEvent []
 
-    let sumarizeClosedPositions positions =
+    let summarizeClosedPositions positions =
         let summarizePosition p =
             let close = Option.get p.Close
             let investedYears = (close -  p.Open).TotalDays / 365.0 |> decimal
@@ -101,6 +101,31 @@ module PositionsInteractor =
 
         positions
         |> Seq.filter(fun p -> p.Close |> Option.isSome)
+        |> Seq.map summarizePosition
+        |> Seq.sortByDescending(fun p -> p.MarketRoiAnual + p.DividendRoiAnual)
+        |> List.ofSeq
+
+    let summarizeOpenPositions positions =
+        let summarizePosition p =
+            let close = DateTime.Now
+            let investedYears = (close -  p.Open).TotalDays / 365.0 |> decimal
+            let marketRoi = (p.Payouts - p.Invested) / p.Invested * 100.0M<Percentage>
+            let dividendRoi = p.Dividends / p.Invested * 100.0M<Percentage>
+            { 
+                Open = p.Open
+                Close = close |> Some
+                Isin = p.Isin
+                Name = p.Name
+                MarketProfit = p.Payouts - p.Invested
+                DividendProfit = p.Dividends
+                MarketRoi = marketRoi
+                DividendRoi = dividendRoi
+                MarketRoiAnual = marketRoi / investedYears 
+                DividendRoiAnual = dividendRoi / investedYears
+            }
+
+        positions
+        |> Seq.filter(fun p -> p.Close |> Option.isNone)
         |> Seq.map summarizePosition
         |> Seq.sortByDescending(fun p -> p.MarketRoiAnual + p.DividendRoiAnual)
         |> List.ofSeq

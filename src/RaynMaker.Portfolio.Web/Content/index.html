@@ -56,6 +56,53 @@
                     </tr>
                 </tbody>
             </table>
+
+            <h1>Open positions</h1>
+
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th colspan="5"></th>
+                        <th colspan="3" style="text-align:center">Profit</th>
+                        <th colspan="3" style="text-align:center">ROI</th>
+                        <th colspan="3" style="text-align:center">Anual</th>
+                    </tr>
+                    <tr>
+                        <th>Name</th>
+                        <th>Isin</th>
+                        <th>Open</th>
+                        <th>Close</th>
+                        <th>Duration</th>
+                        <th>Market</th>
+                        <th>Dividend</th>
+                        <th>Total</th>
+                        <th>Market</th>
+                        <th>Dividend</th>
+                        <th>Total</th>
+                        <th>Market</th>
+                        <th>Dividend</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="item in openPositions">
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.isin }}</td>
+                        <td>{{ item.open }}</td>
+                        <td>{{ item.close }}</td>
+                        <td>{{ item.duration }}</td>
+                        <td>{{ item.marketProfit }}</td>
+                        <td>{{ item.dividendProfit }}</td>
+                        <td>{{ item.totalProfit }}</td>
+                        <td>{{ item.marketRoi }}</td>
+                        <td>{{ item.dividendRoi }}</td>
+                        <td>{{ item.totalRoi }}</td>
+                        <td>{{ item.marketRoiAnual }}</td>
+                        <td>{{ item.dividendRoiAnual }}</td>
+                        <td>{{ item.totalRoiAnual }}</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
