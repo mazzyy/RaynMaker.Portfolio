@@ -52,9 +52,7 @@ module WebApp =
                 "totalRoiAnual" => (p.MarketRoiAnual + p.DividendRoiAnual |> formatPercentage)
             ]
         
-        let summarizePositions f = PositionsInteractor.getPositions >> f >> List.map createSummaryViewModel >> JSON
-        let closedPositions = summarizePositions PositionsInteractor.summarizeClosedPositions
-        let openPositions = summarizePositions PositionsInteractor.summarizeOpenPositions
+        let positions = PositionsInteractor.getPositions >> PositionsInteractor.summarizePositions >> List.map createSummaryViewModel >> JSON
 
     let createApp home store =
         let log = request (fun r -> printfn "%s" r.path; succeed)
@@ -65,8 +63,7 @@ module WebApp =
                     path "/" >=> redirect "/Content/index.html"
                     pathScan "/Content/%s" (fun f -> Files.file (sprintf "%s/Content/%s" home f))
                     pathScan "/Scripts/%s" (fun f -> Files.file (sprintf "%s/Scripts/%s" home f))
-                    path "/api/closedPositions" >=> Handlers.closedPositions store
-                    path "/api/openPositions" >=> Handlers.openPositions store
+                    path "/api/positions" >=> Handlers.positions store
                 ]
         ]
 

@@ -4,16 +4,12 @@
     var app = new Vue({
         el: '#app',
         data: {
-            closedPositions: [],
-            openPositions: []
+            positions: [],
         },
 
         created: function () {
-            this.get('/api/closedPositions', {}, function (that, response) {
-                that.closedPositions = response
-            });
-            this.get('/api/openPositions', {}, function (that, response) {
-                that.openPositions = response
+            this.get('/api/positions', {}, function (that, response) {
+                that.positions = response
             });
         },
 
