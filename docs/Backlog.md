@@ -1,6 +1,4 @@
 
-- vue: sortable tables?
-
 - over all performance
 
 - vue templates for report tables

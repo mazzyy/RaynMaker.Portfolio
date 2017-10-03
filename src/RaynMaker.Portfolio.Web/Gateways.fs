@@ -31,8 +31,6 @@ module WebApp =
             | x when x > 365.0 -> sprintf "%.2f years" (span.TotalDays / 365.0)
             | x when x > 90.0 -> sprintf "%.2f months" (span.TotalDays / 30.0)
             | x -> sprintf "%.0f days" span.TotalDays
-        let formatMoney = sprintf "%.2f"
-        let formatPercentage = sprintf "%.2f%%"
         
         let createSummaryViewModel (p:PositionSummary) =
             dict [
@@ -41,15 +39,15 @@ module WebApp =
                 "open" => (p.Open |> formatDate)
                 "close" => (p.Close |> Option.map formatDate |? "-")
                 "duration" => ((p.Close |? DateTime.Today) - p.Open |> formatTimespan)
-                "marketProfit" => (p.MarketProfit |> formatMoney)
-                "dividendProfit" => (p.DividendProfit |> formatMoney)
-                "totalProfit" => (p.MarketProfit + p.DividendProfit |> formatMoney)
-                "marketRoi" => (p.MarketRoi |> formatPercentage)
-                "dividendRoi" => (p.DividendRoi |> formatPercentage)
-                "totalRoi" => (p.MarketRoi + p.DividendRoi |> formatPercentage)
-                "marketRoiAnual" => (p.MarketRoiAnual |> formatPercentage)
-                "dividendRoiAnual" => (p.DividendRoiAnual |> formatPercentage)
-                "totalRoiAnual" => (p.MarketRoiAnual + p.DividendRoiAnual |> formatPercentage)
+                "marketProfit" => p.MarketProfit
+                "dividendProfit" => p.DividendProfit
+                "totalProfit" => (p.MarketProfit + p.DividendProfit)
+                "marketRoi" => p.MarketRoi
+                "dividendRoi" => p.DividendRoi
+                "totalRoi" => (p.MarketRoi + p.DividendRoi)
+                "marketRoiAnual" => p.MarketRoiAnual
+                "dividendRoiAnual" => p.DividendRoiAnual
+                "totalRoiAnual" => (p.MarketRoiAnual + p.DividendRoiAnual)
                 "isClosed" => (p.Close |> Option.isSome)
             ]
         
