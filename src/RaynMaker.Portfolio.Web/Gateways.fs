@@ -50,6 +50,7 @@ module WebApp =
                 "marketRoiAnual" => (p.MarketRoiAnual |> formatPercentage)
                 "dividendRoiAnual" => (p.DividendRoiAnual |> formatPercentage)
                 "totalRoiAnual" => (p.MarketRoiAnual + p.DividendRoiAnual |> formatPercentage)
+                "isClosed" => (p.Close |> Option.isSome)
             ]
         
         let positions = PositionsInteractor.getPositions >> PositionsInteractor.summarizePositions >> List.map createSummaryViewModel >> JSON
