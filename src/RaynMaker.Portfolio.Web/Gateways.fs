@@ -52,7 +52,17 @@ module WebApp =
             ]
         
         let positions = PositionsInteractor.getPositions >> PositionsInteractor.summarizePositions >> List.map createSummaryViewModel >> JSON
-
+        let performance store =
+            let positions =  store |> (PositionsInteractor.getPositions >> PositionsInteractor.summarizePositions)
+            let avgProfit = 
+                positions
+                |> Seq.filter(fun p -> p.Close |> Option.isSome)
+                |> Seq.averageBy(fun p -> p.MarketRoiAnual + p.DividendRoiAnual)
+            dict [
+                "AvgPast" => avgProfit
+            ]
+            |> JSON
+            
     let createApp home store =
         let log = request (fun r -> printfn "%s" r.path; succeed)
 
@@ -63,6 +73,7 @@ module WebApp =
                     pathScan "/Content/%s" (fun f -> Files.file (sprintf "%s/Content/%s" home f))
                     pathScan "/Scripts/%s" (fun f -> Files.file (sprintf "%s/Scripts/%s" home f))
                     path "/api/positions" >=> Handlers.positions store
+                    path "/api/performance" >=> Handlers.performance store
                 ]
         ]
 

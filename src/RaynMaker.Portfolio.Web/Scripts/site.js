@@ -1,4 +1,10 @@
-﻿function init() {
+﻿function formatValue(value) {
+    if (typeof value === 'string' || value instanceof String) return value
+    let val = (value / 1).toFixed(2).replace('.', ',')
+    return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+}
+
+function init() {
     $.ajaxSetup({ cache: false });
 
     Vue.component('grid', {
@@ -43,11 +49,7 @@
             }
         },
         filters: {
-            formatValue: function (value) {
-                if (typeof value === 'string' || value instanceof String) return value
-                let val = (value / 1).toFixed(2).replace('.', ',')
-                return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
-            }
+            formatValue: formatValue
         },
         methods: {
             sortBy: function (key) {
@@ -66,11 +68,18 @@
                 'marketRoi', 'dividendRoi', 'totalRoi', 'marketRoiAnual', 'dividendRoiAnual', 'totalRoiAnual'],
             headers: ['Name', 'Isin', 'Open', 'Close', 'Duration', 'Market', 'Dividend', 'Total',
                 'Market', 'Dividend', 'Total', 'Market', 'Dividend', 'Total'],
+            avgPast: null
         },
         created: function () {
             this.get('/api/positions', {}, function (that, response) {
                 that.positions = response
             });
+            this.get('/api/performance', {}, function (that, response) {
+                that.avgPast = response.avgPast
+            });
+        },
+        filters: {
+            formatValue: formatValue
         },
         methods: {
             get: function (url, data, onDone) {
