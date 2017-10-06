@@ -68,14 +68,14 @@ function init() {
                 'marketRoi', 'dividendRoi', 'totalRoi', 'marketRoiAnual', 'dividendRoiAnual', 'totalRoiAnual'],
             headers: ['Name', 'Isin', 'Open', 'Close', 'Duration', 'Market', 'Dividend', 'Total',
                 'Market', 'Dividend', 'Total', 'Market', 'Dividend', 'Total'],
-            avgPast: null
+            performance: null
         },
         created: function () {
             this.get('/api/positions', {}, function (that, response) {
                 that.positions = response
             });
             this.get('/api/performance', {}, function (that, response) {
-                that.avgPast = response.avgPast
+                that.performance = response
             });
         },
         filters: {

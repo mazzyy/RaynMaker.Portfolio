@@ -21,7 +21,10 @@
 
             <h1>Performance</h1>
             <p>
-                AVG past: {{ avgPast | formatValue }}
+                AVG past: {{ performance.avgPast | formatValue }}
+            </p>
+            <p>
+                AVG current: {{ performance.avgCurrent | formatValue }}
             </p>
         </div>
     </div>

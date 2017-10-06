@@ -54,12 +54,19 @@ module WebApp =
         let positions = PositionsInteractor.getPositions >> PositionsInteractor.summarizePositions >> List.map createSummaryViewModel >> JSON
         let performance store =
             let positions =  store |> (PositionsInteractor.getPositions >> PositionsInteractor.summarizePositions)
-            let avgProfit = 
+
+            let avgPast = 
                 positions
                 |> Seq.filter(fun p -> p.Close |> Option.isSome)
                 |> Seq.averageBy(fun p -> p.MarketRoiAnual + p.DividendRoiAnual)
+
+            let avgCurrent = 
+                positions
+                |> Seq.averageBy(fun p -> p.MarketRoiAnual + p.DividendRoiAnual)
+
             dict [
-                "AvgPast" => avgProfit
+                "AvgPast" => avgPast
+                "AvgCurrent" => avgCurrent
             ]
             |> JSON
             
