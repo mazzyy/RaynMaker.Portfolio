@@ -16,7 +16,7 @@ module internal Broker =
         { StockBought.Date = date 
           Name = company
           Isin = sprintf "US%i" (company.GetHashCode())
-          Count = count 
+          Count = count |> decimal
           Price = 1.0M<Currency> * (price |> decimal)
           Fee = fee
         } |> StockBought
@@ -25,7 +25,7 @@ module internal Broker =
         { StockSold.Date = date 
           Name = company
           Isin = sprintf "US%i" (company.GetHashCode())
-          Count = count 
+          Count = count |> decimal
           Price = 1.0M<Currency> * (price |> decimal)
           Fee = fee
         } |> StockSold

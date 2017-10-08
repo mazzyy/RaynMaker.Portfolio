@@ -23,7 +23,7 @@ module PositionsInteractor =
         Close : DateTime option
         Isin : string
         Name : string
-        Count : int
+        Count : decimal
         Invested : decimal<Currency> 
         Payouts : decimal<Currency>  
         Dividends : decimal<Currency>  
@@ -35,7 +35,7 @@ module PositionsInteractor =
             Close = None
             Isin = isin
             Name = name
-            Count = 0
+            Count = 0.0M
             Invested = 0.0M<Currency>
             Payouts = 0.0M<Currency>
             Dividends = 0.0M<Currency>
@@ -48,28 +48,34 @@ module PositionsInteractor =
         let buyStock positions (evt:StockBought) =
             let p = evt.Isin |> getPosition positions |? createPosition evt.Date evt.Isin evt.Name
             let newP =
-                { p with Invested = p.Invested + (decimal evt.Count) * evt.Price + evt.Fee
+                { p with Invested = p.Invested + evt.Count * evt.Price + evt.Fee
                          Count = p.Count + evt.Count }
             newP::(positions |> List.filter ((<>) p))
 
         let sellStock positions (evt:StockSold) =
-            // TODO: position must exist
-            let p = evt.Isin |> getPosition positions |> Option.get
+            let p = 
+                match evt.Isin |> getPosition positions with
+                | Some p -> p
+                | None -> failwithf "Cannot sell stock %s (Isin: %s) because no position exists" evt.Name evt.Isin
+            
             let count = p.Count - evt.Count
             // TODO: count must not be zero
             let newP =
-                { p with Payouts = p.Payouts + (decimal evt.Count) * evt.Price - evt.Fee
+                { p with Payouts = p.Payouts + evt.Count * evt.Price - evt.Fee
                          Count = count
-                         Close = if count = 0 then evt.Date |> Some else None }
+                         Close = if count = 0.0M then evt.Date |> Some else None }
             newP::(positions |> List.filter ((<>) p))
 
         let closePosition positions (evt:PositionClosed) =
-            // TODO: position must exist
-            let p = evt.Isin |> getPosition positions |> Option.get
+            let p = 
+                match evt.Isin |> getPosition positions with
+                | Some p -> p
+                | None -> failwithf "Cannot sell stock %s (Isin: %s) because no position exists" evt.Name evt.Isin
+
             // TODO: count must not be zero
             let newP =
-                { p with Payouts = p.Payouts + (decimal p.Count) * evt.Price - evt.Fee
-                         Count = 0 }
+                { p with Payouts = p.Payouts + p.Count * evt.Price - evt.Fee
+                         Count = 0.0M }
             newP::(positions |> List.filter ((<>) p))
 
         let receiveDividend positions (evt:DividendReceived) =
@@ -121,30 +127,19 @@ module PerformanceInteractor =
 
     type PerformanceReport = {
         TotalProfit : decimal<Currency>
-        AvgPast : decimal<Percentage>
-        AvgCurrent : decimal<Percentage>
         }
 
     let getPerformance (positions:PositionSummary list) =
-        let avgPast = 
-            positions
-            |> Seq.filter(fun p -> p.Close |> Option.isSome)
-            |> Seq.averageBy(fun p -> p.MarketRoiAnual + p.DividendRoiAnual)
-
-        let avgCurrent = 
-            positions
-            |> Seq.averageBy(fun p -> p.MarketRoiAnual + p.DividendRoiAnual)
 
         let totalProfit = 
             positions
             |> Seq.sumBy(fun p -> p.MarketProfit + p.DividendProfit)
 
-        { TotalProfit = totalProfit
-          AvgPast = avgPast
-          AvgCurrent = avgCurrent }
+        { TotalProfit = totalProfit }
 
 module BenchmarkInteractor =
     open RaynMaker.Portfolio.Entities
+    open System
 
     type Benchmark = {
         Isin : string
@@ -153,7 +148,47 @@ module BenchmarkInteractor =
         AnualFee : decimal<Currency>
         }
 
+    // TODO: consider disposal instead of buy -  second kind of benchmark
+
     /// Based on the original events (dates and values) new benchmarking events are generated
-    /// which simulate which performance one could have achived by buying the benchmark asset (e.g. an IFT)
-    let getBenchmarkEvents benchmark getPrice (store:DomainEvent list) =
-        store
+    /// which simulate which performance one could have achived by buying the benchmark asset (e.g. an ETF) instead
+    let sellBenchmarkInstead (benchmark:Benchmark) getPrice (store:DomainEvent list) =
+        // TODO: anual fee
+        let buy day (value:decimal<Currency>) =
+            let price = day |> getPrice
+            let count = (value - benchmark.TransactionFee) / price
+            { StockBought.Isin = benchmark.Isin
+              Name = benchmark.Name
+              Date = day
+              Fee = benchmark.TransactionFee
+              Price = price
+              Count = count }
+
+        let sell day (value:decimal<Currency>) =
+            let price = day |> getPrice
+            let count = value / price
+            { StockSold.Isin = benchmark.Isin
+              Name = benchmark.Name
+              Date = day
+              // ignore fee as we wouldnt sell ETF we would also save the fee
+              Fee = 0.0M<Currency>
+              Price = price
+              Count = count }
+        
+        let price = DateTime.Today |> getPrice
+
+        seq {
+            yield! store
+                    |> Seq.choose (function
+                        | StockBought e -> buy e.Date (e.Price * e.Count + e.Fee) |> StockBought |> Some
+                        // if we would invest in ETF we would not sell but we have to do it here in this simulation 
+                        // otherwise we would buy more shares than we have money
+                        // - ignore fee as we wouldnt sell ETF we would also save the fee
+                        | StockSold e -> sell e.Date (e.Price * e.Count) |> StockSold |> Some
+                        | _ -> None)
+            yield { PositionClosed.Name = benchmark.Name
+                    Isin = benchmark.Isin
+                    Price = price
+                    Fee = benchmark.TransactionFee } |> PositionClosed
+        }
+        |> List.ofSeq

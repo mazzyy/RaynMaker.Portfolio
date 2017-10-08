@@ -23,16 +23,10 @@
             <p>
                 <label>Total profit: </label> {{ performance.totalProfit | formatValue }}
             </p>
-            <p>
-                <label>Average ROI (past): </label> {{ performance.avgPast | formatValue }}
-            </p>
-            <p>
-                <label>Average ROI (current): </label> {{ performance.avgCurrent | formatValue }}
-            </p>
 
             <h1>Benchmark</h1>
             <p>
-                If you would have bought the benchmark "{{ benchmark.name }}" (Isin: {{ benchmark.isin }}) instead whenever you made a deposit you would have gained a profit of:
+                If you would have bought the benchmark "{{ benchmark.name }}" (Isin: {{ benchmark.isin }}) instead you would have gained:
             </p>
             <p>
                 <label>Total profit: </label> {{ benchmark.totalProfit | formatValue }}

@@ -65,8 +65,6 @@ module Handlers =
         |> fun p -> 
             dict [
                 "totalProfit" => p.TotalProfit
-                "AvgPast" => p.AvgPast
-                "AvgCurrent" => p.AvgCurrent
             ]
         |> JSON)
             
@@ -74,12 +72,13 @@ module Handlers =
         let history = getBenchmarkHistory()
 
         let getPrice day =
-            history 
-            |> Seq.skipWhile(fun (p:Price) -> p.Day < day)
-            |> Seq.head
+            match history |> Seq.skipWhile(fun (p:Price) -> p.Day < day) |> Seq.tryHead with
+            | Some p -> p.Value
+            | None -> let last = history |> List.last
+                      last.Value
 
         getEvents() 
-        |> BenchmarkInteractor.getBenchmarkEvents benchmark getPrice
+        |> BenchmarkInteractor.sellBenchmarkInstead benchmark getPrice
         |> getPositionSummaries
         |> Seq.head
         |> fun p -> 
@@ -116,14 +115,14 @@ module ExcelEventStore =
                     { StockBought.Date = r.Date
                       Isin = r.ID
                       Name = r.Name
-                      Count = r.Count |> int
+                      Count = r.Count |> decimal
                       Price = (r.Value |> decimal) * 1.0M<Currency>
                       Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> StockBought |> Event
                 | EqualsI "StockSold" _ -> 
                     { StockSold.Date = r.Date
                       Isin = r.ID
                       Name = r.Name
-                      Count = r.Count |> int
+                      Count = r.Count |> decimal
                       Price = (r.Value |> decimal) * 1.0M<Currency>
                       Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> StockSold |> Event
                 | EqualsI "DividendReceived" _ -> 
@@ -165,5 +164,6 @@ module HistoricalPrices =
         |> Seq.map(fun row -> 
             { Day = DateTime.Parse(row.Date)
               Value = row.Price * 1.0M<Currency> } )
+        |> Seq.sortBy(fun x -> x.Day)
         |> List.ofSeq
 

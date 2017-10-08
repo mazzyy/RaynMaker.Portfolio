@@ -9,7 +9,7 @@ type StockBought = {
     Date : DateTime
     Isin : string
     Name : string
-    Count : int
+    Count : decimal
     Price : decimal<Currency>
     Fee : decimal<Currency>
     }
@@ -18,7 +18,7 @@ type StockSold = {
     Date : DateTime
     Isin : string
     Name : string
-    Count : int
+    Count : decimal
     Price : decimal<Currency>
     Fee : decimal<Currency>
     }
