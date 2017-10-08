@@ -1,8 +1,8 @@
 {
-  "Events": "Events.xlsx",
-  "PricesStore": ".",
+  "Store": ".",
   "Benchmark": {
-    "Asset": "FR0011079466",
+    "Isin": "FR0011079466",
+    "Name": "Lyxor MSCI All Country World UCITS ETF",
     "TransactionFee": 1.75,
     "AnualFee": 0.45
   }

@@ -1,19 +1,19 @@
 ﻿namespace RaynMaker.Portfolio.Gateways
 
 module Handlers =
+    open System
     open Suave
     open Suave.Successful
     open Suave.Operators
-    open Suave.Filters
     open Newtonsoft.Json
     open Newtonsoft.Json.Serialization
     open RaynMaker.Portfolio.Interactors
-    open Suave.Redirection
+    open RaynMaker.Portfolio
+    open RaynMaker.Portfolio.Interactors.BenchmarkInteractor
+    open RaynMaker.Portfolio.Entities
     
     [<AutoOpen>]
     module private Impl =
-        open System
-        open RaynMaker.Portfolio
         open RaynMaker.Portfolio.Interactors.PositionsInteractor
         open RaynMaker.Portfolio.Interactors.PerformanceInteractor
 
@@ -33,7 +33,12 @@ module Handlers =
             | x when x > 90.0 -> sprintf "%.2f months" (span.TotalDays / 30.0)
             | x -> sprintf "%.0f days" span.TotalDays
         
-        let createSummaryViewModel (p:PositionSummary) =
+        let getPositionSummaries = PositionsInteractor.getPositions >> PositionsInteractor.summarizePositions
+    
+    let positions getEvents = warbler (fun _ -> 
+        getEvents() 
+        |> getPositionSummaries 
+        |> List.map(fun p -> 
             dict [
                 "name" => p.Name
                 "isin" => p.Isin
@@ -50,27 +55,41 @@ module Handlers =
                 "dividendRoiAnual" => p.DividendRoiAnual
                 "totalRoiAnual" => (p.MarketRoiAnual + p.DividendRoiAnual)
                 "isClosed" => (p.Close |> Option.isSome)
-            ]
-        
-        let createPerformanceViewModel (p:PerformanceReport) =
-            dict [
-                "AvgPast" => p.AvgPast
-                "AvgCurrent" => p.AvgCurrent
-            ]
-
-        let getPositionSummaries = PositionsInteractor.getPositions >> PositionsInteractor.summarizePositions
-    
-    let positions getEvents = warbler (fun _ -> 
-        getEvents() 
-        |> getPositionSummaries 
-        |> List.map createSummaryViewModel 
+            ])
         |> JSON)
     
     let performance getEvents = warbler (fun _ -> 
         getEvents() 
         |> getPositionSummaries 
         |> PerformanceInteractor.getPerformance 
-        |> createPerformanceViewModel 
+        |> fun p -> 
+            dict [
+                "totalProfit" => p.TotalProfit
+                "AvgPast" => p.AvgPast
+                "AvgCurrent" => p.AvgCurrent
+            ]
+        |> JSON)
+            
+    let benchmark getEvents (benchmark:Benchmark) getBenchmarkHistory = warbler (fun _ -> 
+        let history = getBenchmarkHistory()
+
+        let getPrice day =
+            history 
+            |> Seq.skipWhile(fun (p:Price) -> p.Day < day)
+            |> Seq.head
+
+        getEvents() 
+        |> BenchmarkInteractor.getBenchmarkEvents benchmark getPrice
+        |> getPositionSummaries
+        |> Seq.head
+        |> fun p -> 
+            dict [
+                "name" => benchmark.Name
+                "isin" => benchmark.Isin
+                "totalProfit" => (p.MarketProfit + p.DividendProfit)
+                "totalRoi" => (p.MarketRoi + p.DividendRoi)
+                "totalRoiAnual" => (p.MarketRoiAnual + p.DividendRoiAnual)
+            ]
         |> JSON)
             
 module ExcelEventStore =
@@ -139,37 +158,12 @@ module HistoricalPrices =
     open RaynMaker.Portfolio.Entities
 
     type private Sheet = CsvProvider<"../../etc/FR0011079466.history.csv",";">
-
-    type Price = {
-        Day : DateTime
-        Price : decimal<Currency>
-        }
     
     let load (path:string) =
         let sheet = Sheet.Load(path)
         sheet.Rows
         |> Seq.map(fun row -> 
             { Day = DateTime.Parse(row.Date)
-              Price = row.Price * 1.0M<Currency> } )
+              Value = row.Price * 1.0M<Currency> } )
         |> List.ofSeq
 
-module WebApp =
-    open Suave
-    open Suave.Successful
-    open Suave.Operators
-    open Suave.Filters
-    open Suave.Redirection
-
-    let createApp home getEvents =
-        let log = request (fun r -> printfn "%s" r.path; succeed)
-
-        choose [ 
-            GET >=> log >=> choose
-                [
-                    path "/" >=> redirect "/Content/index.html"
-                    pathScan "/Content/%s" (fun f -> Files.file (sprintf "%s/Content/%s" home f))
-                    pathScan "/Scripts/%s" (fun f -> Files.file (sprintf "%s/Scripts/%s" home f))
-                    path "/api/positions" >=> Handlers.positions getEvents
-                    path "/api/performance" >=> Handlers.performance getEvents
-                ]
-        ]

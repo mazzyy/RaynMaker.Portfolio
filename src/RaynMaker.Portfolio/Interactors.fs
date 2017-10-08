@@ -120,6 +120,7 @@ module PerformanceInteractor =
     open RaynMaker.Portfolio.Entities
 
     type PerformanceReport = {
+        TotalProfit : decimal<Currency>
         AvgPast : decimal<Percentage>
         AvgCurrent : decimal<Percentage>
         }
@@ -134,6 +135,25 @@ module PerformanceInteractor =
             positions
             |> Seq.averageBy(fun p -> p.MarketRoiAnual + p.DividendRoiAnual)
 
-        { AvgPast = avgPast
+        let totalProfit = 
+            positions
+            |> Seq.sumBy(fun p -> p.MarketProfit + p.DividendProfit)
+
+        { TotalProfit = totalProfit
+          AvgPast = avgPast
           AvgCurrent = avgCurrent }
 
+module BenchmarkInteractor =
+    open RaynMaker.Portfolio.Entities
+
+    type Benchmark = {
+        Isin : string
+        Name : string
+        TransactionFee : decimal<Currency>
+        AnualFee : decimal<Currency>
+        }
+
+    /// Based on the original events (dates and values) new benchmarking events are generated
+    /// which simulate which performance one could have achived by buying the benchmark asset (e.g. an IFT)
+    let getBenchmarkEvents benchmark getPrice (store:DomainEvent list) =
+        store

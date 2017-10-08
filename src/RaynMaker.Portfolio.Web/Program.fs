@@ -5,8 +5,16 @@ open System
 open System.Reflection
 open System.IO
 open FSharp.Data
+open Suave
+open Suave.Successful
+open Suave.Operators
+open Suave.Filters
+open Suave.Redirection
 open RaynMaker.Portfolio.Frameworks
 open RaynMaker.Portfolio.Gateways
+open RaynMaker.Portfolio.Interactors
+open RaynMaker.Portfolio.Interactors.BenchmarkInteractor
+open RaynMaker.Portfolio.Entities
 
 type Project = JsonProvider<"../../etc/Portfolio.json">
 
@@ -23,20 +31,26 @@ let main argv =
         | x -> Path.Combine(home, "..", "..", "etc", "Portfolio.json")
         |> Path.GetFullPath
 
-    let resolveFromProject path =
-        if Path.IsPathRooted(path) then
-            path
-        else
-            let projectDir = projectFile |> Path.GetDirectoryName
-            Path.Combine(projectDir,path)
-        |> Path.GetFullPath
+    printfn "Project: %s" projectFile
 
     let project = Project.Load(projectFile)
 
-    let loadEvents file =
+    let storeHome =
+        if project.Store |> Path.IsPathRooted then
+            project.Store
+        else
+            let projectDir = projectFile |> Path.GetDirectoryName
+            Path.Combine(projectDir,project.Store)
+        |> Path.GetFullPath
+
+    printfn "Store: %s" storeHome
+
+    let fromStore path = Path.Combine(storeHome,path)
+
+    let loadEvents() =
         printfn "Loading events ..."
 
-        let store = file |> ExcelEventStore.load
+        let store = "Events.xlsx" |> fromStore |> ExcelEventStore.load
 
         store
         |> Seq.choose (function |ExcelEventStore.Unknown(a,b,c) -> Some(a,b,c) | _ -> None)
@@ -44,12 +58,41 @@ let main argv =
 
         store
         |> List.choose (function |ExcelEventStore.Event e -> Some e | _ -> None)
+
+    let loadBenchmarkHistory() =
+        printfn "Loading benchmark history ..."
+
+        project.Benchmark.Isin 
+        |> sprintf "%s.history.csv" 
+        |> fromStore 
+        |> HistoricalPrices.load
     
     printfn "Starting ..."
 
-    let getEvents = remember (fun () -> project.Events |> resolveFromProject |> loadEvents )
+    let getEvents = remember loadEvents
+    let getBenchmarkHistory = remember loadBenchmarkHistory
 
-    let app = WebApp.createApp home getEvents
+    let benchmark = { 
+        Isin = project.Benchmark.Isin
+        Name = project.Benchmark.Name
+        TransactionFee = project.Benchmark.TransactionFee * 1.0M<Currency>
+        AnualFee = project.Benchmark.AnualFee * 1.0M<Currency> }
+
+    let app = 
+        let log = request (fun r -> printfn "%s" r.path; succeed)
+
+        choose [ 
+            GET >=> log >=> choose
+                [
+                    path "/" >=> redirect "/Content/index.html"
+                    pathScan "/Content/%s" (fun f -> Files.file (sprintf "%s/Content/%s" home f))
+                    pathScan "/Scripts/%s" (fun f -> Files.file (sprintf "%s/Scripts/%s" home f))
+                    path "/api/positions" >=> Handlers.positions getEvents
+                    path "/api/performance" >=> Handlers.performance getEvents
+                    path "/api/benchmark" >=> Handlers.benchmark getEvents benchmark getBenchmarkHistory
+                ]
+        ]
+
     let port,cts = Httpd.start app
 
     Browser.start port

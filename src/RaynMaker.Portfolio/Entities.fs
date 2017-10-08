@@ -63,5 +63,7 @@ type DomainEvent =
     | InterestReceived of InterestReceived
     | PositionClosed of PositionClosed
 
-
-
+type Price = {
+    Day : DateTime
+    Value : decimal<Currency>
+    }
