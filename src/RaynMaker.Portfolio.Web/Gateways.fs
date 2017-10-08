@@ -1,7 +1,6 @@
 ﻿namespace RaynMaker.Portfolio.Gateways
 
-
-module WebApp =
+module Handlers =
     open Suave
     open Suave.Successful
     open Suave.Operators
@@ -10,20 +9,21 @@ module WebApp =
     open Newtonsoft.Json.Serialization
     open RaynMaker.Portfolio.Interactors
     open Suave.Redirection
-
-    let JSON v =
-        let jsonSerializerSettings = new JsonSerializerSettings()
-        jsonSerializerSettings.ContractResolver <- new CamelCasePropertyNamesContractResolver()
-
-        JsonConvert.SerializeObject(v, jsonSerializerSettings)
-        |> OK
-        >=> Writers.setMimeType "application/json; charset=utf-8"
-
-    module private Handlers =
+    
+    [<AutoOpen>]
+    module private Impl =
         open System
         open RaynMaker.Portfolio
         open RaynMaker.Portfolio.Interactors.PositionsInteractor
         open RaynMaker.Portfolio.Interactors.PerformanceInteractor
+
+        let JSON v =
+            let jsonSerializerSettings = new JsonSerializerSettings()
+            jsonSerializerSettings.ContractResolver <- new CamelCasePropertyNamesContractResolver()
+
+            JsonConvert.SerializeObject(v, jsonSerializerSettings)
+            |> OK
+            >=> Writers.setMimeType "application/json; charset=utf-8"
 
         let (=>) k v = k,v |> box
         let formatDate (date:DateTime) = date.ToString("yyyy-MM-dd")
@@ -52,31 +52,27 @@ module WebApp =
                 "isClosed" => (p.Close |> Option.isSome)
             ]
         
-        let getPositionSummaries = PositionsInteractor.getPositions >> PositionsInteractor.summarizePositions
-        let positions = getPositionSummaries >> List.map createSummaryViewModel >> JSON
-
         let createPerformanceViewModel (p:PerformanceReport) =
             dict [
                 "AvgPast" => p.AvgPast
                 "AvgCurrent" => p.AvgCurrent
             ]
 
-        let performance = getPositionSummaries >> PerformanceInteractor.getPerformance >> createPerformanceViewModel >> JSON
+        let getPositionSummaries = PositionsInteractor.getPositions >> PositionsInteractor.summarizePositions
+    
+    let positions getEvents = warbler (fun _ -> 
+        getEvents() 
+        |> getPositionSummaries 
+        |> List.map createSummaryViewModel 
+        |> JSON)
+    
+    let performance getEvents = warbler (fun _ -> 
+        getEvents() 
+        |> getPositionSummaries 
+        |> PerformanceInteractor.getPerformance 
+        |> createPerformanceViewModel 
+        |> JSON)
             
-    let createApp home store =
-        let log = request (fun r -> printfn "%s" r.path; succeed)
-
-        choose [ 
-            GET >=> log >=> choose
-                [
-                    path "/" >=> redirect "/Content/index.html"
-                    pathScan "/Content/%s" (fun f -> Files.file (sprintf "%s/Content/%s" home f))
-                    pathScan "/Scripts/%s" (fun f -> Files.file (sprintf "%s/Scripts/%s" home f))
-                    path "/api/positions" >=> Handlers.positions store
-                    path "/api/performance" >=> Handlers.performance store
-                ]
-        ]
-
 module ExcelEventStore =
     open System
     open FSharp.ExcelProvider
@@ -156,3 +152,24 @@ module HistoricalPrices =
             { Day = DateTime.Parse(row.Date)
               Price = row.Price * 1.0M<Currency> } )
         |> List.ofSeq
+
+module WebApp =
+    open Suave
+    open Suave.Successful
+    open Suave.Operators
+    open Suave.Filters
+    open Suave.Redirection
+
+    let createApp home getEvents =
+        let log = request (fun r -> printfn "%s" r.path; succeed)
+
+        choose [ 
+            GET >=> log >=> choose
+                [
+                    path "/" >=> redirect "/Content/index.html"
+                    pathScan "/Content/%s" (fun f -> Files.file (sprintf "%s/Content/%s" home f))
+                    pathScan "/Scripts/%s" (fun f -> Files.file (sprintf "%s/Scripts/%s" home f))
+                    path "/api/positions" >=> Handlers.positions getEvents
+                    path "/api/performance" >=> Handlers.performance getEvents
+                ]
+        ]

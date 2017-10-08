@@ -33,21 +33,23 @@ let main argv =
 
     let project = Project.Load(projectFile)
 
-    printfn "Loading events ..."
+    let loadEvents file =
+        printfn "Loading events ..."
 
-    let store =  project.Events |> resolveFromProject |> ExcelEventStore.load
+        let store = file |> ExcelEventStore.load
 
-    store
-    |> Seq.choose (function |ExcelEventStore.Unknown(a,b,c) -> Some(a,b,c) | _ -> None)
-    |> Seq.iter(fun (e,d,p) -> printfn "Unknown event skipped: %s|%A|%A" e d p)
-    
+        store
+        |> Seq.choose (function |ExcelEventStore.Unknown(a,b,c) -> Some(a,b,c) | _ -> None)
+        |> Seq.iter(fun (e,d,p) -> printfn "Unknown event skipped: %s|%A|%A" e d p)
 
-    printfn "Starting ..."
-
-    let app = 
         store
         |> List.choose (function |ExcelEventStore.Event e -> Some e | _ -> None)
-        |> WebApp.createApp home
+    
+    printfn "Starting ..."
+
+    let getEvents = remember (fun () -> project.Events |> resolveFromProject |> loadEvents )
+
+    let app = WebApp.createApp home getEvents
     let port,cts = Httpd.start app
 
     Browser.start port
