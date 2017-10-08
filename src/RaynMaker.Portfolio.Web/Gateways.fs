@@ -11,6 +11,7 @@ module Handlers =
     open RaynMaker.Portfolio
     open RaynMaker.Portfolio.Interactors.BenchmarkInteractor
     open RaynMaker.Portfolio.Entities
+    open RaynMaker.Portfolio.Interactors.PositionsInteractor
     
     [<AutoOpen>]
     module private Impl =
@@ -68,7 +69,7 @@ module Handlers =
             ]
         |> JSON)
             
-    let benchmark getEvents (benchmark:Benchmark) getBenchmarkHistory = warbler (fun _ -> 
+    let benchmark getEvents (benchmark:Benchmark) getBenchmarkHistory cashLimit = warbler (fun _ -> 
         let history = getBenchmarkHistory()
 
         let getPrice day =
@@ -77,18 +78,31 @@ module Handlers =
             | None -> let last = history |> List.last
                       last.Value
 
-        getEvents() 
-        |> BenchmarkInteractor.sellBenchmarkInstead benchmark getPrice
-        |> getPositionSummaries
-        |> Seq.head
-        |> fun p -> 
+        let b1 =
+            getEvents() 
+            |> BenchmarkInteractor.buyBenchmarkInstead benchmark getPrice
+            |> getPositionSummaries
+            |> Seq.head
+
+        let b2 =
+            getEvents() 
+            |> BenchmarkInteractor.buyBenchmarkByPlan benchmark getPrice cashLimit
+            |> getPositionSummaries
+            |> Seq.head
+
+        let vm (p:PositionSummary) =
             dict [
-                "name" => benchmark.Name
-                "isin" => benchmark.Isin
                 "totalProfit" => (p.MarketProfit + p.DividendProfit)
                 "totalRoi" => (p.MarketRoi + p.DividendRoi)
-                "totalRoiAnual" => (p.MarketRoiAnual + p.DividendRoiAnual)
+                "totalRoiAnual" => (p.MarketRoiAnual + p.DividendRoiAnual) 
             ]
+
+        dict [
+            "name" => benchmark.Name
+            "isin" => benchmark.Isin
+            "buyInstead" => (b1 |> vm)
+            "buyPlan" => (b2 |> vm)
+        ]
         |> JSON)
             
 module ExcelEventStore =
@@ -141,7 +155,8 @@ module ExcelEventStore =
                     { InterestReceived.Date = r.Date
                       Value = (r.Value |> decimal) * 1.0M<Currency>} |> InterestReceived |> Event
                 | EqualsI "PositionClosed" _ -> 
-                    { PositionClosed.Isin = r.ID
+                    { PositionClosed.Date = DateTime.Today
+                      Isin = r.ID
                       Name = r.Name
                       Price = (r.Value |> decimal) * 1.0M<Currency>
                       Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> PositionClosed |> Event

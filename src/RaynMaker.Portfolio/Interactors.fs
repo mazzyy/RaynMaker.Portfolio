@@ -138,31 +138,57 @@ module PerformanceInteractor =
         { TotalProfit = totalProfit }
 
 module BenchmarkInteractor =
-    open RaynMaker.Portfolio.Entities
     open System
+    open RaynMaker.Portfolio
+    open RaynMaker.Portfolio.Entities
+
+    type SavingsPlan = {
+        Fee : decimal<Percentage>
+        AnualFee : decimal<Percentage>
+        }
+
+    type ManualOrder = {
+        Fee : decimal<Percentage>
+        MinFee : decimal<Currency>
+        MaxFee : decimal<Currency>
+        }
+    
+    let getFee order value =
+        match value |> percent order.Fee with
+        | x when x < order.MinFee -> order.MinFee
+        | x when x > order.MaxFee -> order.MaxFee
+        | x -> x
 
     type Benchmark = {
         Isin : string
         Name : string
-        TransactionFee : decimal<Currency>
-        AnualFee : decimal<Currency>
+        SavingsPlan : SavingsPlan
+        Manual : ManualOrder
         }
 
-    // TODO: consider disposal instead of buy -  second kind of benchmark
+    /// Based on the original buy events new benchmarking events are generated which simulate 
+    /// the performance one could have achived by buying the benchmark asset (e.g. an ETF) instead
+    let buyBenchmarkInstead (benchmark:Benchmark) getPrice (store:DomainEvent list) =
+        let getFee = getFee benchmark.Manual
 
-    /// Based on the original events (dates and values) new benchmarking events are generated
-    /// which simulate which performance one could have achived by buying the benchmark asset (e.g. an ETF) instead
-    let sellBenchmarkInstead (benchmark:Benchmark) getPrice (store:DomainEvent list) =
-        // TODO: anual fee
         let buy day (value:decimal<Currency>) =
             let price = day |> getPrice
-            let count = (value - benchmark.TransactionFee) / price
+            let fee = value |> getFee
+            let count = (value - fee) / price
             { StockBought.Isin = benchmark.Isin
               Name = benchmark.Name
               Date = day
-              Fee = benchmark.TransactionFee
+              Fee = fee
               Price = price
               Count = count }
+
+        let closePosition() =
+            { PositionClosed.Date = DateTime.Today
+              Name = benchmark.Name
+              Isin = benchmark.Isin
+              Price = DateTime.Today |> getPrice
+              // TODO: fix
+              Fee = 10.0M<Currency> } 
 
         let sell day (value:decimal<Currency>) =
             let price = day |> getPrice
@@ -175,8 +201,6 @@ module BenchmarkInteractor =
               Price = price
               Count = count }
         
-        let price = DateTime.Today |> getPrice
-
         seq {
             yield! store
                     |> Seq.choose (function
@@ -186,9 +210,22 @@ module BenchmarkInteractor =
                         // - ignore fee as we wouldnt sell ETF we would also save the fee
                         | StockSold e -> sell e.Date (e.Price * e.Count) |> StockSold |> Some
                         | _ -> None)
-            yield { PositionClosed.Name = benchmark.Name
-                    Isin = benchmark.Isin
-                    Price = price
-                    Fee = benchmark.TransactionFee } |> PositionClosed
+            yield closePosition() |> PositionClosed
         }
         |> List.ofSeq
+
+    /// Simulate buying a benchmark every month with the money available to calculate
+    /// possible performance
+    let buyBenchmarkByPlan (benchmark:Benchmark) getPrice cashLimit (store:DomainEvent list) =
+
+        // TODO: anual fee
+    
+        let start = store.Head |> Events.GetDate
+        let stop = DateTime.Today
+        let numMonths = (stop.Year - start.Year) * 12 + (stop.Month - start.Month + 1)
+        
+        //[0 .. numMonths]
+        //|> Seq.map(fun m -> (new DateTime(start.Year, start.Month, 1)).AddMonths(m))
+        //|> Seq.map workingDay
+
+        store

@@ -25,3 +25,12 @@ let memoize f =
 let remember f = 
     let ret = lazy( f() )
     fun () -> ret.Value
+
+/// if day is a working day this one is retuned, otherwise the next working day is returned
+let workingDay (day:DateTime) =
+    if day.DayOfWeek = DayOfWeek.Saturday then
+        day.AddDays(2.0)
+    elif day.DayOfWeek = DayOfWeek.Sunday then
+        day.AddDays(1.0)
+    else
+        day

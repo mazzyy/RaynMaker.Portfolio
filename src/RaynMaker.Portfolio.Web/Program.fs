@@ -75,8 +75,12 @@ let main argv =
     let benchmark = { 
         Isin = project.Benchmark.Isin
         Name = project.Benchmark.Name
-        TransactionFee = project.Benchmark.TransactionFee * 1.0M<Currency>
-        AnualFee = project.Benchmark.AnualFee * 1.0M<Currency> }
+        SavingsPlan = { SavingsPlan.Fee = project.Benchmark.SavingsPlan.Fee * 1.0M<Percentage>
+                        AnualFee = project.Benchmark.SavingsPlan.AnualFee * 1.0M<Percentage> }
+        Manual = { ManualOrder.Fee = project.Benchmark.Manual.Fee * 1.0M<Percentage>
+                   MinFee = project.Benchmark.Manual.MinFee * 1.0M<Currency>
+                   MaxFee = project.Benchmark.Manual.MaxFee * 1.0M<Currency> }
+        }
 
     let app = 
         let log = request (fun r -> printfn "%s" r.path; succeed)
@@ -89,7 +93,7 @@ let main argv =
                     pathScan "/Scripts/%s" (fun f -> Files.file (sprintf "%s/Scripts/%s" home f))
                     path "/api/positions" >=> Handlers.positions getEvents
                     path "/api/performance" >=> Handlers.performance getEvents
-                    path "/api/benchmark" >=> Handlers.benchmark getEvents benchmark getBenchmarkHistory
+                    path "/api/benchmark" >=> Handlers.benchmark getEvents benchmark getBenchmarkHistory project.CashLimit
                 ]
         ]
 

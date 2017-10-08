@@ -26,16 +26,29 @@
 
             <h1>Benchmark</h1>
             <p>
-                If you would have bought the benchmark "{{ benchmark.name }}" (Isin: {{ benchmark.isin }}) instead you would have gained:
+                If you would have bought the benchmark "{{ benchmark.name }}" (Isin: {{ benchmark.isin }}) instead of your stock picks you would have gained:
             </p>
             <p>
-                <label>Total profit: </label> {{ benchmark.totalProfit | formatValue }}
+                <label>Total profit: </label> {{ benchmark.buyInstead.totalProfit | formatValue }}
             </p>
             <p>
-                <label>Total ROI: </label> {{ benchmark.totalRoi | formatValue }}
+                <label>Total ROI: </label> {{ benchmark.buyInstead.totalRoi | formatValue }}
             </p>
             <p>
-                <label>Anual ROI: </label> {{ benchmark.totalRoiAnual | formatValue }}
+                <label>Anual ROI: </label> {{ benchmark.buyInstead.totalRoiAnual | formatValue }}
+            </p>
+
+            <p>
+                If you would have bought the benchmark "{{ benchmark.name }}" (Isin: {{ benchmark.isin }}) every month (considering the cash limit) yout would have gained:
+            </p>
+            <p>
+                <label>Total profit: </label> {{ benchmark.buyPlan.totalProfit | formatValue }}
+            </p>
+            <p>
+                <label>Total ROI: </label> {{ benchmark.buyPlan.totalRoi | formatValue }}
+            </p>
+            <p>
+                <label>Anual ROI: </label> {{ benchmark.buyPlan.totalRoiAnual | formatValue }}
             </p>
         </div>
     </div>

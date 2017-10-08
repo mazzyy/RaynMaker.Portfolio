@@ -5,6 +5,11 @@ open System
 [<Measure>] type Currency
 [<Measure>] type Percentage
 
+[<AutoOpen>]
+module Finance =
+    let percent (p:decimal<Percentage>) (v:decimal<_>) =
+        v * p / 100.0M<Percentage>
+
 type StockBought = {
     Date : DateTime
     Isin : string
@@ -48,6 +53,7 @@ type InterestReceived = {
 
 /// Simulates that position is closed to get current performance
 type PositionClosed = {
+    Date : DateTime
     Isin : string
     Name : string
     Price : decimal<Currency>
@@ -62,6 +68,17 @@ type DomainEvent =
     | DisbursementAccounted of DisbursementAccounted
     | InterestReceived of InterestReceived
     | PositionClosed of PositionClosed
+
+module Events =
+    let GetDate event =
+        match event with
+        | StockBought e -> e.Date
+        | StockSold e -> e.Date
+        | DividendReceived e -> e.Date
+        | DepositAccounted e -> e.Date
+        | DisbursementAccounted e -> e.Date
+        | InterestReceived e -> e.Date
+        | PositionClosed e -> e.Date
 
 type Price = {
     Day : DateTime
