@@ -21,3 +21,4 @@
 /packages/System.ValueTuple.*
 /packages/FsUnit.*
 /packages/NUnit.*
+/packages/FSharp.Data.*

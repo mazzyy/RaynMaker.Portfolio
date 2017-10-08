@@ -141,14 +141,21 @@ module ExcelEventStore =
         |> List.ofSeq
 
 //module HistoricalPrices =
-//<form action="/quote/historic/historic.csv" method="get" name="histcsv"> 
-//<input type="hidden" name="secu" value="100087266" /> 
-//<input type="hidden" name="boerse_id" value="8" /> 
-//<input type="hidden" name="clean_split"  value="1" /> 
-//<input type="hidden" name="clean_payout" value="1" /> 
-//<input type="hidden" name="clean_bezug"  value="1" /> 
-//<input id="minTime" name="min_time" value="8.10.2016"/> 
-//<input id="maxTime" name="max_time" value="8.10.2017"/> 
-//<input id="trenner" name="trenner" value=";"/>
-//</form>
-   
+//    open System
+//    open FSharp.ExcelProvider
+//    open RaynMaker.Portfolio
+//    open RaynMaker.Portfolio.Entities
+
+//    [<Literal>] 
+//    let private template = @"../../etc/Historic.csv"
+
+//    type private EventsSheet = ExcelFile<template>
+
+//    type ParsedEvent = 
+//        | Event of DomainEvent
+//        | Unknown of string * DateTime * payload:obj list
+
+//    let load path =
+//        let sheet = new EventsSheet(path)
+//        // FR0011079466  
+//        // 

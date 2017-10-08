@@ -1,0 +1,9 @@
+{
+  "Events": "Events.xlsx",
+  "PricesStore": ".",
+  "Benchmark": {
+    "Asset": "FR0011079466",
+    "TransactionFee": 1.75,
+    "AnualFee": 0.45
+  }
+}

@@ -4,22 +4,38 @@ open System.Threading
 open System
 open System.Reflection
 open System.IO
+open FSharp.Data
 open RaynMaker.Portfolio.Frameworks
 open RaynMaker.Portfolio.Gateways
 
+type Project = JsonProvider<"../../etc/Portfolio.json">
+
 [<EntryPoint>]
 let main argv = 
-    let home = Path.GetDirectoryName( Assembly.GetExecutingAssembly().Location )
+    let home = Assembly.GetExecutingAssembly().Location |> Path.GetDirectoryName |> Path.GetFullPath
     printfn "Home: %s" home
+
+    printfn "Loading project ..."
+
+    let projectFile = 
+        match argv with
+        | [|path|] -> path 
+        | x -> Path.Combine(home, "..", "..", "etc", "Portfolio.json")
+        |> Path.GetFullPath
+
+    let resolveFromProject path =
+        if Path.IsPathRooted(path) then
+            path
+        else
+            let projectDir = projectFile |> Path.GetDirectoryName
+            Path.Combine(projectDir,path)
+        |> Path.GetFullPath
+
+    let project = Project.Load(projectFile)
 
     printfn "Loading events ..."
 
-    let storeLocation = 
-        match argv with
-        | [|path|] -> path
-        | x -> Path.GetFullPath( Path.Combine(home, "..", "..", "etc", "Events.xlsx") )
-
-    let store = ExcelEventStore.load storeLocation
+    let store =  project.Events |> resolveFromProject |> ExcelEventStore.load
 
     store
     |> Seq.choose (function |ExcelEventStore.Unknown(a,b,c) -> Some(a,b,c) | _ -> None)
