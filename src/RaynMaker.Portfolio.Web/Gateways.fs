@@ -23,6 +23,7 @@ module WebApp =
         open System
         open RaynMaker.Portfolio
         open RaynMaker.Portfolio.Interactors.PositionsInteractor
+        open RaynMaker.Portfolio.Interactors.PerformanceInteractor
 
         let (=>) k v = k,v |> box
         let formatDate (date:DateTime) = date.ToString("yyyy-MM-dd")
@@ -51,24 +52,16 @@ module WebApp =
                 "isClosed" => (p.Close |> Option.isSome)
             ]
         
-        let positions = PositionsInteractor.getPositions >> PositionsInteractor.summarizePositions >> List.map createSummaryViewModel >> JSON
-        let performance store =
-            let positions =  store |> (PositionsInteractor.getPositions >> PositionsInteractor.summarizePositions)
+        let getPositionSummaries = PositionsInteractor.getPositions >> PositionsInteractor.summarizePositions
+        let positions = getPositionSummaries >> List.map createSummaryViewModel >> JSON
 
-            let avgPast = 
-                positions
-                |> Seq.filter(fun p -> p.Close |> Option.isSome)
-                |> Seq.averageBy(fun p -> p.MarketRoiAnual + p.DividendRoiAnual)
-
-            let avgCurrent = 
-                positions
-                |> Seq.averageBy(fun p -> p.MarketRoiAnual + p.DividendRoiAnual)
-
+        let createPerformanceViewModel (p:PerformanceReport) =
             dict [
-                "AvgPast" => avgPast
-                "AvgCurrent" => avgCurrent
+                "AvgPast" => p.AvgPast
+                "AvgCurrent" => p.AvgCurrent
             ]
-            |> JSON
+
+        let performance = getPositionSummaries >> PerformanceInteractor.getPerformance >> createPerformanceViewModel >> JSON
             
     let createApp home store =
         let log = request (fun r -> printfn "%s" r.path; succeed)
@@ -146,3 +139,16 @@ module ExcelEventStore =
                 | ex -> failwithf "Failed reading event store at %s with %A" r.Event ex 
         )
         |> List.ofSeq
+
+//module HistoricalPrices =
+//<form action="/quote/historic/historic.csv" method="get" name="histcsv"> 
+//<input type="hidden" name="secu" value="100087266" /> 
+//<input type="hidden" name="boerse_id" value="8" /> 
+//<input type="hidden" name="clean_split"  value="1" /> 
+//<input type="hidden" name="clean_payout" value="1" /> 
+//<input type="hidden" name="clean_bezug"  value="1" /> 
+//<input id="minTime" name="min_time" value="8.10.2016"/> 
+//<input id="maxTime" name="max_time" value="8.10.2017"/> 
+//<input id="trenner" name="trenner" value=";"/>
+//</form>
+   

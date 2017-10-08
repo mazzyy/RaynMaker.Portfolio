@@ -115,4 +115,25 @@ module PositionsInteractor =
         |> Seq.sortByDescending(fun p -> p.MarketRoiAnual + p.DividendRoiAnual)
         |> List.ofSeq
 
+module PerformanceInteractor =
+    open PositionsInteractor
+    open RaynMaker.Portfolio.Entities
+
+    type PerformanceReport = {
+        AvgPast : decimal<Percentage>
+        AvgCurrent : decimal<Percentage>
+        }
+
+    let getPerformance (positions:PositionSummary list) =
+        let avgPast = 
+            positions
+            |> Seq.filter(fun p -> p.Close |> Option.isSome)
+            |> Seq.averageBy(fun p -> p.MarketRoiAnual + p.DividendRoiAnual)
+
+        let avgCurrent = 
+            positions
+            |> Seq.averageBy(fun p -> p.MarketRoiAnual + p.DividendRoiAnual)
+
+        { AvgPast = avgPast
+          AvgCurrent = avgCurrent }
 

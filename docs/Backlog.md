@@ -1,5 +1,8 @@
 
 - over all performance
+  - TWR
+  - MWR
+  - benchmark with ETF
 
 - show negative numbers in red
 
