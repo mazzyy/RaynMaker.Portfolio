@@ -39,7 +39,7 @@
             </p>
 
             <p>
-                If you would have bought the benchmark "{{ benchmark.name }}" (Isin: {{ benchmark.isin }}) every month (considering the cash limit) yout would have gained:
+                If you would have bought the benchmark "{{ benchmark.name }}" (Isin: {{ benchmark.isin }}) every month with a rate of {{ benchmark.buyPlan.rate }} yout would have gained:
             </p>
             <p>
                 <label>Total profit: </label> {{ benchmark.buyPlan.totalProfit | formatValue }}

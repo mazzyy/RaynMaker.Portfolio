@@ -69,7 +69,7 @@ module Handlers =
             ]
         |> JSON)
             
-    let benchmark getEvents (benchmark:Benchmark) getBenchmarkHistory cashLimit = warbler (fun _ -> 
+    let benchmark getEvents (benchmark:Benchmark) getBenchmarkHistory = warbler (fun _ -> 
         let history = getBenchmarkHistory()
 
         let getPrice day =
@@ -86,22 +86,24 @@ module Handlers =
 
         let b2 =
             getEvents() 
-            |> BenchmarkInteractor.buyBenchmarkByPlan benchmark getPrice cashLimit
+            |> BenchmarkInteractor.buyBenchmarkByPlan benchmark getPrice
             |> getPositionSummaries
             |> Seq.head
-
-        let vm (p:PositionSummary) =
-            dict [
-                "totalProfit" => (p.MarketProfit + p.DividendProfit)
-                "totalRoi" => (p.MarketRoi + p.DividendRoi)
-                "totalRoiAnual" => (p.MarketRoiAnual + p.DividendRoiAnual) 
-            ]
 
         dict [
             "name" => benchmark.Name
             "isin" => benchmark.Isin
-            "buyInstead" => (b1 |> vm)
-            "buyPlan" => (b2 |> vm)
+            "buyInstead" => dict [
+                "totalProfit" => (b1.MarketProfit + b1.DividendProfit)
+                "totalRoi" => (b1.MarketRoi + b1.DividendRoi)
+                "totalRoiAnual" => (b1.MarketRoiAnual + b1.DividendRoiAnual) 
+            ]
+            "buyPlan" => dict [
+                "totalProfit" => (b2.MarketProfit + b2.DividendProfit)
+                "totalRoi" => (b2.MarketRoi + b2.DividendRoi)
+                "totalRoiAnual" => (b2.MarketRoiAnual + b2.DividendRoiAnual) 
+                "rate" => benchmark.SavingsPlan.Rate
+            ]
         ]
         |> JSON)
             

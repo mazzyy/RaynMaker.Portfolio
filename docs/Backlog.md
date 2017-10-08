@@ -4,6 +4,15 @@
   - MWR
   - benchmark with ETF
 
+- refactor core positions logic
+  - move to dedicated interactor and make buy and sell methods public so that we can test individually
+
+- anual roi actually is no simple math average ...
+
+- closePosition event would have to calculate the fee based on broker conditions
+
+- fix anual fee in benchmark
+
 - show negative numbers in red
 
 - vue navigation?

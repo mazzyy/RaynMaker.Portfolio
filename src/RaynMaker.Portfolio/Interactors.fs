@@ -47,8 +47,16 @@ module PositionsInteractor =
 
         let buyStock positions (evt:StockBought) =
             let p = evt.Isin |> getPosition positions |? createPosition evt.Date evt.Isin evt.Name
+            let investment = evt.Count * evt.Price + evt.Fee
+            let newInvestment,payouts = 
+                if investment > p.Payouts then 
+                    investment - p.Payouts,0.0M<Currency>
+                else
+                    0.0M<Currency>,p.Payouts - investment
+
             let newP =
-                { p with Invested = p.Invested + evt.Count * evt.Price + evt.Fee
+                { p with Invested = p.Invested + newInvestment
+                         Payouts = payouts
                          Count = p.Count + evt.Count }
             newP::(positions |> List.filter ((<>) p))
 
@@ -145,6 +153,7 @@ module BenchmarkInteractor =
     type SavingsPlan = {
         Fee : decimal<Percentage>
         AnualFee : decimal<Percentage>
+        Rate : decimal<Currency>
         }
 
     type ManualOrder = {
@@ -166,7 +175,14 @@ module BenchmarkInteractor =
         Manual : ManualOrder
         }
 
-    /// Based on the original buy events new benchmarking events are generated which simulate 
+    let private closePosition benchmark getPrice =
+        { PositionClosed.Date = DateTime.Today
+          Name = benchmark.Name
+          Isin = benchmark.Isin
+          Price = DateTime.Today |> getPrice
+          Fee = 10.0M<Currency> } 
+
+    /// Based on the original buy & sell events new benchmarking events are generated which simulate 
     /// the performance one could have achived by buying the benchmark asset (e.g. an ETF) instead
     let buyBenchmarkInstead (benchmark:Benchmark) getPrice (store:DomainEvent list) =
         let getFee = getFee benchmark.Manual
@@ -182,22 +198,14 @@ module BenchmarkInteractor =
               Price = price
               Count = count }
 
-        let closePosition() =
-            { PositionClosed.Date = DateTime.Today
-              Name = benchmark.Name
-              Isin = benchmark.Isin
-              Price = DateTime.Today |> getPrice
-              // TODO: fix
-              Fee = 10.0M<Currency> } 
-
         let sell day (value:decimal<Currency>) =
             let price = day |> getPrice
+            let fee = value |> getFee
             let count = value / price
             { StockSold.Isin = benchmark.Isin
               Name = benchmark.Name
               Date = day
-              // ignore fee as we wouldnt sell ETF we would also save the fee
-              Fee = 0.0M<Currency>
+              Fee = fee
               Price = price
               Count = count }
         
@@ -205,27 +213,39 @@ module BenchmarkInteractor =
             yield! store
                     |> Seq.choose (function
                         | StockBought e -> buy e.Date (e.Price * e.Count + e.Fee) |> StockBought |> Some
-                        // if we would invest in ETF we would not sell but we have to do it here in this simulation 
-                        // otherwise we would buy more shares than we have money
-                        // - ignore fee as we wouldnt sell ETF we would also save the fee
                         | StockSold e -> sell e.Date (e.Price * e.Count) |> StockSold |> Some
                         | _ -> None)
-            yield closePosition() |> PositionClosed
+            yield closePosition benchmark getPrice |> PositionClosed
         }
         |> List.ofSeq
 
-    /// Simulate buying a benchmark every month with the money available to calculate
-    /// possible performance
-    let buyBenchmarkByPlan (benchmark:Benchmark) getPrice cashLimit (store:DomainEvent list) =
+    /// Simulate buying a benchmark whenever a deposit was made considering the cash limit
+    let buyBenchmarkByPlan (benchmark:Benchmark) getPrice (store:DomainEvent list) =
+
+        let buy day  =
+            let price = day |> getPrice
+            let value = benchmark.SavingsPlan.Rate
+            let fee = value |> percent benchmark.SavingsPlan.Fee
+            let count = (value - fee) / price
+            { StockBought.Isin = benchmark.Isin
+              Name = benchmark.Name
+              Date = day
+              Fee = fee
+              Price = price
+              Count = count }
 
         // TODO: anual fee
+        // -> what about just inventing an event because it could then be calculated when walking the positions
     
         let start = store.Head |> Events.GetDate
         let stop = DateTime.Today
         let numMonths = (stop.Year - start.Year) * 12 + (stop.Month - start.Month + 1)
         
-        //[0 .. numMonths]
-        //|> Seq.map(fun m -> (new DateTime(start.Year, start.Month, 1)).AddMonths(m))
-        //|> Seq.map workingDay
-
-        store
+        seq {
+            yield!  [0 .. numMonths]
+                    |> Seq.map(fun m -> (new DateTime(start.Year, start.Month, 1)).AddMonths(m))
+                    |> Seq.map workingDay
+                    |> Seq.map(fun day -> day |> buy |> StockBought)
+            yield closePosition benchmark getPrice |> PositionClosed
+        }
+        |> List.ofSeq
