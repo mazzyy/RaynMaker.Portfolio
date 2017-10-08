@@ -83,17 +83,14 @@ module ExcelEventStore =
     open RaynMaker.Portfolio
     open RaynMaker.Portfolio.Entities
 
-    [<Literal>] 
-    let private template = @"../../etc/Events.xlsx"
-
-    type private EventsSheet = ExcelFile<template>
+    type private Sheet = ExcelFile<"../../etc/Events.xlsx">
 
     type ParsedEvent = 
         | Event of DomainEvent
         | Unknown of string * DateTime * payload:obj list
 
     let load path =
-        let sheet = new EventsSheet(path)
+        let sheet = new Sheet(path)
 
         sheet.Data
         |> Seq.filter(fun r -> String.IsNullOrEmpty(r.Event) |> not)
@@ -140,22 +137,22 @@ module ExcelEventStore =
         )
         |> List.ofSeq
 
-//module HistoricalPrices =
-//    open System
-//    open FSharp.ExcelProvider
-//    open RaynMaker.Portfolio
-//    open RaynMaker.Portfolio.Entities
+module HistoricalPrices =
+    open System
+    open FSharp.Data
+    open RaynMaker.Portfolio.Entities
 
-//    [<Literal>] 
-//    let private template = @"../../etc/Historic.csv"
+    type private Sheet = CsvProvider<"../../etc/FR0011079466.history.csv",";">
 
-//    type private EventsSheet = ExcelFile<template>
-
-//    type ParsedEvent = 
-//        | Event of DomainEvent
-//        | Unknown of string * DateTime * payload:obj list
-
-//    let load path =
-//        let sheet = new EventsSheet(path)
-//        // FR0011079466  
-//        // 
+    type Price = {
+        Day : DateTime
+        Price : decimal<Currency>
+        }
+    
+    let load (path:string) =
+        let sheet = Sheet.Load(path)
+        sheet.Rows
+        |> Seq.map(fun row -> 
+            { Day = DateTime.Parse(row.Date)
+              Price = row.Price * 1.0M<Currency> } )
+        |> List.ofSeq

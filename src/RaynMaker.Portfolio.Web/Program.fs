@@ -41,6 +41,7 @@ let main argv =
     |> Seq.choose (function |ExcelEventStore.Unknown(a,b,c) -> Some(a,b,c) | _ -> None)
     |> Seq.iter(fun (e,d,p) -> printfn "Unknown event skipped: %s|%A|%A" e d p)
     
+
     printfn "Starting ..."
 
     let app = 

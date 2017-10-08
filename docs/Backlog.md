@@ -13,3 +13,6 @@
 - report: pie chart of positions + cash compared to total investment capital
 
 - refactor to EventSourcing and CQRS with agents
+
+- automatically download prices from
+  - http://www.google.com/finance/historical?q=MSFT&output=csv
