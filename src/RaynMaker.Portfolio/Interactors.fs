@@ -134,16 +134,27 @@ module PerformanceInteractor =
     open RaynMaker.Portfolio.Entities
 
     type PerformanceReport = {
+        TotalInvestment : decimal<Currency>
         TotalProfit : decimal<Currency>
         }
 
-    let getPerformance (positions:PositionSummary list) =
+    let getPerformance store (positions:PositionSummary list) =
+        let processEvent total evt =
+            match evt with
+            | DepositAccounted evt -> printfn "%A - %A = %A" evt.Date evt.Value total; total + evt.Value
+            | DisbursementAccounted evt -> printfn "%A - %A = %A" evt.Date evt.Value total; total - evt.Value
+            | _ -> total
+
+        let investment =
+            store
+            |> List.fold processEvent 0.0M<Currency>
 
         let totalProfit = 
             positions
             |> Seq.sumBy(fun p -> p.MarketProfit + p.DividendProfit)
 
-        { TotalProfit = totalProfit }
+        { TotalInvestment = investment
+          TotalProfit = totalProfit }
 
 module BenchmarkInteractor =
     open System

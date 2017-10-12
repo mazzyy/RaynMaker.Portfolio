@@ -4,8 +4,15 @@
   - MWR
   - benchmark with ETF
 
+- show cash transactions and current cash as sanity check
+
+- sanity checks
+  - value is never negative - the event type defines whether it has to be substracted or summed up
+
 - refactor core positions logic
   - move to dedicated interactor and make buy and sell methods public so that we can test individually
+
+- re-read boostrap book to have better html (all these paragraphs ...)
 
 - anual roi actually is no simple math average ...
 

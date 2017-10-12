@@ -60,11 +60,14 @@ module Handlers =
         |> JSON)
     
     let performance getEvents = warbler (fun _ -> 
-        getEvents() 
+        let events = getEvents() 
+        
+        events
         |> getPositionSummaries 
-        |> PerformanceInteractor.getPerformance 
+        |> PerformanceInteractor.getPerformance events
         |> fun p -> 
             dict [
+                "totalInvestment" => p.TotalInvestment
                 "totalProfit" => p.TotalProfit
             ]
         |> JSON)
