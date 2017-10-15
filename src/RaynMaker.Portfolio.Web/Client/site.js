@@ -1,8 +1,19 @@
 ﻿function init() {
-    const Foo = { template: '<div>foo</div>' }
+    var Foo = Vue.extend({
+        template: '<p>{{firstName}} {{lastName}} aka {{alias}}</p>',
+        data: function () {
+            return {
+                firstName: 'Walter',
+                lastName: 'White',
+                alias: 'Heisenberg'
+            }
+        }
+    })
     const Bar = { template: '<div>bar</div>' }
+
     // https://router.vuejs.org/en/advanced/data-fetching.html
     const routes = [
+        { path: '/', redirect: '/foo'},
         { path: '/foo', component: Foo },
         { path: '/bar', component: Bar }
     ]

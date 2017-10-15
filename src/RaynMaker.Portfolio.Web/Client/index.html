@@ -11,6 +11,17 @@
 <body>
     <div class="container-fluid">
         <div id="app">
+            <nav class="navbar navbar-inverse">
+                <div class="container-fluid">
+                    <ul class="nav navbar-nav">
+                        <li><router-link to="/foo">Go to Foo</router-link></li>
+                        <li><router-link to="/bar">Go to Bar</router-link></li>
+                    </ul>
+                </div>
+            </nav>
+
+            <router-view></router-view>
+
             <h1>Positions</h1>
 
             <form id="filter">
@@ -56,16 +67,6 @@
 
             <h1>Diversification</h1>
             <pie-chart :width="500" :height="500" :data="diversification.data" :labels="diversification.labels"></pie-chart>
-
-
-
-            <div>
-                <router-link to="/foo">Go to Foo</router-link>
-                <router-link to="/bar">Go to Bar</router-link>
-
-                <router-view></router-view>
-            </div>
-
         </div>
     </div>
 
