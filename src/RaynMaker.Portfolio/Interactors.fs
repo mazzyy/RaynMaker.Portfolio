@@ -260,3 +260,18 @@ module BenchmarkInteractor =
             yield closePosition benchmark getPrice |> PositionClosed
         }
         |> List.ofSeq
+
+module StatisticsInteractor =
+    open PositionsInteractor
+    open RaynMaker.Portfolio.Entities
+
+    type DiversificationReport = {
+        Positions : (string*decimal<Currency>) list
+        }
+
+    let getDiversification (positions:Position list) =
+        let investmentPerPositions =
+            positions
+            |> List.map(fun p -> p.Name,p.Invested)        
+        
+        { Positions = investmentPerPositions } 

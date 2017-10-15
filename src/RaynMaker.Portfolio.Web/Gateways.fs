@@ -109,6 +109,20 @@ module Handlers =
             ]
         ]
         |> JSON)
+
+    let diversification getEvents = warbler (fun _ -> 
+        let events = getEvents() 
+        
+        let report =
+            events
+            |> PositionsInteractor.getPositions 
+            |> StatisticsInteractor.getDiversification
+
+        dict [
+            "labels" => (report.Positions |> List.map fst)
+            "data" => (report.Positions |> List.map snd)
+        ]
+        |> JSON)
             
 module ExcelEventStore =
     open System

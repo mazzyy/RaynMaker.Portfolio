@@ -95,6 +95,7 @@ let main argv =
                     path "/api/positions" >=> Handlers.positions getEvents
                     path "/api/performance" >=> Handlers.performance getEvents
                     path "/api/benchmark" >=> Handlers.benchmark getEvents benchmark getBenchmarkHistory 
+                    path "/api/diversification" >=> Handlers.diversification getEvents 
                 ]
         ]
 
