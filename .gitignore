@@ -22,3 +22,4 @@
 /packages/FsUnit.*
 /packages/NUnit.*
 /packages/FSharp.Data.*
+/src/RaynMaker.Portfolio.Web/node_modules/**

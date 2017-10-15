@@ -97,9 +97,8 @@ let main argv =
         choose [ 
             GET >=> log >=> choose
                 [
-                    path "/" >=> redirect "/Content/index.html"
-                    pathScan "/Content/%s" (fun f -> Files.file (sprintf "%s/Content/%s" home f))
-                    pathScan "/Scripts/%s" (fun f -> Files.file (sprintf "%s/Scripts/%s" home f))
+                    path "/" >=> redirect "/Client/index.html"
+                    pathScan "/Client/%s" (fun f -> Files.file (sprintf "%s/Client/%s" home f))
                     path "/api/positions" >=> Handlers.positions getEvents
                     path "/api/performance" >=> Handlers.performance getEvents
                     path "/api/benchmark" >=> Handlers.benchmark getEvents benchmark getBenchmarkHistory 
