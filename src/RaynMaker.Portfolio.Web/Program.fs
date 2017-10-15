@@ -15,13 +15,21 @@ open RaynMaker.Portfolio.Gateways
 open RaynMaker.Portfolio.Interactors
 open RaynMaker.Portfolio.Interactors.BenchmarkInteractor
 open RaynMaker.Portfolio.Entities
+open System.Diagnostics
 
 type Project = JsonProvider<"../../etc/Portfolio.json">
 
 [<EntryPoint>]
-let main argv = 
-    let home = Assembly.GetExecutingAssembly().Location |> Path.GetDirectoryName |> Path.GetFullPath
+let main argv =
+    let location = Assembly.GetExecutingAssembly().Location
+    let home = location |> Path.GetDirectoryName |> Path.GetFullPath
     printfn "Home: %s" home
+
+    // development support
+    Process.GetProcesses()
+    |> Seq.filter(fun x -> x.ProcessName = Path.GetFileNameWithoutExtension(location))
+    |> Seq.filter(fun x -> x.Id <> Process.GetCurrentProcess().Id)
+    |> Seq.iter(fun x -> x.Kill())
 
     printfn "Loading project ..."
 

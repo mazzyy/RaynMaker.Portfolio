@@ -4,6 +4,12 @@
   - MWR
   - benchmark with ETF
 
+
+
+- vue navigation
+- agents in BE to remember state
+
+
 - show cash transactions and current cash as sanity check
 
 - sanity checks
@@ -25,8 +31,6 @@
 - vue navigation?
 
 - test and impl event invariants (e.g. cannot sell more than i have)
-
-- report: pie chart of positions + cash compared to total investment capital
 
 - refactor to EventSourcing and CQRS with agents
 

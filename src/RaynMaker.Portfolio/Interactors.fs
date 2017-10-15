@@ -272,6 +272,8 @@ module StatisticsInteractor =
     let getDiversification (positions:Position list) =
         let investmentPerPositions =
             positions
-            |> List.map(fun p -> p.Name,p.Invested)        
+            |> Seq.filter(fun p -> p.Close |> Option.isNone)        
+            |> Seq.map(fun p -> p.Name,p.Invested)  
+            |> List.ofSeq
         
         { Positions = investmentPerPositions } 

@@ -6,6 +6,17 @@ function formatValue(value) {
     return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
 }
 
+function randomColor() {
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    var h = randomInt(0, 360);
+    var s = randomInt(42, 98);
+    var l = randomInt(40, 90);
+    return "hsl(" + h + "," + s + "%," + l +"%)";
+}
+
 Vue.component('grid', {
     template: '#grid-template',
     props: {
@@ -57,4 +68,26 @@ Vue.component('grid', {
         }
     }
 })
+
+Vue.component('pie-chart', {
+    extends: VueChartJs.Pie,
+    props: {
+        data: Array,
+        labels: Array
+    },
+    mounted: function () {
+        var backgrounds = [];
+        for (var i in this.data) {
+            backgrounds.push(randomColor());
+        }
+
+        this.renderChart({
+            labels: this.labels,
+            datasets: [{
+                backgroundColor: backgrounds,
+                data: this.data
+            }]
+        }, { responsive: false, maintainAspectRatio: false })
+    }
+});
 
