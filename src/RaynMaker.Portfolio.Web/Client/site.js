@@ -1,7 +1,18 @@
-﻿
-function init() {
+﻿function init() {
+    const Foo = { template: '<div>foo</div>' }
+    const Bar = { template: '<div>bar</div>' }
+    // https://router.vuejs.org/en/advanced/data-fetching.html
+    const routes = [
+        { path: '/foo', component: Foo },
+        { path: '/bar', component: Bar }
+    ]
+    const router = new VueRouter({
+        routes: routes
+    })
+
     var app = new Vue({
         el: '#app',
+        router: router,
         data: {
             positions: [],
             filter: '',

@@ -56,6 +56,16 @@
 
             <h1>Diversification</h1>
             <pie-chart :width="500" :height="500" :data="diversification.data" :labels="diversification.labels"></pie-chart>
+
+
+
+            <div>
+                <router-link to="/foo">Go to Foo</router-link>
+                <router-link to="/bar">Go to Bar</router-link>
+
+                <router-view></router-view>
+            </div>
+
         </div>
     </div>
 
@@ -91,6 +101,7 @@
     <script src="/Client/bootstrap.min.js"></script>
     <script src="/Client/vue.min.js"></script>
     <script src="/Client/vue-chartjs.full.min.js"></script>
+    <script src="/Client/vue-router.min.js"></script>
     <script src="/Client/site.library.js"></script>
     <script src="/Client/site.js"></script>
     <script>
