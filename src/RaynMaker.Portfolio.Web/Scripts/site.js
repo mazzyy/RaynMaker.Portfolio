@@ -1,63 +1,35 @@
-﻿function formatValue(value) {
-    if (typeof value === 'string' || value instanceof String) return value
-    let val = (value / 1).toFixed(2).replace('.', ',')
-    return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
-}
-
+﻿
 function init() {
-    $.ajaxSetup({ cache: false });
-
-    Vue.component('grid', {
-        template: '#grid-template',
+    Vue.component('pie-chart', {
+        extends: VueChartJs.Pie,
         props: {
             data: Array,
-            columns: Array,
-            columnHeaders: Array,
-            filterKey: String
+            labels: Array
         },
-        data: function () {
-            var sortOrders = {}
-            this.columns.forEach(function (key) {
-                sortOrders[key] = 1
-            })
-            return {
-                sortKey: '',
-                sortOrders: sortOrders
-            }
-        },
-        computed: {
-            filteredData: function () {
-                var sortKey = this.sortKey
-                var filterKey = this.filterKey && this.filterKey.toLowerCase()
-                var order = this.sortOrders[sortKey] || 1
-                var data = this.data
-                if (filterKey) {
-                    data = data.filter(function (row) {
-                        return Object.keys(row).some(function (key) {
-                            return String(row[key]).toLowerCase().indexOf(filterKey) > -1
-                        })
-                    })
+        mounted: function () {
+            var dynamicColor = function () {
+                var letters = '789ABCD'.split('');
+                var color = '#';
+                for (var i = 0; i < 6; i++) {
+                    color += letters[Math.round(Math.random() * 6)];
                 }
-                if (sortKey) {
-                    data = data.slice().sort(function (a, b) {
-                        a = a[sortKey]
-                        b = b[sortKey]
-                        return (a === b ? 0 : a > b ? 1 : -1) * order
-                    })
-                }
-                return data
+                return color;            };
+
+            //backgroundColor: ["#3e95cd", "#8e5ea2", "#3cba9f", "#e8c3b9", "#c45850"],
+            var backgrounds = [];
+            for (var i in this.data) {
+                backgrounds.push(dynamicColor());
             }
-        },
-        filters: {
-            formatValue: formatValue
-        },
-        methods: {
-            sortBy: function (key) {
-                this.sortKey = key
-                this.sortOrders[key] = this.sortOrders[key] * -1
-            }
+
+            this.renderChart({
+                labels: this.labels,
+                datasets: [{
+                    backgroundColor: backgrounds,
+                    data: this.data
+                }]
+            }, { responsive: false, maintainAspectRatio: false })
         }
-    })
+    });
 
     var app = new Vue({
         el: '#app',
@@ -69,7 +41,11 @@ function init() {
             headers: ['Name', 'Isin', 'Open', 'Close', 'Duration', 'Market', 'Dividend', 'Total',
                 'Market', 'Dividend', 'Total', 'Market', 'Dividend', 'Total'],
             performance: null,
-            benchmark: null
+            benchmark: null,
+            diversification: {
+                data: null,
+                labels: null
+            }
         },
         created: function () {
             this.get('/api/positions', {}, function (that, response) {
@@ -80,6 +56,10 @@ function init() {
             });
             this.get('/api/benchmark', {}, function (that, response) {
                 that.benchmark = response
+            });
+            this.get('/api/diversification', {}, function (that, response) {
+                that.diversification.data = [2478, 5267, 734, 784, 433];
+                that.diversification.labels = ["Africa", "Asia", "Europe", "Latin America", "North America"];
             });
         },
         filters: {

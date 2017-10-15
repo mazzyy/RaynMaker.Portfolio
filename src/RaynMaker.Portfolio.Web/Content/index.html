@@ -53,6 +53,9 @@
             <p>
                 <label>Anual ROI: </label> {{ benchmark.buyPlan.totalRoiAnual | formatValue }}
             </p>
+
+            <h1>Diversification</h1>
+            <pie-chart :width="500" :height="500" :data="diversification.data" :labels="diversification.labels"></pie-chart>
         </div>
     </div>
 
@@ -87,6 +90,8 @@
     <script src="/Scripts/jquery-3.2.1.min.js"></script>
     <script src="/Scripts/vue.min.js"></script>
     <script src="/Scripts/bootstrap.min.js"></script>
+    <script src="https://unpkg.com/vue-chartjs/dist/vue-chartjs.full.min.js"></script>
+    <script src="/Scripts/site.library.js"></script>
     <script src="/Scripts/site.js"></script>
     <script>
         $(function () {
