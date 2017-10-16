@@ -1,5 +1,5 @@
 ﻿function init() {
-    var Foo = Vue.extend({
+    var Positions = Vue.extend({
         template: '<p>{{firstName}} {{lastName}} aka {{alias}}</p>',
         data: function () {
             return {
@@ -9,16 +9,18 @@
             }
         }
     })
-    const Bar = { template: '<div>bar</div>' }
+
+    const Performance = { template: '<div>bar</div>' }
 
     // https://router.vuejs.org/en/advanced/data-fetching.html
     const routes = [
-        { path: '/', redirect: '/foo'},
-        { path: '/foo', component: Foo },
-        { path: '/bar', component: Bar }
+        { path: '/Positions', alias: '/', component: Positions },
+        { path: '/Performance', component: Performance }
     ]
     const router = new VueRouter({
-        routes: routes
+        routes: routes,
+        linkActiveClass: "active", 
+        linkExactActiveClass: "active" 
     })
 
     var app = new Vue({
