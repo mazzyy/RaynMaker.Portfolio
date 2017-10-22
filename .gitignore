@@ -22,5 +22,5 @@
 /packages/FsUnit.*
 /packages/NUnit.*
 /packages/FSharp.Data.*
-/src/RaynMaker.Portfolio.Web/node_modules/**
+/src/RaynMaker.Portfolio.Html/node_modules/**
 /src/RaynMaker.Portfolio.Service/node_modules/**

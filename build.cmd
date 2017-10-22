@@ -15,4 +15,8 @@ echo Updating node modules of %project%
 cd %project%
 npm install
 
+cd %home%\src\RaynMaker.Portfolio.Html
+npm run build
+
+
 endlocal
