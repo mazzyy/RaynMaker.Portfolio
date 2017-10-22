@@ -14,3 +14,4 @@ new Vue({
 
 require('../node_modules/bootstrap/dist/css/bootstrap.min.css')
 require('./assets/css/site.css')
+require('./assets/js/site.js')

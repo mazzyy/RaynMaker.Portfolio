@@ -35,6 +35,9 @@
     <Compile Include="config\dev.env.js" />
     <Compile Include="config\index.js" />
     <Compile Include="config\prod.env.js" />
+    <Compile Include="src\assets\js\site.js">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="src\main.js" />
     <Content Include="src\App.vue" />
     <Compile Include="src\router\index.js" />
@@ -47,6 +50,7 @@
     <Folder Include="src" />
     <Folder Include="src\assets" />
     <Folder Include="src\assets\css\" />
+    <Folder Include="src\assets\js\" />
     <Folder Include="src\components" />
     <Folder Include="src\router" />
     <Folder Include="static" />
