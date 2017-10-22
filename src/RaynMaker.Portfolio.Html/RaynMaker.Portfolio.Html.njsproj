@@ -37,8 +37,8 @@
     <Compile Include="config\prod.env.js" />
     <Compile Include="src\main.js" />
     <Content Include="src\App.vue" />
-    <Content Include="src\assets\logo.png" />
     <Compile Include="src\router\index.js" />
+    <Content Include="src\assets\css\site.css" />
     <Content Include="src\components\HelloWorld.vue" />
   </ItemGroup>
   <ItemGroup>
@@ -46,6 +46,7 @@
     <Folder Include="config" />
     <Folder Include="src" />
     <Folder Include="src\assets" />
+    <Folder Include="src\assets\css\" />
     <Folder Include="src\components" />
     <Folder Include="src\router" />
     <Folder Include="static" />
