@@ -3,7 +3,13 @@ setlocal
 
 set home=%~dp0
 
-set project=%home%\src\RaynMaker.Portfolio.Web
+set project=%home%\src\RaynMaker.Portfolio.Service
+echo Updating node modules of %project%
+
+cd %project%
+npm install
+
+set project=%home%\src\RaynMaker.Portfolio.Html
 echo Updating node modules of %project%
 
 cd %project%

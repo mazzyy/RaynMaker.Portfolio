@@ -1,0 +1,114 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>RaynMaker - Portfolio</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="/Client/bootstrap.min.css" />
+    <link rel="stylesheet" href="/Client/site.css" />
+</head>
+<body>
+    <div class="container-fluid">
+        <div id="app">
+            <nav class="navbar navbar-inverse">
+                <div class="container-fluid">
+                    <ul class="nav navbar-nav">
+                        <li><router-link to="/Positions">Home</router-link></li>
+                        <li><router-link to="/Performance">Performance</router-link></li>
+                    </ul>
+                </div>
+            </nav>
+
+            <router-view></router-view>
+
+            <h1>Positions</h1>
+
+            <form id="filter">
+                Filter <input name="query" v-model="filter">
+            </form>
+
+            <grid :data="positions" :columns="properties" :filter-key="filter" :column-headers="headers" style="margin-top:10px"></grid>
+
+            <h1>Performance</h1>
+            <p>
+                <label>Total investment: </label> {{ performance.totalInvestment | formatValue }}
+            </p>
+            <p>
+                <label>Total profit: </label> {{ performance.totalProfit | formatValue }}
+            </p>
+
+            <h1>Benchmark</h1>
+            <p>
+                If you would have bought the benchmark "{{ benchmark.name }}" (Isin: {{ benchmark.isin }}) instead of your stock picks you would have gained:
+            </p>
+            <p>
+                <label>Total profit: </label> {{ benchmark.buyInstead.totalProfit | formatValue }}
+            </p>
+            <p>
+                <label>Total ROI: </label> {{ benchmark.buyInstead.totalRoi | formatValue }}
+            </p>
+            <p>
+                <label>Anual ROI: </label> {{ benchmark.buyInstead.totalRoiAnual | formatValue }}
+            </p>
+
+            <p>
+                If you would have bought the benchmark "{{ benchmark.name }}" (Isin: {{ benchmark.isin }}) every month with a rate of {{ benchmark.buyPlan.rate }} yout would have gained:
+            </p>
+            <p>
+                <label>Total profit: </label> {{ benchmark.buyPlan.totalProfit | formatValue }}
+            </p>
+            <p>
+                <label>Total ROI: </label> {{ benchmark.buyPlan.totalRoi | formatValue }}
+            </p>
+            <p>
+                <label>Anual ROI: </label> {{ benchmark.buyPlan.totalRoiAnual | formatValue }}
+            </p>
+
+            <h1>Diversification</h1>
+            <pie-chart :width="500" :height="500" :data="diversification.data" :labels="diversification.labels"></pie-chart>
+        </div>
+    </div>
+
+    <script type="text/x-template" id="grid-template">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th colspan="5"></th>
+                    <th colspan="3" style="text-align:center">Profit</th>
+                    <th colspan="3" style="text-align:center">ROI (%)</th>
+                    <th colspan="3" style="text-align:center">Anual (%)</th>
+                </tr>
+                <tr>
+                    <th v-for="(key,idx) in columns"
+                        @click="sortBy(key)"
+                        :class="{ sortedBy: sortKey == key }">
+                        {{ columnHeaders[idx] }}
+                        <span class="arrow" :class="sortOrders[key] > 0 ? 'asc' : 'dsc'"></span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="entry in filteredData" :class="{ closed: entry.isClosed }">
+                    <td v-for="key in columns">
+                        {{ entry[key] | formatValue }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </script>
+
+    <script src="/Client/jquery.min.js"></script>
+    <script src="/Client/bootstrap.min.js"></script>
+    <script src="/Client/vue.min.js"></script>
+    <script src="/Client/vue-chartjs.full.min.js"></script>
+    <script src="/Client/vue-router.min.js"></script>
+    <script src="/Client/site.library.js"></script>
+    <script src="/Client/site.js"></script>
+    <script>
+        $(function () {
+            init();
+        });
+    </script>
+</body>
+</html> 

@@ -1,12 +1,13 @@
 
 - setup a vue project with webback and vue loader to support vue components
-  - install npm?
+  - https://vuejs.org/v2/guide/installation.html
   - separate FE and BE
   - add build.cmd which updates modules and builds project
   - how to build a package? (copy stuff to bin -> webpack?)
 - create a WPF app which hosts suave BE and VUE FE
 
 
+- show for "position closed" the date in the web page to know from when the prices are
 
 - over all performance
   - TWR
@@ -26,8 +27,6 @@
 
 - refactor core positions logic
   - move to dedicated interactor and make buy and sell methods public so that we can test individually
-
-- re-read boostrap book to have better html (all these paragraphs ...)
 
 - anual roi actually is no simple math average ...
 
