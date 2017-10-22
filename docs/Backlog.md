@@ -1,4 +1,13 @@
 
+- setup a vue project with webback and vue loader to support vue components
+  - install npm?
+  - separate FE and BE
+  - add build.cmd which updates modules and builds project
+  - how to build a package? (copy stuff to bin -> webpack?)
+- create a WPF app which hosts suave BE and VUE FE
+
+
+
 - over all performance
   - TWR
   - MWR

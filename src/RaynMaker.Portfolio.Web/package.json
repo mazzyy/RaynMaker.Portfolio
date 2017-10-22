@@ -1,4 +1,10 @@
 {
+  "description": "Client of the RaynMaker Portfolio app",
+  "license": "BSD-3-Clause",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bg0jr/RaynMaker.Portfolio.git"
+  },
   "dependencies": {
     "jquery": "^3.2.1",
     "bootstrap": "^3.3.7",
