@@ -6,17 +6,19 @@
     <ProjectGuid>{5f392859-15c1-41ca-b6aa-e164f24d66b2}</ProjectGuid>
     <ProjectHome>.</ProjectHome>
     <ProjectView>ProjectFiles</ProjectView>
-    <StartupFile>.eslintrc.js</StartupFile>
+    <StartupFile>debug.js</StartupFile>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <ProjectTypeGuids>{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{349c5851-65df-11da-9384-00065b846f21};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}</ProjectTypeGuids>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">15.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
     <Disable_CopyWebApplication>True</Disable_CopyWebApplication>
+    <StartWebBrowser>True</StartWebBrowser>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
   <ItemGroup>
+    <Content Include="debug.js" />
     <Content Include="index.html" />
     <Content Include="package.json" />
     <Compile Include=".eslintrc.js" />
