@@ -1,15 +1,15 @@
 <template>
   <div>
-    <h1>{{ msg }}</h1>
+    <h1>Performance</h1>
     <div>
-      Is Production: {{ isProduction }}
+      coming soon
     </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'HelloWorld',
+  name: 'Performance',
   data () {
     return {
       msg: 'Welcome to Your Vue.js App',

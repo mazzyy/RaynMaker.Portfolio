@@ -42,7 +42,11 @@
     <Content Include="src\App.vue" />
     <Compile Include="src\router\index.js" />
     <Content Include="src\assets\css\site.css" />
-    <Content Include="src\components\HelloWorld.vue" />
+    <Content Include="src\components\Performance.vue" />
+    <Content Include="src\components\Positions.vue" />
+    <Content Include="src\components\PositionsGrid.vue">
+      <SubType>Code</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="build" />
