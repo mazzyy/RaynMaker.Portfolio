@@ -1,7 +1,7 @@
 
 <script>
   import { Pie } from 'vue-chartjs'
-  import * as my from '../assets/js/site.js'
+  import * as pl from '../../../../packages/GooglePaletteJs/palette.js'
 
   export default {
     extends: Pie,
@@ -27,16 +27,16 @@
       render () {
         var backgrounds = []
         if (this.chartData) {
-          this.chartData.forEach(_ => {
-            backgrounds.push(my.randomColor())
+          backgrounds = pl.palette('tol', this.chartData.length).map(function (hex) {
+            return '#' + hex
           })
         }
 
         this.renderChart({
           labels: this.labels,
           datasets: [{
-            backgroundColor: backgrounds,
-            data: this.chartData
+            data: this.chartData,
+            backgroundColor: backgrounds
           }]
         }, { responsive: false, maintainAspectRatio: false })
       }
