@@ -15,6 +15,7 @@
   - benchmark with ETF
 
 
+- add overview on disposals per year
 
 - vue navigation
 - agents in BE to remember state
