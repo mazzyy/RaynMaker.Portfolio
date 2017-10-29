@@ -24,9 +24,9 @@
       return {
         positions: [],
         filter: '',
-        properties: ['name', 'isin', 'open', 'close', 'duration', 'marketProfit', 'dividendProfit', 'totalProfit',
+        properties: ['name', 'isin', 'open', 'pricedAt', 'duration', 'marketProfit', 'dividendProfit', 'totalProfit',
           'marketRoi', 'dividendRoi', 'totalRoi', 'marketRoiAnual', 'dividendRoiAnual', 'totalRoiAnual'],
-        headers: ['Name', 'Isin', 'Open', 'Close', 'Duration', 'Market', 'Dividend', 'Total',
+        headers: ['Name', 'Isin', 'Open', 'Priced At', 'Duration', 'Market', 'Dividend', 'Total',
           'Market', 'Dividend', 'Total', 'Market', 'Dividend', 'Total'],
         diversification: {
           data: null,

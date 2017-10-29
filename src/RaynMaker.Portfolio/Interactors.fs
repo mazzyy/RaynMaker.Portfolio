@@ -7,7 +7,8 @@ module PositionsInteractor =
 
     type PositionSummary = {
         Open : DateTime 
-        Close : DateTime option
+        PricedAt : DateTime option
+        IsClosed : bool
         Isin : string
         Name : string
         MarketProfit : decimal<Currency>
@@ -20,7 +21,8 @@ module PositionsInteractor =
 
     type Position = {
         Open : DateTime 
-        Close : DateTime option
+        PricedAt : DateTime option
+        IsClosed : bool
         Isin : string
         Name : string
         Count : decimal
@@ -32,7 +34,8 @@ module PositionsInteractor =
     let createPosition date isin name =
         { 
             Open = date
-            Close = None
+            PricedAt = None
+            IsClosed = false
             Isin = isin
             Name = name
             Count = 0.0M
@@ -71,7 +74,8 @@ module PositionsInteractor =
             let newP =
                 { p with Payouts = p.Payouts + evt.Count * evt.Price - evt.Fee
                          Count = count
-                         Close = if count = 0.0M then evt.Date |> Some else None }
+                         PricedAt = evt.Date |> Some
+                         IsClosed = count = 0.0M }
             newP::(positions |> List.filter ((<>) p))
 
         let closePosition positions (evt:PositionClosed) =
@@ -83,7 +87,8 @@ module PositionsInteractor =
             // TODO: count must not be zero
             let newP =
                 { p with Payouts = p.Payouts + p.Count * evt.Price - evt.Fee
-                         Count = 0.0M }
+                         Count = 0.0M 
+                         PricedAt = evt.Date |> Some }
             newP::(positions |> List.filter ((<>) p))
 
         let receiveDividend positions (evt:DividendReceived) =
@@ -107,13 +112,14 @@ module PositionsInteractor =
     let summarizePositions positions =
         let summarizePosition p =
             let investedYears = 
-                let span = p.Close |> Option.map(fun c -> c - p.Open) |? (DateTime.Today - p.Open)
+                let span = p.PricedAt |> Option.map(fun c -> c - p.Open) |? (DateTime.Today - p.Open)
                 span.TotalDays / 365.0 |> decimal
             let marketRoi = (p.Payouts - p.Invested) / p.Invested * 100.0M<Percentage>
             let dividendRoi = p.Dividends / p.Invested * 100.0M<Percentage>
             { 
                 Open = p.Open
-                Close = p.Close
+                PricedAt = p.PricedAt
+                IsClosed = p.IsClosed
                 Isin = p.Isin
                 Name = p.Name
                 MarketProfit = p.Payouts - p.Invested
@@ -272,7 +278,7 @@ module StatisticsInteractor =
     let getDiversification (positions:Position list) =
         let investmentPerPositions =
             positions
-            |> Seq.filter(fun p -> p.Close |> Option.isNone)        
+            |> Seq.filter(fun p -> p.IsClosed |> not)        
             |> Seq.map(fun p -> p.Name,p.Invested)  
             |> List.ofSeq
         

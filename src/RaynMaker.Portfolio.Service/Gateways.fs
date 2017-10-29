@@ -44,8 +44,8 @@ module Handlers =
                 "name" => p.Name
                 "isin" => p.Isin
                 "open" => (p.Open |> formatDate)
-                "close" => (p.Close |> Option.map formatDate |? "-")
-                "duration" => ((p.Close |? DateTime.Today) - p.Open |> formatTimespan)
+                "pricedAt" => (p.PricedAt|> Option.map formatDate |? "-")
+                "duration" => ((p.PricedAt |? DateTime.Today) - p.Open |> formatTimespan)
                 "marketProfit" => p.MarketProfit
                 "dividendProfit" => p.DividendProfit
                 "totalProfit" => (p.MarketProfit + p.DividendProfit)
@@ -55,7 +55,7 @@ module Handlers =
                 "marketRoiAnual" => p.MarketRoiAnual
                 "dividendRoiAnual" => p.DividendRoiAnual
                 "totalRoiAnual" => (p.MarketRoiAnual + p.DividendRoiAnual)
-                "isClosed" => (p.Close |> Option.isSome)
+                "isClosed" => p.IsClosed 
             ])
         |> JSON)
     
