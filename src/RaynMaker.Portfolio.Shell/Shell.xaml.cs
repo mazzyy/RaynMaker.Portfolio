@@ -7,6 +7,8 @@ namespace RaynMaker.Portfolio.Shell
         public Shell()
         {
             InitializeComponent();
+
+            myBrowser.Navigate("http://localhost:2525/");
         }
     }
 }

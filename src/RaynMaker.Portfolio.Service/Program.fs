@@ -18,10 +18,13 @@ open Suave.RequestErrors
 
 type Project = JsonProvider<"../../etc/Portfolio.json">
 
-[<EntryPoint>]
-let main argv =
+let private getHome () =
     let location = Assembly.GetExecutingAssembly().Location
-    let home = location |> Path.GetDirectoryName |> Path.GetFullPath
+    location |> Path.GetDirectoryName |> Path.GetFullPath
+
+let start projectFile =
+    let location = Assembly.GetExecutingAssembly().Location
+    let home = getHome()
     printfn "Home: %s" home
 
     // development support
@@ -31,12 +34,6 @@ let main argv =
     |> Seq.iter(fun x -> x.Kill())
 
     printfn "Loading project ..."
-
-    let projectFile = 
-        match argv with
-        | [|path|] -> path 
-        | x -> Path.Combine(home, "..", "..", "etc", "Portfolio.json")
-        |> Path.GetFullPath
 
     printfn "Project: %s" projectFile
 
@@ -107,12 +104,30 @@ let main argv =
                 ]
         ]
 
-    let port,cts = Httpd.start app
+    Httpd.start app
+
+let stop (cts:CancellationTokenSource) =
+    cts.Cancel()
+
+let getProjectFileFromCommandLine argv =
+    let home = getHome()
+
+    match argv with
+    | [|path|] -> path 
+    | x -> Path.Combine(home, "..", "..", "etc", "Portfolio.json")
+    |> Path.GetFullPath
+
+[<EntryPoint>]
+let main argv =
+    let port,cts = 
+        argv
+        |> getProjectFileFromCommandLine
+        |> start 
 
     Browser.start port
 
     Console.ReadKey true |> ignore
     
-    cts.Cancel()
+    stop cts
 
     0

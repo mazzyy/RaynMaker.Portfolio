@@ -102,4 +102,8 @@
       </FlavorProperties>
     </VisualStudio>
   </ProjectExtensions>
+  <Target Name="AfterBuild">
+    <Exec Condition="$(Configuration) == 'Debug'" Command="npm run build-dev" />
+    <Exec Condition="$(Configuration) == 'Release'" Command="npm run build-prod" />
+  </Target>
 </Project>

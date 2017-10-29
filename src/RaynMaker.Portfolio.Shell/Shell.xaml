@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:RaynMaker.Portfolio.Shell"
         mc:Ignorable="d"
         Title="MainWindow" Height="800" Width="1400">
-    <Grid>
-        
-    </Grid>
+    <DockPanel LastChildFill="True">
+        <WebBrowser Name="myBrowser"></WebBrowser>
+    </DockPanel>
 </Window>

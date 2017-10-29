@@ -4,12 +4,13 @@
 // see http://vuejs-templates.github.io/webpack for documentation.
 
 const path = require('path')
+var buildMode = process.env.NODE_ENV === 'production' ? 'Release' : 'Debug'
 
 module.exports = {
   build: {
     env: require('./prod.env'),
-    index: path.resolve(__dirname, '../../../bin/Release/Client/index.html'),
-    assetsRoot: path.resolve(__dirname, '../../../bin/Release/Client/'),
+    index: path.resolve(__dirname, '../../../bin/' + buildMode + '/Client/index.html'),
+    assetsRoot: path.resolve(__dirname, '../../../bin/' + buildMode + '/Client/'),
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     productionSourceMap: true,
