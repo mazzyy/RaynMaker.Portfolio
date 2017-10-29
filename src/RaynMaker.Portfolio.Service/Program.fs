@@ -6,16 +6,15 @@ open System.Reflection
 open System.IO
 open FSharp.Data
 open Suave
-open Suave.Successful
 open Suave.Operators
 open Suave.Filters
 open Suave.Redirection
 open RaynMaker.Portfolio.Frameworks
 open RaynMaker.Portfolio.Gateways
-open RaynMaker.Portfolio.Interactors
 open RaynMaker.Portfolio.Interactors.BenchmarkInteractor
 open RaynMaker.Portfolio.Entities
 open System.Diagnostics
+open Suave.RequestErrors
 
 type Project = JsonProvider<"../../etc/Portfolio.json">
 
@@ -99,10 +98,12 @@ let main argv =
                 [
                     path "/" >=> redirect "/Client/index.html"
                     pathScan "/Client/%s" (fun f -> Files.file (sprintf "%s/Client/%s" home f))
+                    pathScan "/static/%s" (fun f -> Files.file (sprintf "%s/Client/static/%s" home f))
                     path "/api/positions" >=> Handlers.positions getEvents
                     path "/api/performance" >=> Handlers.performance getEvents
                     path "/api/benchmark" >=> Handlers.benchmark getEvents benchmark getBenchmarkHistory 
                     path "/api/diversification" >=> Handlers.diversification getEvents 
+                    NOT_FOUND "Resource not found."
                 ]
         ]
 

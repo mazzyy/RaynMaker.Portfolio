@@ -17,24 +17,11 @@
   </PropertyGroup>
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
-    <Content Include="Client\index.html">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Client\site.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Client\site.library.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Client\site.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Gateways.fs" />
     <Compile Include="Frameworks.fs" />
     <Compile Include="Program.fs" />
     <None Include="App.config" />
-    <None Include="package.json" />
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -99,10 +86,4 @@
       <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
-  <Target Name="AfterBuild">
-    <ItemGroup>
-      <NPM Include="node_modules\*\dist\**\*.*" />
-    </ItemGroup>
-    <Copy SourceFiles="@(NPM)" DestinationFolder="$(OutputPath)\Client\" SkipUnchangedFiles="true" />
-  </Target>
 </Project>

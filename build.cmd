@@ -1,22 +1,18 @@
 @echo off
 setlocal
 
+call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\Common7\Tools\VsDevCmd.bat"
+
 set home=%~dp0
 
-set project=%home%\src\RaynMaker.Portfolio.Service
-echo Updating node modules of %project%
+echo Building Solution
+cd %home%
+call msbuild /p:Configuration=Release /p:Platform="Any CPU" %home%\RaynMaker.Portfolio.sln /t:rebuild
 
-cd %project%
-npm install
-
-set project=%home%\src\RaynMaker.Portfolio.Html
-echo Updating node modules of %project%
-
-cd %project%
-npm install
-
+echo Building Client
 cd %home%\src\RaynMaker.Portfolio.Html
-npm run build
+call npm install
+call npm run build
 
 
 endlocal
