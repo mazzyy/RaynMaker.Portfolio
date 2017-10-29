@@ -18,6 +18,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "RaynMaker.Portfolio.Specs",
 EndProject
 Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "RaynMaker.Portfolio.Html", "src\RaynMaker.Portfolio.Html\RaynMaker.Portfolio.Html.njsproj", "{5F392859-15C1-41CA-B6AA-E164F24D66B2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RaynMaker.Portfolio.Shell", "src\RaynMaker.Portfolio.Shell\RaynMaker.Portfolio.Shell.csproj", "{74BABC5A-8261-4C2E-8374-346517C5E6DE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,6 +42,10 @@ Global
 		{5F392859-15C1-41CA-B6AA-E164F24D66B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5F392859-15C1-41CA-B6AA-E164F24D66B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5F392859-15C1-41CA-B6AA-E164F24D66B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74BABC5A-8261-4C2E-8374-346517C5E6DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74BABC5A-8261-4C2E-8374-346517C5E6DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74BABC5A-8261-4C2E-8374-346517C5E6DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74BABC5A-8261-4C2E-8374-346517C5E6DE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,13 +1,8 @@
 
-- setup a vue project with webback and vue loader to support vue components
-  - https://vuejs.org/v2/guide/installation.html
-  - separate FE and BE
-  - add build.cmd which updates modules and builds project
-  - how to build a package? (copy stuff to bin -> webpack?)
+
 - create a WPF app which hosts suave BE and VUE FE
 
 
-- show for "position closed" the date in the web page to know from when the prices are
 
 - over all performance
   - TWR
@@ -15,13 +10,17 @@
   - benchmark with ETF
 
 
-- add overview on disposals per year
+- add more tests
+  - for the interactors
+  - maybe also for the gateways? can we make those that simple that it is not required?
 
-- vue navigation
+
+- show for "position closed" the date in the web page to know from when the prices are
+
 - agents in BE to remember state
 
-
 - show cash transactions and current cash as sanity check
+- add overview on disposals per year
 
 - sanity checks
   - value is never negative - the event type defines whether it has to be substracted or summed up
