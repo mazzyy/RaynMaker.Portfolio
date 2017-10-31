@@ -84,3 +84,39 @@ type Price = {
     Day : DateTime
     Value : decimal<Currency>
     }
+
+module EventStore =
+    open RaynMaker.Portfolio
+
+    type private Msg = 
+        | Post of DomainEvent
+        | Get of AsyncReplyChannel<DomainEvent list>
+        | Stop 
+
+    type Api = {
+        Post: DomainEvent -> unit
+        Get: unit -> DomainEvent list
+        Stop: unit -> unit
+    }
+
+    let Instance =
+        let agent = Agent<Msg>.Start(fun inbox ->
+            let rec loop store =
+                async {
+                    let! msg = inbox.Receive()
+
+                    match msg with
+                    | Post evt -> return! loop (evt::store)
+                    | Get replyChannel -> 
+                        replyChannel.Reply (store |> List.rev)
+                        return! loop store
+                    | Stop -> return ()
+                }
+            loop [] ) 
+
+        agent.Error.Add(handleLastChanceException)
+
+        { Post = fun evt -> agent.Post(evt |> Post)
+          Get = fun () -> agent.PostAndReply( fun replyChannel -> replyChannel |> Get)
+          Stop = fun () -> agent.Post Stop }
+

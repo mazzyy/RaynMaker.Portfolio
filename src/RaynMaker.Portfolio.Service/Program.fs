@@ -96,10 +96,10 @@ let start projectFile =
                     path "/" >=> redirect "/Client/index.html"
                     pathScan "/Client/%s" (fun f -> Files.file (sprintf "%s/Client/%s" home f))
                     pathScan "/static/%s" (fun f -> Files.file (sprintf "%s/Client/static/%s" home f))
-                    path "/api/positions" >=> Handlers.positions getEvents
-                    path "/api/performance" >=> Handlers.performance getEvents
-                    path "/api/benchmark" >=> Handlers.benchmark getEvents benchmark getBenchmarkHistory 
-                    path "/api/diversification" >=> Handlers.diversification getEvents 
+                    path "/api/positions" >=> Controllers.positions getEvents
+                    path "/api/performance" >=> Controllers.performance getEvents
+                    path "/api/benchmark" >=> Controllers.benchmark getEvents benchmark getBenchmarkHistory 
+                    path "/api/diversification" >=> Controllers.diversification getEvents 
                     NOT_FOUND "Resource not found."
                 ]
         ]

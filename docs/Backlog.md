@@ -1,13 +1,19 @@
 
 - use agents to manage states in BE
   - do we see them as interactors?
-  - agensts
+    ==> question is: "would i write it different for a different framework?"
+	    - OO? TPL? CQRS?
+    --> no -> lets take them as interactors
+  - agents
     - event store
 	- positions
 	- history
 
 - do we consider the handlers as "second level" interactors?
   - then we would focus testing on interactors
+  ==> question is: "would i write it different for a different framework?" 
+      - how would i write it for WPF? different?
+  --> mostly yes! only minimal code can be extracted to make the gateways "data conversion only" (whereever applicable)
 
 - over all performance
   - TWR

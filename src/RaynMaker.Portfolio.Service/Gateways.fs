@@ -1,6 +1,6 @@
 ﻿namespace RaynMaker.Portfolio.Gateways
 
-module Handlers =
+module Controllers =
     open System
     open Suave
     open Suave.Successful

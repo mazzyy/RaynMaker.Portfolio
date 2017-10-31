@@ -18,7 +18,8 @@
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Foundation.fs" />
     <Compile Include="Entities.fs" />
-    <Compile Include="Interactors.fs" />
+    <Compile Include="Positions.fs" />
+    <Compile Include="Benchmark.fs" />
     <Content Include="App.config" />
     <Content Include="packages.config" />
   </ItemGroup>
@@ -27,6 +28,9 @@
       <HintPath>..\..\packages\FSharp.Core.4.0.0.1\lib\net40\FSharp.Core.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
+    <Reference Include="Plainion.Core">
+      <HintPath>..\..\packages\Plainion.Core.3.4.0\lib\NET45\Plainion.Core.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />

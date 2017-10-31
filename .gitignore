@@ -25,3 +25,4 @@
 /src/RaynMaker.Portfolio.Html/node_modules/**
 /src/RaynMaker.Portfolio.Service/node_modules/**
 **/npm-debug.log
+/packages/Plainion.*
