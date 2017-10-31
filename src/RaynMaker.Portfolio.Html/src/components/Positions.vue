@@ -39,10 +39,10 @@
       'pie-chart': PieChart
     },
     created: function () {
-      this.get('/api/positions', {}, function (that, response) {
+      this.get(this, '/api/positions', {}, function (that, response) {
         that.positions = response
       })
-      this.get('/api/diversification', {}, function (that, response) {
+      this.get(this, '/api/diversification', {}, function (that, response) {
         that.diversification.data = response.data
         that.diversification.labels = response.labels
       })
@@ -50,26 +50,7 @@
     filters: {
       formatValue: my.formatValue
     },
-    methods: {
-      get: function (url, data, onDone) {
-        let baseUrl = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:2525'
-        var that = this
-        $.ajax({
-          url: baseUrl + url,
-          data: data,
-          dataType: 'json',
-          method: 'GET'
-        }).then(function (response) {
-          if (response.error) {
-            console.err('ERROR: ' + response.error)
-          } else {
-            onDone(that, response)
-          }
-        }).catch(function (err) {
-          console.error('EXCEPTION: ' + err)
-        })
-      }
-    }
+    mixins: [ my.webApi ]
   }
 </script>
 

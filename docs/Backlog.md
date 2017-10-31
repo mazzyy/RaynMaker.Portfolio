@@ -1,5 +1,13 @@
 
-- the handlers are actually also interactors - just aggregated ones - factor out the code!
+- use agents to manage states in BE
+  - do we see them as interactors?
+  - agensts
+    - event store
+	- positions
+	- history
+
+- do we consider the handlers as "second level" interactors?
+  - then we would focus testing on interactors
 
 - over all performance
   - TWR
@@ -10,7 +18,6 @@
   - maybe also for the gateways? can we make those that simple that it is not required?
 
 
-- agents in BE to remember state
 
 
 - money accounting
