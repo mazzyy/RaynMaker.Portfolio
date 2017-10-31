@@ -1,19 +1,22 @@
 
-- use agents to manage states in BE
-  - do we see them as interactors?
-    ==> question is: "would i write it different for a different framework?"
-	    - OO? TPL? CQRS?
-    --> no -> lets take them as interactors
-  - agents
-    - event store
-	- positions
-	- history
+- pass eventstore to controllers
 
-- do we consider the handlers as "second level" interactors?
-  - then we would focus testing on interactors
-  ==> question is: "would i write it different for a different framework?" 
-      - how would i write it for WPF? different?
-  --> mostly yes! only minimal code can be extracted to make the gateways "data conversion only" (whereever applicable)
+- controllers are no interactors 
+  - move as much out of controllers so that they become data transformators only
+
+-> move position to entities
+-> move "buy" and "sell" and "close" to entities
+   - have method working on one position
+   - methods for collections to be checked - might be interactor still
+   -> add tests
+- positions as agent
+
+
+- history as agent
+
+- check which code needs to be tested in gateways
+
+
 
 - over all performance
   - TWR
@@ -25,6 +28,11 @@
 
 
 
+-> rethink "ClosePosition"
+   - this is an "evaluation" actualy
+   - how do we model that this is a "transient" event?
+   --> we should not model it like that!!
+   (at least not once we support non-transient stuff)
 
 - money accounting
   - show cash transactions and current cash as sanity check

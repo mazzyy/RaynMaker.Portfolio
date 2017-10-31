@@ -5,7 +5,7 @@ module PositionsInteractor =
     open RaynMaker.Portfolio.Entities
     open System
 
-    type PositionSummary = {
+    type PositionEvaluation = {
         Open : DateTime 
         PricedAt : DateTime option
         IsClosed : bool
@@ -109,7 +109,7 @@ module PositionsInteractor =
         store
         |> List.fold processEvent []
 
-    let summarizePositions positions =
+    let evaluatePositions positions =
         let summarizePosition p =
             let investedYears = 
                 let span = p.PricedAt |> Option.map(fun c -> c - p.Open) |? (DateTime.Today - p.Open)
@@ -144,7 +144,7 @@ module PerformanceInteractor =
         TotalProfit : decimal<Currency>
         }
 
-    let getPerformance store (positions:PositionSummary list) =
+    let getPerformance store (positions:PositionEvaluation list) =
         let processEvent total evt =
             match evt with
             | DepositAccounted evt -> printfn "%A - %A = %A" evt.Date evt.Value total; total + evt.Value

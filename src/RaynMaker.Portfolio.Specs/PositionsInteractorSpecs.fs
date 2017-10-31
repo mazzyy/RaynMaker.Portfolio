@@ -62,7 +62,7 @@ module ``Given some stock transactions`` =
                 at 2016 01 01 |> sell "Joe Inc" 15 20.0
             ]
             |> PositionsInteractor.getPositions
-            |> PositionsInteractor.summarizePositions
+            |> PositionsInteractor.evaluatePositions
 
         summary |> should haveLength 1
 

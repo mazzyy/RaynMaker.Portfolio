@@ -34,7 +34,7 @@ module Controllers =
             | x when x > 90.0 -> sprintf "%.2f months" (span.TotalDays / 30.0)
             | x -> sprintf "%.0f days" span.TotalDays
         
-        let getPositionSummaries = PositionsInteractor.getPositions >> PositionsInteractor.summarizePositions
+        let getPositionSummaries = PositionsInteractor.getPositions >> PositionsInteractor.evaluatePositions
     
     let positions getEvents = warbler (fun _ -> 
         getEvents() 
