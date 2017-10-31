@@ -51,17 +51,15 @@ let start projectFile =
 
     let fromStore path = Path.Combine(storeHome,path)
 
+    let store = EventStore.Instance
     let loadEvents() =
         printfn "Loading events ..."
 
-        let store = "Events.xlsx" |> fromStore |> ExcelEventStore.load
+        let error (msg,payload:obj list) = 
+            printfn "Unknown event skipped: %s|%A" msg payload
 
-        store
-        |> Seq.choose (function |ExcelEventStore.Unknown(a,b,c) -> Some(a,b,c) | _ -> None)
-        |> Seq.iter(fun (e,d,p) -> printfn "Unknown event skipped: %s|%A|%A" e d p)
-
-        store
-        |> List.choose (function |ExcelEventStore.Event e -> Some e | _ -> None)
+        "Events.xlsx" |> fromStore |> ExcelStoreReader.load store error
+        store.Get()
 
     let loadBenchmarkHistory() =
         printfn "Loading benchmark history ..."

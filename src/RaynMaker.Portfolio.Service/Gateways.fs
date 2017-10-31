@@ -124,7 +124,7 @@ module Controllers =
         ]
         |> JSON)
             
-module ExcelEventStore =
+module ExcelStoreReader =
     open System
     open FSharp.ExcelProvider
     open RaynMaker.Portfolio
@@ -132,16 +132,14 @@ module ExcelEventStore =
 
     type private Sheet = ExcelFile<"../../etc/Events.xlsx">
 
-    type ParsedEvent = 
-        | Event of DomainEvent
-        | Unknown of string * DateTime * payload:obj list
-
-    let load path =
+    let load (store:EventStore.Api) (error:string * obj list -> unit) path =
         let sheet = new Sheet(path)
 
         sheet.Data
         |> Seq.filter(fun r -> String.IsNullOrEmpty(r.Event) |> not)
-        |> Seq.map(fun r -> 
+        |> Seq.iter(fun r -> 
+            let asArray (r:Sheet.Row) : obj list = [r.Event;r.Date;r.ID; r.Name; r.Value; r.Fee; r.Count; r.Comment]
+
             try
                 match r.Event with
                 | EqualsI "StockBought" _ -> 
@@ -150,40 +148,39 @@ module ExcelEventStore =
                       Name = r.Name
                       Count = r.Count |> decimal
                       Price = (r.Value |> decimal) * 1.0M<Currency>
-                      Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> StockBought |> Event
+                      Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> StockBought |> store.Post
                 | EqualsI "StockSold" _ -> 
                     { StockSold.Date = r.Date
                       Isin = r.ID
                       Name = r.Name
                       Count = r.Count |> decimal
                       Price = (r.Value |> decimal) * 1.0M<Currency>
-                      Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> StockSold |> Event
+                      Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> StockSold |> store.Post
                 | EqualsI "DividendReceived" _ -> 
                     { DividendReceived.Date = r.Date
                       Isin = r.ID
                       Name = r.Name
                       Value = (r.Value |> decimal) * 1.0M<Currency>
-                      Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> DividendReceived |> Event
+                      Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> DividendReceived |> store.Post
                 | EqualsI "DepositAccounted" _ -> 
                     { DepositAccounted.Date = r.Date
-                      Value = (r.Value |> decimal) * 1.0M<Currency>} |> DepositAccounted |> Event
+                      Value = (r.Value |> decimal) * 1.0M<Currency>} |> DepositAccounted |> store.Post
                 | EqualsI "DisbursementAccounted" _ -> 
                     { DisbursementAccounted.Date = r.Date
-                      Value = (r.Value |> decimal) * 1.0M<Currency>} |> DisbursementAccounted |> Event
+                      Value = (r.Value |> decimal) * 1.0M<Currency>} |> DisbursementAccounted |> store.Post
                 | EqualsI "InterestReceived" _ -> 
                     { InterestReceived.Date = r.Date
-                      Value = (r.Value |> decimal) * 1.0M<Currency>} |> InterestReceived |> Event
+                      Value = (r.Value |> decimal) * 1.0M<Currency>} |> InterestReceived |> store.Post
                 | EqualsI "PositionClosed" _ -> 
                     { PositionClosed.Date = DateTime.Today
                       Isin = r.ID
                       Name = r.Name
                       Price = (r.Value |> decimal) * 1.0M<Currency>
-                      Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> PositionClosed |> Event
-                | x -> Unknown(r.Event,r.Date,[r.ID; r.Name; r.Value; r.Fee; r.Count; r.Comment])
+                      Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> PositionClosed |> store.Post
+                | x -> error((sprintf "Unknown event: %s" r.Event), r |> asArray)
             with 
-                | ex -> failwithf "Failed reading event store at %s with %A" r.Event ex 
+                | ex -> error((sprintf "Failed parsing event: %A" (ex |> dumpException)), r |> asArray) 
         )
-        |> List.ofSeq
 
 module HistoricalPrices =
     open System

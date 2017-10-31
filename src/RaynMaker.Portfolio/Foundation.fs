@@ -60,6 +60,9 @@ type Agent<'T> private(f:Agent<'T> -> Async<unit>) as self =
         mbox.Start()
         mbox
 
+let dumpException (ex:Exception) = 
+    ex |> ExceptionExtensions.Dump
+
 let handleLastChanceException (ex:Exception) = 
     Console.Error.WriteLine( "FATAL ERROR: " + ExceptionExtensions.Dump(ex) )
 
