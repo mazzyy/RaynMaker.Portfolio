@@ -17,6 +17,7 @@ module.exports = merge(baseWebpackConfig, {
     rules: utils.styleLoaders({ sourceMap: config.dev.cssSourceMap })
   },
   // cheap-module-eval-source-map is faster for development
+  // change to "#source-map" to be able to set break points
   devtool: '#cheap-module-eval-source-map',
   plugins: [
     new webpack.DefinePlugin({
