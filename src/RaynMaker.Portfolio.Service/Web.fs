@@ -12,6 +12,7 @@ module Controllers =
     open RaynMaker.Portfolio.Interactors.BenchmarkInteractor
     open RaynMaker.Portfolio.Entities
     open RaynMaker.Portfolio.Interactors.PositionsInteractor
+    open RaynMaker.Portfolio.Storage
     
     [<AutoOpen>]
     module private Impl =
@@ -34,11 +35,10 @@ module Controllers =
             | x when x > 90.0 -> sprintf "%.2f months" (span.TotalDays / 30.0)
             | x -> sprintf "%.0f days" span.TotalDays
         
-        let getPositionSummaries = PositionsInteractor.getPositions >> PositionsInteractor.evaluatePositions
-    
     let positions (store:EventStore.Api) = warbler (fun _ -> 
         store.Get() 
-        |> getPositionSummaries 
+        |> PositionsInteractor.getPositions
+        |> PositionsInteractor.evaluatePositions 
         |> List.map(fun p -> 
             dict [
                 "name" => p.Name
@@ -61,7 +61,8 @@ module Controllers =
     
     let performance (store:EventStore.Api) = warbler (fun _ -> 
         store.Get()
-        |> getPositionSummaries 
+        |> PositionsInteractor.getPositions
+        |> PositionsInteractor.evaluatePositions 
         |> PerformanceInteractor.getPerformance (store.Get())
         |> fun p -> 
             dict [
@@ -82,13 +83,15 @@ module Controllers =
         let b1 =
             store.Get()
             |> BenchmarkInteractor.buyBenchmarkInstead benchmark getPrice
-            |> getPositionSummaries
+            |> PositionsInteractor.getPositions
+            |> PositionsInteractor.evaluatePositions 
             |> Seq.head
 
         let b2 =
             store.Get()
             |> BenchmarkInteractor.buyBenchmarkByPlan benchmark getPrice
-            |> getPositionSummaries
+            |> PositionsInteractor.getPositions
+            |> PositionsInteractor.evaluatePositions 
             |> Seq.head
 
         dict [
@@ -120,88 +123,3 @@ module Controllers =
         ]
         |> JSON)
             
-module ExcelStoreReader =
-    open System
-    open FSharp.ExcelProvider
-    open RaynMaker.Portfolio
-    open RaynMaker.Portfolio.Entities
-
-    type private Sheet = ExcelFile<"../../etc/Events.xlsx">
-
-    let load path =
-        let sheet = new Sheet(path)
-
-        let error msg (r:Sheet.Row) = 
-            let payload : obj list = [r.Date;r.ID; r.Name; r.Value; r.Fee; r.Count; r.Comment]
-            sprintf "%s: Event=%s Payload=%A" msg r.Event payload
-
-        let tryRead (r:Sheet.Row) =
-            match r.Event with
-            | EqualsI "StockBought" _ -> 
-                { StockBought.Date = r.Date
-                  Isin = r.ID
-                  Name = r.Name
-                  Count = r.Count |> decimal
-                  Price = (r.Value |> decimal) * 1.0M<Currency>
-                  Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> StockBought |> Some
-            | EqualsI "StockSold" _ -> 
-                { StockSold.Date = r.Date
-                  Isin = r.ID
-                  Name = r.Name
-                  Count = r.Count |> decimal
-                  Price = (r.Value |> decimal) * 1.0M<Currency>
-                  Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> StockSold |> Some
-            | EqualsI "DividendReceived" _ -> 
-                { DividendReceived.Date = r.Date
-                  Isin = r.ID
-                  Name = r.Name
-                  Value = (r.Value |> decimal) * 1.0M<Currency>
-                  Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> DividendReceived |> Some
-            | EqualsI "DepositAccounted" _ -> 
-                { DepositAccounted.Date = r.Date
-                  Value = (r.Value |> decimal) * 1.0M<Currency>} |> DepositAccounted |> Some
-            | EqualsI "DisbursementAccounted" _ -> 
-                { DisbursementAccounted.Date = r.Date
-                  Value = (r.Value |> decimal) * 1.0M<Currency>} |> DisbursementAccounted |> Some
-            | EqualsI "InterestReceived" _ -> 
-                { InterestReceived.Date = r.Date
-                  Value = (r.Value |> decimal) * 1.0M<Currency>} |> InterestReceived |> Some
-            | EqualsI "PositionClosed" _ -> 
-                { PositionClosed.Date = DateTime.Today
-                  Isin = r.ID
-                  Name = r.Name
-                  Price = (r.Value |> decimal) * 1.0M<Currency>
-                  Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> PositionClosed |> Some
-            | x -> None
-
-        let tryParseEvent errors (r:Sheet.Row) =
-            try
-                match r |> tryRead with
-                | Some e -> Some(e),errors
-                | None -> None, (error "Unknown event type" r)::errors
-            with 
-                | ex -> None, (error "Failed to parse event" r)::errors
-
-        let events, errors =  
-            sheet.Data
-            |> Seq.filter(fun r -> String.IsNullOrEmpty(r.Event) |> not)
-            |> Seq.mapFold tryParseEvent []
-        
-        (events |> Seq.choose id |> Seq.rev |> List.ofSeq), errors
-
-module HistoricalPrices =
-    open System
-    open FSharp.Data
-    open RaynMaker.Portfolio.Entities
-
-    type private Sheet = CsvProvider<"../../etc/FR0011079466.history.csv",";">
-    
-    let load (path:string) =
-        let sheet = Sheet.Load(path)
-        sheet.Rows
-        |> Seq.map(fun row -> 
-            { Day = DateTime.Parse(row.Date)
-              Value = row.Price * 1.0M<Currency> } )
-        |> Seq.sortBy(fun x -> x.Day)
-        |> List.ofSeq
-

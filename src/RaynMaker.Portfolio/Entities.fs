@@ -1,9 +1,14 @@
-﻿namespace RaynMaker.Portfolio.Entities
+﻿module RaynMaker.Portfolio.Entities
 
 open System
 
 [<Measure>] type Currency
 [<Measure>] type Percentage
+
+type Isin = Isin of string
+
+module Str = 
+    let ofIsin (Isin x) = x
 
 [<AutoOpen>]
 module Finance =
@@ -12,7 +17,7 @@ module Finance =
 
 type StockBought = {
     Date : DateTime
-    Isin : string
+    Isin : Isin
     Name : string
     Count : decimal
     Price : decimal<Currency>
@@ -21,7 +26,7 @@ type StockBought = {
 
 type StockSold = {
     Date : DateTime
-    Isin : string
+    Isin : Isin
     Name : string
     Count : decimal
     Price : decimal<Currency>
@@ -30,7 +35,7 @@ type StockSold = {
 
 type DividendReceived = {
     Date : DateTime
-    Isin : string
+    Isin : Isin
     Name : string
     Value : decimal<Currency>
     Fee : decimal<Currency>
@@ -54,7 +59,7 @@ type InterestReceived = {
 /// Simulates that position is closed to get current performance
 type PositionClosed = {
     Date : DateTime
-    Isin : string
+    Isin : Isin
     Name : string
     Price : decimal<Currency>
     Fee : decimal<Currency>
@@ -84,46 +89,4 @@ type Price = {
     Day : DateTime
     Value : decimal<Currency>
     }
-
-module EventStore =
-    open RaynMaker.Portfolio
-
-    type private Msg = 
-        | Init of (unit -> DomainEvent list)
-        | Post of DomainEvent
-        | Get of AsyncReplyChannel<DomainEvent list>
-        | Stop 
-
-    type Api = {
-        Init: (unit -> DomainEvent list) -> unit
-        Post: DomainEvent -> unit
-        Get: unit -> DomainEvent list
-        Stop: unit -> unit
-    }
-
-    let Instance =
-        let agent = Agent<Msg>.Start(fun inbox ->
-            let rec loop store =
-                async {
-                    let! msg = inbox.Receive()
-
-                    match msg with
-                    | Init f -> 
-                        match store with
-                        | [] -> return! loop (f())
-                        | _ -> failwith "Can only be initialized once"
-                    | Post evt -> return! loop (evt::store)
-                    | Get replyChannel -> 
-                        replyChannel.Reply (store |> List.rev)
-                        return! loop store
-                    | Stop -> return ()
-                }
-            loop [] ) 
-
-        agent.Error.Add(handleLastChanceException)
-
-        { Init = fun f -> agent.Post(f |> Init)
-          Post = fun evt -> agent.Post(evt |> Post)
-          Get = fun () -> agent.PostAndReply( fun replyChannel -> replyChannel |> Get)
-          Stop = fun () -> agent.Post Stop }
 

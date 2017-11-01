@@ -9,7 +9,7 @@ module PositionsInteractor =
         Open : DateTime 
         PricedAt : DateTime option
         IsClosed : bool
-        Isin : string
+        Isin : Isin
         Name : string
         MarketProfit : decimal<Currency>
         DividendProfit : decimal<Currency>
@@ -23,7 +23,7 @@ module PositionsInteractor =
         Open : DateTime 
         PricedAt : DateTime option
         IsClosed : bool
-        Isin : string
+        Isin : Isin
         Name : string
         Count : decimal
         Invested : decimal<Currency> 
@@ -67,7 +67,7 @@ module PositionsInteractor =
             let p = 
                 match evt.Isin |> getPosition positions with
                 | Some p -> p
-                | None -> failwithf "Cannot sell stock %s (Isin: %s) because no position exists" evt.Name evt.Isin
+                | None -> failwithf "Cannot sell stock %s (Isin: %s) because no position exists" evt.Name (Str.ofIsin evt.Isin)
             
             let count = p.Count - evt.Count
             // TODO: count must not be zero
@@ -82,7 +82,7 @@ module PositionsInteractor =
             let p = 
                 match evt.Isin |> getPosition positions with
                 | Some p -> p
-                | None -> failwithf "Cannot sell stock %s (Isin: %s) because no position exists" evt.Name evt.Isin
+                | None -> failwithf "Cannot sell stock %s (Isin: %s) because no position exists" evt.Name (Str.ofIsin evt.Isin)
 
             // TODO: count must not be zero
             let newP =

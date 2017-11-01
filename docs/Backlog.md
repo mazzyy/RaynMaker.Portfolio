@@ -1,8 +1,6 @@
 
-- pass eventstore to controllers
+- history as agent
 
-- controllers are no interactors 
-  - move as much out of controllers so that they become data transformators only
 
 -> move position to entities
 -> move "buy" and "sell" and "close" to entities
@@ -12,9 +10,10 @@
 - positions as agent
 
 
-- history as agent
 
-- check which code needs to be tested in gateways
+- controllers are no interactors 
+  - move as much out of controllers so that they become data transformators only
+
 
 
 
@@ -24,7 +23,9 @@
 
 - add more tests
   - for the interactors
-  - maybe also for the gateways? can we make those that simple that it is not required?
+  - gateways
+    - ExcelStoreReader: success and errors
+	- HistoricalPrices
 
 
 
@@ -61,4 +62,9 @@
 - automatically download prices from
   - http://www.google.com/finance/historical?q=MSFT&output=csv
 
+
+# References 
+
+- http://tidyjava.com/clean-architecture-screaming/
+- https://github.com/cleancoders/CleanCodeCaseStudy/tree/master/src/cleancoderscom
 

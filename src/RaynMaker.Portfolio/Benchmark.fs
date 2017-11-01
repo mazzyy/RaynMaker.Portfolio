@@ -24,7 +24,7 @@ module BenchmarkInteractor =
         | x -> x
 
     type Benchmark = {
-        Isin : string
+        Isin : Isin
         Name : string
         SavingsPlan : SavingsPlan
         Manual : ManualOrder

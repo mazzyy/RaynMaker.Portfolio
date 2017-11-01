@@ -15,12 +15,23 @@ open RaynMaker.Portfolio.Interactors.BenchmarkInteractor
 open RaynMaker.Portfolio.Entities
 open System.Diagnostics
 open Suave.RequestErrors
+open RaynMaker.Portfolio.Storage
 
 type Project = JsonProvider<"../../etc/Portfolio.json">
 
 let private getHome () =
     let location = Assembly.GetExecutingAssembly().Location
     location |> Path.GetDirectoryName |> Path.GetFullPath
+
+type internal Services = {
+    suaveCts : CancellationTokenSource
+    eventStore : EventStore.Api
+}
+
+type Instance = {
+    port : int
+    services : obj 
+}
 
 let start projectFile =
     let location = Assembly.GetExecutingAssembly().Location
@@ -51,15 +62,12 @@ let start projectFile =
 
     let fromStore path = Path.Combine(storeHome,path)
 
-    let store = EventStore.Instance
-    let loadEvents() =
+    let store = EventStore.create (fun () -> 
         printfn "Loading events ..."
 
-        let events, errors = "Events.xlsx" |> fromStore |> ExcelStoreReader.load
+        let events, errors = "Events.xlsx" |> fromStore |> EventsReader.readExcel
         errors |> Seq.iter (printf "  %s")
-        events
-
-    loadEvents |> store.Init 
+        events)
 
     let loadBenchmarkHistory() =
         printfn "Loading benchmark history ..."
@@ -67,14 +75,14 @@ let start projectFile =
         project.Benchmark.Isin 
         |> sprintf "%s.history.csv" 
         |> fromStore 
-        |> HistoricalPrices.load
+        |> HistoricalPricesReader.readCsv
     
     printfn "Starting ..."
 
     let getBenchmarkHistory = remember loadBenchmarkHistory
 
     let benchmark = { 
-        Isin = project.Benchmark.Isin
+        Isin = project.Benchmark.Isin |> Isin
         Name = project.Benchmark.Name
         SavingsPlan = { SavingsPlan.Fee = project.Benchmark.SavingsPlan.Fee * 1.0M<Percentage>
                         AnualFee = project.Benchmark.SavingsPlan.AnualFee * 1.0M<Percentage>
@@ -101,10 +109,17 @@ let start projectFile =
                 ]
         ]
 
-    Httpd.start app
+    let port,cts = Httpd.start app
 
-let stop (cts:CancellationTokenSource) =
-    cts.Cancel()
+    { port = port
+      services = { suaveCts = cts 
+                   eventStore = store } }
+
+let stop instance =
+    let services = instance.services :?> Services
+
+    services.suaveCts.Cancel()
+    services.eventStore.Stop()
 
 let getProjectFileFromCommandLine argv =
     let home = getHome()
@@ -116,15 +131,15 @@ let getProjectFileFromCommandLine argv =
 
 [<EntryPoint>]
 let main argv =
-    let port,cts = 
+    let instance = 
         argv
         |> getProjectFileFromCommandLine
         |> start 
 
-    Browser.start port
+    Browser.start instance.port
 
     Console.ReadKey true |> ignore
     
-    stop cts
+    stop instance
 
     0
