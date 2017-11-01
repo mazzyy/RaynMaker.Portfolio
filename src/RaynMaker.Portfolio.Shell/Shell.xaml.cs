@@ -8,7 +8,7 @@ namespace RaynMaker.Portfolio.Shell
         {
             InitializeComponent();
 
-            myBrowser.Navigate(string.Format("http://localhost:{0}/" + App.Port));
+            myBrowser.Navigate(string.Format("http://localhost:{0}/", App.Port));
         }
     }
 }
