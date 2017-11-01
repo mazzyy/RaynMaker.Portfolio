@@ -39,7 +39,7 @@ module Controllers =
 
     let positions (store:EventStore.Api) broker = warbler (fun _ -> 
         store.Get() 
-        |> PositionsInteractor.getPositions
+        |> Positions.create
         |> PositionsInteractor.evaluatePositions broker (lastPriceOf store)
         |> List.map(fun p -> 
             dict [
@@ -63,7 +63,7 @@ module Controllers =
     
     let performance (store:EventStore.Api) broker = warbler (fun _ -> 
         store.Get()
-        |> PositionsInteractor.getPositions
+        |> Positions.create
         |> PositionsInteractor.evaluatePositions broker (lastPriceOf store)
         |> PerformanceInteractor.getPerformance (store.Get())
         |> fun p -> 
@@ -86,7 +86,7 @@ module Controllers =
             let events = store.Get() |> BenchmarkInteractor.buyBenchmarkInstead broker benchmark getPrice
             
             events
-            |> PositionsInteractor.getPositions
+            |> Positions.create
             |> PositionsInteractor.evaluatePositions broker (Events.LastPriceOf events)
             |> Seq.head
 
@@ -94,7 +94,7 @@ module Controllers =
             let events = store.Get() |> BenchmarkInteractor.buyBenchmarkByPlan savingsPlan benchmark getPrice
             
             events
-            |> PositionsInteractor.getPositions
+            |> Positions.create
             |> PositionsInteractor.evaluatePositions broker (Events.LastPriceOf events)
             |> Seq.head
 
@@ -118,7 +118,7 @@ module Controllers =
     let diversification (store:EventStore.Api) = warbler (fun _ -> 
         let report =
             store.Get()
-            |> PositionsInteractor.getPositions 
+            |> Positions.create 
             |> StatisticsInteractor.getDiversification
 
         dict [

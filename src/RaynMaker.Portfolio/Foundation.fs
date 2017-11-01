@@ -36,6 +36,10 @@ let workingDay (day:DateTime) =
     else
         day
 
+[<RequireQualifiedAccess>]
+module Contract =
+    let requires f msg = if f() |> not then failwith msg
+
 /// MailboxProcessor catching unhandled exceptions and reporting those as event.
 type Agent<'T> private(f:Agent<'T> -> Async<unit>) as self =
     let event = Event<_>()

@@ -19,6 +19,7 @@
 
 - add more tests
   - for the interactors
+  - broker.getfee
   - gateways
     - ExcelStoreReader: success and errors
 	- HistoricalPrices

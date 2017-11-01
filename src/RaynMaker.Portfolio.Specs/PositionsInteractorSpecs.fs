@@ -46,7 +46,7 @@ module ``Given some stock transactions`` =
                 at 2016 10 10 |> buy "Joe Inc" 10 10.0
                 at 2016 12 12 |> buy "Joe Inc" 5 15.0
             ]
-            |> PositionsInteractor.getPositions
+            |> Positions.create
 
         positions |> should haveLength 1
 
@@ -68,7 +68,7 @@ module ``Given some stock transactions`` =
 
         let summary =
             events
-            |> PositionsInteractor.getPositions
+            |> Positions.create
             |> PositionsInteractor.evaluatePositions broker (Events.LastPriceOf events)
 
         summary |> should haveLength 1
