@@ -1,5 +1,41 @@
 ﻿namespace RaynMaker.Portfolio.Interactors
 
+module Depot =
+    open RaynMaker.Portfolio
+    open RaynMaker.Portfolio.Entities
+
+    type private Msg = 
+        | Init of (unit -> DomainEvent list)
+        | Get of AsyncReplyChannel<Position list>
+        | Stop 
+
+    type Api = {
+        Get: unit -> Position list
+        Stop: unit -> unit
+    }
+
+    let create init =
+        let agent = Agent<Msg>.Start(fun inbox ->
+            let rec loop store =
+                async {
+                    let! msg = inbox.Receive()
+
+                    match msg with
+                    | Init f -> return! loop (f() |> Positions.create)
+                    | Get replyChannel -> 
+                        replyChannel.Reply store
+                        return! loop store
+                    | Stop -> return ()
+                }
+            loop [] ) 
+
+        agent.Error.Add(handleLastChanceException)
+        
+        agent.Post(init |> Init)
+
+        { Get = fun () -> agent.PostAndReply( fun replyChannel -> replyChannel |> Get)
+          Stop = fun () -> agent.Post Stop }
+
 module PositionsInteractor =
     open RaynMaker.Portfolio
     open RaynMaker.Portfolio.Entities

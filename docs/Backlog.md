@@ -1,5 +1,5 @@
 
-- positions as agent
+- should we have explicit dependencies between event store agent and position agent?
 
 - write more tests for position creation
   - esp. for the single position functions

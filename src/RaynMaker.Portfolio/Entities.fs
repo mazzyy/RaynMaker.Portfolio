@@ -85,7 +85,6 @@ module Events =
     /// searches for the last price information available
     let LastPriceOf events isin =
         events
-        |> List.rev
         |> Seq.tryPick (function 
             | StockBought e when e.Isin = isin -> { Day = e.Date; Value = e.Price } |> Some 
             | StockSold e when e.Isin = isin -> { Day = e.Date; Value = e.Price } |> Some 

@@ -24,9 +24,9 @@ module EventStore =
 
                     match msg with
                     | Init f -> return! loop (f())
-                    | Post evt -> return! loop (evt::store)
+                    | Post evt -> return! loop (evt::store |> List.rev)
                     | Get replyChannel -> 
-                        replyChannel.Reply (store |> List.rev)
+                        replyChannel.Reply store
                         return! loop store
                     | Stop -> return ()
                 }

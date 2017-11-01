@@ -35,12 +35,9 @@ module Controllers =
             | x when x > 90.0 -> sprintf "%.2f months" (span.TotalDays / 30.0)
             | x -> sprintf "%.0f days" span.TotalDays
         
-        let lastPriceOf (store:EventStore.Api) = Events.LastPriceOf (store.Get())
-
-    let positions (store:EventStore.Api) broker = warbler (fun _ -> 
-        store.Get() 
-        |> Positions.create
-        |> PositionsInteractor.evaluatePositions broker (lastPriceOf store)
+    let positions (depot:Depot.Api) broker lastPriceOf = warbler (fun _ -> 
+        depot.Get() 
+        |> PositionsInteractor.evaluatePositions broker lastPriceOf
         |> List.map(fun p -> 
             dict [
                 "name" => p.Position.Name
@@ -61,10 +58,9 @@ module Controllers =
             ])
         |> JSON)
     
-    let performance (store:EventStore.Api) broker = warbler (fun _ -> 
-        store.Get()
-        |> Positions.create
-        |> PositionsInteractor.evaluatePositions broker (lastPriceOf store)
+    let performance (store:EventStore.Api) (depot:Depot.Api) broker lastPriceOf = warbler (fun _ -> 
+        depot.Get()
+        |> PositionsInteractor.evaluatePositions broker lastPriceOf
         |> PerformanceInteractor.getPerformance (store.Get())
         |> fun p -> 
             dict [
@@ -115,11 +111,8 @@ module Controllers =
         ]
         |> JSON)
 
-    let diversification (store:EventStore.Api) = warbler (fun _ -> 
-        let report =
-            store.Get()
-            |> Positions.create 
-            |> StatisticsInteractor.getDiversification
+    let diversification (depot:Depot.Api) = warbler (fun _ -> 
+        let report = depot.Get() |> StatisticsInteractor.getDiversification
 
         dict [
             "labels" => (report.Positions |> List.map fst)
