@@ -1,7 +1,4 @@
 
-- history as agent
-
-
 -> move position to entities
 -> move "buy" and "sell" and "close" to entities
    - have method working on one position

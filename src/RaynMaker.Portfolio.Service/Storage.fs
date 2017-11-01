@@ -41,35 +41,43 @@ module EventStore =
           Stop = fun () -> agent.Post Stop }
 
 module HistoricalPrices =
+    open System
     open RaynMaker.Portfolio
     open RaynMaker.Portfolio.Entities
 
     type private Msg = 
-        | Get of AsyncReplyChannel<DomainEvent list>
+        | Get of Isin * AsyncReplyChannel<Price list>
         | Stop 
 
     type Api = {
-        Get: unit -> DomainEvent list
+        Get: Isin -> Price list
         Stop: unit -> unit
     }
 
-    let create init =
+    let create read =
         let agent = Agent<Msg>.Start(fun inbox ->
             let rec loop store =
                 async {
                     let! msg = inbox.Receive()
 
                     match msg with
-                    | Get replyChannel -> 
-                        replyChannel.Reply (store |> List.rev)
-                        return! loop store
+                    | Get(isin, replyChannel) -> 
+                        let newStore, prices = 
+                            match store |> Map.tryFind isin with
+                            | Some prices -> store, prices
+                            | None -> let prices = read isin
+                                      (store |> Map.add isin prices), prices
+
+                        replyChannel.Reply prices
+
+                        return! loop newStore
                     | Stop -> return ()
                 }
-            loop [] ) 
+            loop Map.empty ) 
 
         agent.Error.Add(handleLastChanceException)
         
-        { Get = fun () -> agent.PostAndReply( fun replyChannel -> replyChannel |> Get)
+        { Get = fun isin -> agent.PostAndReply( fun replyChannel -> (isin,replyChannel) |> Get)
           Stop = fun () -> agent.Post Stop }
 
 module EventsReader =

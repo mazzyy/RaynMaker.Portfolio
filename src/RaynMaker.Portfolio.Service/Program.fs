@@ -26,6 +26,7 @@ let private getHome () =
 type internal Services = {
     suaveCts : CancellationTokenSource
     eventStore : EventStore.Api
+    historicalPrices : HistoricalPrices.Api
 }
 
 type Instance = {
@@ -69,17 +70,16 @@ let start projectFile =
         errors |> Seq.iter (printf "  %s")
         events)
 
-    let loadBenchmarkHistory() =
-        printfn "Loading benchmark history ..."
+    let historicalPrices = HistoricalPrices.create (fun isin ->
+        printfn "Loading historical prices for %s" (Str.ofIsin isin)
 
-        project.Benchmark.Isin 
+        isin
+        |> Str.ofIsin
         |> sprintf "%s.history.csv" 
         |> fromStore 
-        |> HistoricalPricesReader.readCsv
+        |> HistoricalPricesReader.readCsv)
     
     printfn "Starting ..."
-
-    let getBenchmarkHistory = remember loadBenchmarkHistory
 
     let benchmark = { 
         Isin = project.Benchmark.Isin |> Isin
@@ -103,7 +103,7 @@ let start projectFile =
                     pathScan "/static/%s" (fun f -> Files.file (sprintf "%s/Client/static/%s" home f))
                     path "/api/positions" >=> Controllers.positions store
                     path "/api/performance" >=> Controllers.performance store
-                    path "/api/benchmark" >=> Controllers.benchmark store benchmark getBenchmarkHistory 
+                    path "/api/benchmark" >=> Controllers.benchmark store historicalPrices benchmark 
                     path "/api/diversification" >=> Controllers.diversification store 
                     NOT_FOUND "Resource not found."
                 ]
@@ -113,13 +113,15 @@ let start projectFile =
 
     { port = port
       services = { suaveCts = cts 
-                   eventStore = store } }
+                   eventStore = store
+                   historicalPrices = historicalPrices } }
 
 let stop instance =
     let services = instance.services :?> Services
 
     services.suaveCts.Cancel()
     services.eventStore.Stop()
+    services.historicalPrices.Stop()
 
 let getProjectFileFromCommandLine argv =
     let home = getHome()

@@ -71,8 +71,8 @@ module Controllers =
             ]
         |> JSON)
             
-    let benchmark (store:EventStore.Api) (benchmark:Benchmark) getBenchmarkHistory = warbler (fun _ -> 
-        let history = getBenchmarkHistory()
+    let benchmark (store:EventStore.Api) (historicalPrices:HistoricalPrices.Api) (benchmark:Benchmark) = warbler (fun _ -> 
+        let history = benchmark.Isin |> historicalPrices.Get
 
         let getPrice day =
             match history |> Seq.skipWhile(fun (p:Price) -> p.Day < day) |> Seq.tryHead with
