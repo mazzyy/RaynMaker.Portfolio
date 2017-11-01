@@ -4,7 +4,7 @@
 // see http://vuejs-templates.github.io/webpack for documentation.
 
 const path = require('path')
-var buildMode = process.env.NODE_ENV === 'production' ? 'Release' : 'Debug'
+var buildMode = process.env.NODE_ENV === 'production' ? 'pCI' : 'Debug'
 
 module.exports = {
   build: {
