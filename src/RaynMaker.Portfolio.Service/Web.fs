@@ -35,17 +35,19 @@ module Controllers =
             | x when x > 90.0 -> sprintf "%.2f months" (span.TotalDays / 30.0)
             | x -> sprintf "%.0f days" span.TotalDays
         
+        let lastPriceOf (store:EventStore.Api) = Events.LastPriceOf (store.Get())
+
     let positions (store:EventStore.Api) = warbler (fun _ -> 
         store.Get() 
         |> PositionsInteractor.getPositions
-        |> PositionsInteractor.evaluatePositions 
+        |> PositionsInteractor.evaluatePositions (lastPriceOf store)
         |> List.map(fun p -> 
             dict [
-                "name" => p.Name
-                "isin" => p.Isin
-                "open" => (p.Open |> formatDate)
-                "pricedAt" => (p.PricedAt|> Option.map formatDate |? "-")
-                "duration" => ((p.PricedAt |? DateTime.Today) - p.Open |> formatTimespan)
+                "name" => p.Position.Name
+                "isin" => p.Position.Isin
+                "open" => (p.Position.OpenedAt |> formatDate)
+                "pricedAt" => (p.PricedAt |> formatDate)
+                "duration" => (p.PricedAt - p.Position.OpenedAt |> formatTimespan)
                 "marketProfit" => p.MarketProfit
                 "dividendProfit" => p.DividendProfit
                 "totalProfit" => (p.MarketProfit + p.DividendProfit)
@@ -55,14 +57,14 @@ module Controllers =
                 "marketRoiAnual" => p.MarketRoiAnual
                 "dividendRoiAnual" => p.DividendRoiAnual
                 "totalRoiAnual" => (p.MarketRoiAnual + p.DividendRoiAnual)
-                "isClosed" => p.IsClosed 
+                "isClosed" => (p.Position.ClosedAt |> Option.isSome) 
             ])
         |> JSON)
     
     let performance (store:EventStore.Api) = warbler (fun _ -> 
         store.Get()
         |> PositionsInteractor.getPositions
-        |> PositionsInteractor.evaluatePositions 
+        |> PositionsInteractor.evaluatePositions (lastPriceOf store)
         |> PerformanceInteractor.getPerformance (store.Get())
         |> fun p -> 
             dict [
@@ -81,17 +83,19 @@ module Controllers =
                       last.Value
 
         let b1 =
-            store.Get()
-            |> BenchmarkInteractor.buyBenchmarkInstead benchmark getPrice
+            let events = store.Get() |> BenchmarkInteractor.buyBenchmarkInstead benchmark getPrice
+            
+            events
             |> PositionsInteractor.getPositions
-            |> PositionsInteractor.evaluatePositions 
+            |> PositionsInteractor.evaluatePositions (Events.LastPriceOf events)
             |> Seq.head
 
         let b2 =
-            store.Get()
-            |> BenchmarkInteractor.buyBenchmarkByPlan benchmark getPrice
+            let events = store.Get() |> BenchmarkInteractor.buyBenchmarkByPlan benchmark getPrice
+            
+            events
             |> PositionsInteractor.getPositions
-            |> PositionsInteractor.evaluatePositions 
+            |> PositionsInteractor.evaluatePositions (Events.LastPriceOf events)
             |> Seq.head
 
         dict [

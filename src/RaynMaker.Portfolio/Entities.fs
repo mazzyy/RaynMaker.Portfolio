@@ -21,8 +21,7 @@ type StockBought = {
     Name : string
     Count : decimal
     Price : decimal<Currency>
-    Fee : decimal<Currency>
-    }
+    Fee : decimal<Currency> }
 
 type StockSold = {
     Date : DateTime
@@ -30,40 +29,34 @@ type StockSold = {
     Name : string
     Count : decimal
     Price : decimal<Currency>
-    Fee : decimal<Currency>
-    }
+    Fee : decimal<Currency> }
 
 type DividendReceived = {
     Date : DateTime
     Isin : Isin
     Name : string
     Value : decimal<Currency>
-    Fee : decimal<Currency>
-    }
+    Fee : decimal<Currency> }
 
 type DepositAccounted = {
     Date : DateTime
-    Value : decimal<Currency>
-    }
+    Value : decimal<Currency> }
 
 type DisbursementAccounted = {
     Date : DateTime
-    Value : decimal<Currency>
-    }
+    Value : decimal<Currency> }
 
 type InterestReceived = {
     Date : DateTime
-    Value : decimal<Currency>
-    }
+    Value : decimal<Currency> }
 
-/// Simulates that position is closed to get current performance
-type PositionClosed = {
+/// notifies the (final) price of a stock at a given date
+type StockPriced = {
     Date : DateTime
     Isin : Isin
     Name : string
     Price : decimal<Currency>
-    Fee : decimal<Currency>
-    }
+    Fee : decimal<Currency> }
 
 type DomainEvent = 
     | StockBought of StockBought
@@ -72,7 +65,12 @@ type DomainEvent =
     | DepositAccounted of DepositAccounted
     | DisbursementAccounted of DisbursementAccounted
     | InterestReceived of InterestReceived
-    | PositionClosed of PositionClosed
+    | StockPriced of StockPriced
+
+type Price = {
+    Day : DateTime
+    Value : decimal<Currency>
+    }
 
 module Events =
     let GetDate event =
@@ -83,10 +81,16 @@ module Events =
         | DepositAccounted e -> e.Date
         | DisbursementAccounted e -> e.Date
         | InterestReceived e -> e.Date
-        | PositionClosed e -> e.Date
+        | StockPriced e -> e.Date
 
-type Price = {
-    Day : DateTime
-    Value : decimal<Currency>
-    }
+    /// searches for the last price information available
+    let LastPriceOf events isin =
+        events
+        |> List.rev
+        |> Seq.tryPick (function 
+            | StockBought e when e.Isin = isin -> { Day = e.Date; Value = e.Price } |> Some 
+            | StockSold e when e.Isin = isin -> { Day = e.Date; Value = e.Price } |> Some 
+            | StockPriced e when e.Isin = isin -> { Day = e.Date; Value = e.Price } |> Some 
+            | _ -> None)
+
 

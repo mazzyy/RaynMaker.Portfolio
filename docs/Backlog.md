@@ -1,3 +1,5 @@
+- closePosition event would have to calculate the fee based on broker conditions
+  - remove fee property
 
 -> move position to entities
 -> move "buy" and "sell" and "close" to entities
@@ -13,7 +15,6 @@
 
 
 
-
 - over all performance
   - TWR
   - MWR
@@ -26,11 +27,17 @@
 
 
 
--> rethink "ClosePosition"
-   - this is an "evaluation" actualy
-   - how do we model that this is a "transient" event?
-   --> we should not model it like that!!
-   (at least not once we support non-transient stuff)
+
+- do we want to introduce an entity called stock? 
+  (or stock id?)
+
+- should we remove StockPriced event and translate it into a "get info from service" activity?
+  - like with historical prices
+  - maybe we first need to read more about event sourcing?
+
+- keep the position details
+  - at least by and sell activities
+  - would also be easier to "get a last price"
 
 - money accounting
   - show cash transactions and current cash as sanity check
@@ -45,8 +52,6 @@
   - move to dedicated interactor and make buy and sell methods public so that we can test individually
 
 - anual roi actually is no simple math average ...
-
-- closePosition event would have to calculate the fee based on broker conditions
 
 - fix anual fee in benchmark
 

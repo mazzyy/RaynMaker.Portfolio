@@ -30,8 +30,8 @@ module BenchmarkInteractor =
         Manual : ManualOrder
         }
 
-    let private closePosition benchmark getPrice =
-        { PositionClosed.Date = DateTime.Today
+    let private pricePosition benchmark getPrice =
+        { StockPriced.Date = DateTime.Today
           Name = benchmark.Name
           Isin = benchmark.Isin
           Price = DateTime.Today |> getPrice
@@ -70,7 +70,7 @@ module BenchmarkInteractor =
                         | StockBought e -> buy e.Date (e.Price * e.Count + e.Fee) |> StockBought |> Some
                         | StockSold e -> sell e.Date (e.Price * e.Count) |> StockSold |> Some
                         | _ -> None)
-            yield closePosition benchmark getPrice |> PositionClosed
+            yield pricePosition benchmark getPrice |> StockPriced
         }
         |> List.ofSeq
 
@@ -101,7 +101,7 @@ module BenchmarkInteractor =
                     |> Seq.map(fun m -> (new DateTime(start.Year, start.Month, 1)).AddMonths(m))
                     |> Seq.map workingDay
                     |> Seq.map(fun day -> day |> buy |> StockBought)
-            yield closePosition benchmark getPrice |> PositionClosed
+            yield pricePosition benchmark getPrice |> StockPriced
         }
         |> List.ofSeq
 

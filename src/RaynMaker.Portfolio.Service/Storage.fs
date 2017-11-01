@@ -126,12 +126,13 @@ module EventsReader =
             | EqualsI "InterestReceived" _ -> 
                 { InterestReceived.Date = r.Date
                   Value = (r.Value |> decimal) * 1.0M<Currency>} |> InterestReceived |> Some
-            | EqualsI "PositionClosed" _ -> 
-                { PositionClosed.Date = DateTime.Today
+            | EqualsI "PositionClosed" _
+            | EqualsI "StockPriced" _ -> 
+                { StockPriced.Date = DateTime.Today
                   Isin = r.ID |> Isin
                   Name = r.Name
                   Price = (r.Value |> decimal) * 1.0M<Currency>
-                  Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> PositionClosed |> Some
+                  Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> StockPriced |> Some
             | x -> None
 
         let tryParseEvent errors (r:Sheet.Row) =
