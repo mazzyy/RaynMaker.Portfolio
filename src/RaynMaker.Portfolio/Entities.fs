@@ -55,8 +55,7 @@ type StockPriced = {
     Date : DateTime
     Isin : Isin
     Name : string
-    Price : decimal<Currency>
-    Fee : decimal<Currency> }
+    Price : decimal<Currency> }
 
 type DomainEvent = 
     | StockBought of StockBought
@@ -93,4 +92,17 @@ module Events =
             | StockPriced e when e.Isin = isin -> { Day = e.Date; Value = e.Price } |> Some 
             | _ -> None)
 
+type Broker = {
+    Name : string
+    Fee : decimal<Percentage>
+    MinFee : decimal<Currency>
+    MaxFee : decimal<Currency> }
+
+[<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
+module Broker =
+    let getFee broker value =
+        match value |> percent broker.Fee with
+        | x when x < broker.MinFee -> broker.MinFee
+        | x when x > broker.MaxFee -> broker.MaxFee
+        | x -> x
 

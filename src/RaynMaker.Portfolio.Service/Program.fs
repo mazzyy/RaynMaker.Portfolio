@@ -83,15 +83,16 @@ let start projectFile =
 
     let benchmark = { 
         Isin = project.Benchmark.Isin |> Isin
-        Name = project.Benchmark.Name
-        SavingsPlan = { SavingsPlan.Fee = project.Benchmark.SavingsPlan.Fee * 1.0M<Percentage>
+        Name = project.Benchmark.Name }
+    
+    let savingsPlan = { SavingsPlan.Fee = project.Benchmark.SavingsPlan.Fee * 1.0M<Percentage>
                         AnualFee = project.Benchmark.SavingsPlan.AnualFee * 1.0M<Percentage>
                         Rate = (decimal project.Benchmark.SavingsPlan.Rate) * 1.0M<Currency> }
-        Manual = { ManualOrder.Fee = project.Benchmark.Manual.Fee * 1.0M<Percentage>
-                   MinFee = project.Benchmark.Manual.MinFee * 1.0M<Currency>
-                   MaxFee = project.Benchmark.Manual.MaxFee * 1.0M<Currency> }
-        }
 
+    let broker = { Broker.Name = project.Broker.Name
+                   Fee = project.Broker.Fee * 1.0M<Percentage>
+                   MinFee = project.Broker.MinFee * 1.0M<Currency>
+                   MaxFee = project.Broker.MaxFee * 1.0M<Currency> }
     let app = 
         let log = request (fun r -> printfn "%s" r.path; succeed)
 
@@ -101,9 +102,9 @@ let start projectFile =
                     path "/" >=> redirect "/Client/index.html"
                     pathScan "/Client/%s" (fun f -> Files.file (sprintf "%s/Client/%s" home f))
                     pathScan "/static/%s" (fun f -> Files.file (sprintf "%s/Client/static/%s" home f))
-                    path "/api/positions" >=> Controllers.positions store
-                    path "/api/performance" >=> Controllers.performance store
-                    path "/api/benchmark" >=> Controllers.benchmark store historicalPrices benchmark 
+                    path "/api/positions" >=> Controllers.positions store broker
+                    path "/api/performance" >=> Controllers.performance store broker
+                    path "/api/benchmark" >=> Controllers.benchmark store broker savingsPlan historicalPrices benchmark 
                     path "/api/diversification" >=> Controllers.diversification store 
                     NOT_FOUND "Resource not found."
                 ]

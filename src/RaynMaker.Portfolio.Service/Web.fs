@@ -37,10 +37,10 @@ module Controllers =
         
         let lastPriceOf (store:EventStore.Api) = Events.LastPriceOf (store.Get())
 
-    let positions (store:EventStore.Api) = warbler (fun _ -> 
+    let positions (store:EventStore.Api) broker = warbler (fun _ -> 
         store.Get() 
         |> PositionsInteractor.getPositions
-        |> PositionsInteractor.evaluatePositions (lastPriceOf store)
+        |> PositionsInteractor.evaluatePositions broker (lastPriceOf store)
         |> List.map(fun p -> 
             dict [
                 "name" => p.Position.Name
@@ -61,10 +61,10 @@ module Controllers =
             ])
         |> JSON)
     
-    let performance (store:EventStore.Api) = warbler (fun _ -> 
+    let performance (store:EventStore.Api) broker = warbler (fun _ -> 
         store.Get()
         |> PositionsInteractor.getPositions
-        |> PositionsInteractor.evaluatePositions (lastPriceOf store)
+        |> PositionsInteractor.evaluatePositions broker (lastPriceOf store)
         |> PerformanceInteractor.getPerformance (store.Get())
         |> fun p -> 
             dict [
@@ -73,7 +73,7 @@ module Controllers =
             ]
         |> JSON)
             
-    let benchmark (store:EventStore.Api) (historicalPrices:HistoricalPrices.Api) (benchmark:Benchmark) = warbler (fun _ -> 
+    let benchmark (store:EventStore.Api) broker savingsPlan (historicalPrices:HistoricalPrices.Api) (benchmark:Benchmark) = warbler (fun _ -> 
         let history = benchmark.Isin |> historicalPrices.Get
 
         let getPrice day =
@@ -83,19 +83,19 @@ module Controllers =
                       last.Value
 
         let b1 =
-            let events = store.Get() |> BenchmarkInteractor.buyBenchmarkInstead benchmark getPrice
+            let events = store.Get() |> BenchmarkInteractor.buyBenchmarkInstead broker benchmark getPrice
             
             events
             |> PositionsInteractor.getPositions
-            |> PositionsInteractor.evaluatePositions (Events.LastPriceOf events)
+            |> PositionsInteractor.evaluatePositions broker (Events.LastPriceOf events)
             |> Seq.head
 
         let b2 =
-            let events = store.Get() |> BenchmarkInteractor.buyBenchmarkByPlan benchmark getPrice
+            let events = store.Get() |> BenchmarkInteractor.buyBenchmarkByPlan savingsPlan benchmark getPrice
             
             events
             |> PositionsInteractor.getPositions
-            |> PositionsInteractor.evaluatePositions (Events.LastPriceOf events)
+            |> PositionsInteractor.evaluatePositions broker (Events.LastPriceOf events)
             |> Seq.head
 
         dict [
@@ -110,7 +110,7 @@ module Controllers =
                 "totalProfit" => (b2.MarketProfit + b2.DividendProfit)
                 "totalRoi" => (b2.MarketRoi + b2.DividendRoi)
                 "totalRoiAnual" => (b2.MarketRoiAnual + b2.DividendRoiAnual) 
-                "rate" => benchmark.SavingsPlan.Rate
+                "rate" => savingsPlan.Rate
             ]
         ]
         |> JSON)

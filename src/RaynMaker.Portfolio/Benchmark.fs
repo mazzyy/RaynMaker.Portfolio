@@ -8,43 +8,24 @@ module BenchmarkInteractor =
     type SavingsPlan = {
         Fee : decimal<Percentage>
         AnualFee : decimal<Percentage>
-        Rate : decimal<Currency>
-        }
-
-    type ManualOrder = {
-        Fee : decimal<Percentage>
-        MinFee : decimal<Currency>
-        MaxFee : decimal<Currency>
-        }
+        Rate : decimal<Currency> }
     
-    let getFee order value =
-        match value |> percent order.Fee with
-        | x when x < order.MinFee -> order.MinFee
-        | x when x > order.MaxFee -> order.MaxFee
-        | x -> x
-
     type Benchmark = {
         Isin : Isin
-        Name : string
-        SavingsPlan : SavingsPlan
-        Manual : ManualOrder
-        }
+        Name : string }
 
     let private pricePosition benchmark getPrice =
         { StockPriced.Date = DateTime.Today
           Name = benchmark.Name
           Isin = benchmark.Isin
-          Price = DateTime.Today |> getPrice
-          Fee = 10.0M<Currency> } 
+          Price = DateTime.Today |> getPrice } 
 
     /// Based on the original buy & sell events new benchmarking events are generated which simulate 
     /// the performance one could have achived by buying the benchmark asset (e.g. an ETF) instead
-    let buyBenchmarkInstead (benchmark:Benchmark) getPrice (store:DomainEvent list) =
-        let getFee = getFee benchmark.Manual
-
+    let buyBenchmarkInstead broker (benchmark:Benchmark) getPrice (store:DomainEvent list) =
         let buy day (value:decimal<Currency>) =
             let price = day |> getPrice
-            let fee = value |> getFee
+            let fee = value |> Broker.getFee broker
             let count = (value - fee) / price
             { StockBought.Isin = benchmark.Isin
               Name = benchmark.Name
@@ -55,7 +36,7 @@ module BenchmarkInteractor =
 
         let sell day (value:decimal<Currency>) =
             let price = day |> getPrice
-            let fee = value |> getFee
+            let fee = value |> Broker.getFee broker
             let count = value / price
             { StockSold.Isin = benchmark.Isin
               Name = benchmark.Name
@@ -75,12 +56,12 @@ module BenchmarkInteractor =
         |> List.ofSeq
 
     /// Simulate buying a benchmark whenever a deposit was made considering the cash limit
-    let buyBenchmarkByPlan (benchmark:Benchmark) getPrice (store:DomainEvent list) =
+    let buyBenchmarkByPlan savingsPlan (benchmark:Benchmark) getPrice (store:DomainEvent list) =
 
         let buy day  =
             let price = day |> getPrice
-            let value = benchmark.SavingsPlan.Rate
-            let fee = value |> percent benchmark.SavingsPlan.Fee
+            let value = savingsPlan.Rate
+            let fee = value |> percent savingsPlan.Fee
             let count = (value - fee) / price
             { StockBought.Isin = benchmark.Isin
               Name = benchmark.Name

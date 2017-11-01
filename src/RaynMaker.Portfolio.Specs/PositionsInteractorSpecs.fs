@@ -33,7 +33,12 @@ module internal Broker =
 
 [<TestFixture>]
 module ``Given some stock transactions`` =
-    
+    let broker = { 
+        Name = "Dummy"
+        Fee = 0.25M<Percentage>
+        MinFee = 10.0M<Currency>
+        MaxFee = 25.0M<Currency> }
+
     [<Test>]
     let ``<When> stock only bought <Then> position is open and full invest is sumed up``() =
         let positions =
@@ -64,7 +69,7 @@ module ``Given some stock transactions`` =
         let summary =
             events
             |> PositionsInteractor.getPositions
-            |> PositionsInteractor.evaluatePositions (Events.LastPriceOf events)
+            |> PositionsInteractor.evaluatePositions broker (Events.LastPriceOf events)
 
         summary |> should haveLength 1
 

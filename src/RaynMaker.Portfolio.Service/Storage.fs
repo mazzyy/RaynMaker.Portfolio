@@ -131,8 +131,7 @@ module EventsReader =
                 { StockPriced.Date = DateTime.Today
                   Isin = r.ID |> Isin
                   Name = r.Name
-                  Price = (r.Value |> decimal) * 1.0M<Currency>
-                  Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> StockPriced |> Some
+                  Price = (r.Value |> decimal) * 1.0M<Currency> } |> StockPriced |> Some
             | x -> None
 
         let tryParseEvent errors (r:Sheet.Row) =

@@ -1,5 +1,3 @@
-- closePosition event would have to calculate the fee based on broker conditions
-  - remove fee property
 
 -> move position to entities
 -> move "buy" and "sell" and "close" to entities

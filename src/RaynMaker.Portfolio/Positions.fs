@@ -87,13 +87,13 @@ module PositionsInteractor =
         MarketRoiAnual : decimal<Percentage>
         DividendRoiAnual : decimal<Percentage> }
         
-    let evaluatePositions getLastPrice positions =
+    let evaluatePositions broker getLastPrice positions =
         let evaluate (p:Position) =
             let p,pricedAt = 
                 match p.ClosedAt with
                 | Some c -> p,c
                 | None -> let price = p.Isin |> getLastPrice |> Option.get // there has to be a price otherwise there would be no position
-                          { p with Payouts = p.Payouts + p.Count * price.Value // TODO: impl - evt.Fee
+                          { p with Payouts = p.Payouts + p.Count * price.Value - (Broker.getFee broker price.Value)
                                    Count = 0.0M }, price.Day
 
             let investedYears = (pricedAt - p.OpenedAt).TotalDays / 365.0 |> decimal
