@@ -161,35 +161,33 @@ module Positions =
         { p with Dividends = p.Dividends + evt.Value - evt.Fee }
     
     let create store =
-        let getPosition positions isin = 
-            positions |> List.tryFind(fun p -> p.Isin = isin)
+        let update f positions =
+            let p = positions |> f
+            positions
+            |> Map.remove p.Isin
+            |> Map.add p.Isin p
 
-        let buyStock positions (evt:StockBought) =
-            let p = evt.Isin |> getPosition positions |? openNew evt.Date evt.Isin evt.Name
-            let newP = buy p evt
-            newP::(positions |> List.filter ((<>) p))
-
-        let sellStock positions (evt:StockSold) =
-            let p = 
-                match evt.Isin |> getPosition positions with
-                | Some p -> p
-                | None -> failwithf "Cannot sell stock %s (Isin: %s) because no position exists" evt.Name (Str.ofIsin evt.Isin)
+        let buyStock (evt:StockBought) positions =
+            let p = positions |> Map.tryFind evt.Isin |? openNew evt.Date evt.Isin evt.Name
+            buy p evt
             
-            let newP = sell p evt
-            newP::(positions |> List.filter ((<>) p))
+        let sellStock (evt:StockSold) positions =
+            let p = positions |> Map.tryFind evt.Isin |! (sprintf "Cannot sell stock %s (Isin: %s). No position exists" evt.Name (Str.ofIsin evt.Isin))
+            sell p evt
 
-        let receiveDividend positions (evt:DividendReceived) =
-            // TODO: position not found actually is an error
-            let p = evt.Isin |> getPosition positions |? openNew evt.Date evt.Isin evt.Name
-            let newP = addDividends p evt
-            newP::(positions |> List.filter ((<>) p))
+        let receiveDividend (evt:DividendReceived) positions =
+            let p = positions |> Map.tryFind evt.Isin |!(sprintf "Cannot get dividends for stock %s (Isin: %s). No position exists" evt.Name (Str.ofIsin evt.Isin))
+            addDividends p evt
 
         let processEvent positions evt =
             match evt with
-            | StockBought evt -> evt |> buyStock positions
-            | StockSold evt  -> evt |> sellStock positions
-            | DividendReceived evt -> evt |> receiveDividend positions
+            | StockBought evt -> positions |> update (buyStock evt)
+            | StockSold evt  -> positions |> update (sellStock evt)
+            | DividendReceived evt -> positions |> update (receiveDividend evt)
             | _ -> positions
 
         store
-        |> List.fold processEvent []
+        |> List.fold processEvent Map.empty
+        |> Map.toSeq
+        |> Seq.map snd
+        |> List.ofSeq

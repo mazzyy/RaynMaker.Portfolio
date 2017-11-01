@@ -1,12 +1,8 @@
 
--> move position to entities
--> move "buy" and "sell" and "close" to entities
-   - have method working on one position
-   - methods for collections to be checked - might be interactor still
-   -> add tests
 - positions as agent
 
-
+- write more tests for position creation
+  - esp. for the single position functions
 
 - controllers are no interactors 
   - move as much out of controllers so that they become data transformators only

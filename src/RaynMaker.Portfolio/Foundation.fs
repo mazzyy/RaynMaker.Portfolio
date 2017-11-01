@@ -6,6 +6,10 @@ open System.Collections.Generic
 open Plainion
 
 let (|?) = defaultArg
+let (|!) arg msg = 
+    match arg with
+    | Some x -> x
+    | None -> failwith msg
 
 let (|EqualsI|_|) (lhs:string) rhs =
     if lhs.Equals(rhs, StringComparison.OrdinalIgnoreCase) then
