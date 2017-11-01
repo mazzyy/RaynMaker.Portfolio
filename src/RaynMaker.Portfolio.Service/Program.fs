@@ -55,11 +55,11 @@ let start projectFile =
     let loadEvents() =
         printfn "Loading events ..."
 
-        let error (msg,payload:obj list) = 
-            printfn "Unknown event skipped: %s|%A" msg payload
+        let events, errors = "Events.xlsx" |> fromStore |> ExcelStoreReader.load
+        errors |> Seq.iter (printf "  %s")
+        events
 
-        "Events.xlsx" |> fromStore |> ExcelStoreReader.load store error
-        store.Get()
+    loadEvents |> store.Init 
 
     let loadBenchmarkHistory() =
         printfn "Loading benchmark history ..."
@@ -71,7 +71,6 @@ let start projectFile =
     
     printfn "Starting ..."
 
-    let getEvents = remember loadEvents
     let getBenchmarkHistory = remember loadBenchmarkHistory
 
     let benchmark = { 
@@ -94,10 +93,10 @@ let start projectFile =
                     path "/" >=> redirect "/Client/index.html"
                     pathScan "/Client/%s" (fun f -> Files.file (sprintf "%s/Client/%s" home f))
                     pathScan "/static/%s" (fun f -> Files.file (sprintf "%s/Client/static/%s" home f))
-                    path "/api/positions" >=> Controllers.positions getEvents
-                    path "/api/performance" >=> Controllers.performance getEvents
-                    path "/api/benchmark" >=> Controllers.benchmark getEvents benchmark getBenchmarkHistory 
-                    path "/api/diversification" >=> Controllers.diversification getEvents 
+                    path "/api/positions" >=> Controllers.positions store
+                    path "/api/performance" >=> Controllers.performance store
+                    path "/api/benchmark" >=> Controllers.benchmark store benchmark getBenchmarkHistory 
+                    path "/api/diversification" >=> Controllers.diversification store 
                     NOT_FOUND "Resource not found."
                 ]
         ]

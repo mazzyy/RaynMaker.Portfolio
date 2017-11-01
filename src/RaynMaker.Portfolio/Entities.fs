@@ -89,11 +89,13 @@ module EventStore =
     open RaynMaker.Portfolio
 
     type private Msg = 
+        | Init of (unit -> DomainEvent list)
         | Post of DomainEvent
         | Get of AsyncReplyChannel<DomainEvent list>
         | Stop 
 
     type Api = {
+        Init: (unit -> DomainEvent list) -> unit
         Post: DomainEvent -> unit
         Get: unit -> DomainEvent list
         Stop: unit -> unit
@@ -106,6 +108,10 @@ module EventStore =
                     let! msg = inbox.Receive()
 
                     match msg with
+                    | Init f -> 
+                        match store with
+                        | [] -> return! loop (f())
+                        | _ -> failwith "Can only be initialized once"
                     | Post evt -> return! loop (evt::store)
                     | Get replyChannel -> 
                         replyChannel.Reply (store |> List.rev)
@@ -116,7 +122,8 @@ module EventStore =
 
         agent.Error.Add(handleLastChanceException)
 
-        { Post = fun evt -> agent.Post(evt |> Post)
+        { Init = fun f -> agent.Post(f |> Init)
+          Post = fun evt -> agent.Post(evt |> Post)
           Get = fun () -> agent.PostAndReply( fun replyChannel -> replyChannel |> Get)
           Stop = fun () -> agent.Post Stop }
 

@@ -36,8 +36,8 @@ module Controllers =
         
         let getPositionSummaries = PositionsInteractor.getPositions >> PositionsInteractor.evaluatePositions
     
-    let positions getEvents = warbler (fun _ -> 
-        getEvents() 
+    let positions (store:EventStore.Api) = warbler (fun _ -> 
+        store.Get() 
         |> getPositionSummaries 
         |> List.map(fun p -> 
             dict [
@@ -59,12 +59,10 @@ module Controllers =
             ])
         |> JSON)
     
-    let performance getEvents = warbler (fun _ -> 
-        let events = getEvents() 
-        
-        events
+    let performance (store:EventStore.Api) = warbler (fun _ -> 
+        store.Get()
         |> getPositionSummaries 
-        |> PerformanceInteractor.getPerformance events
+        |> PerformanceInteractor.getPerformance (store.Get())
         |> fun p -> 
             dict [
                 "totalInvestment" => p.TotalInvestment
@@ -72,7 +70,7 @@ module Controllers =
             ]
         |> JSON)
             
-    let benchmark getEvents (benchmark:Benchmark) getBenchmarkHistory = warbler (fun _ -> 
+    let benchmark (store:EventStore.Api) (benchmark:Benchmark) getBenchmarkHistory = warbler (fun _ -> 
         let history = getBenchmarkHistory()
 
         let getPrice day =
@@ -82,13 +80,13 @@ module Controllers =
                       last.Value
 
         let b1 =
-            getEvents() 
+            store.Get()
             |> BenchmarkInteractor.buyBenchmarkInstead benchmark getPrice
             |> getPositionSummaries
             |> Seq.head
 
         let b2 =
-            getEvents() 
+            store.Get()
             |> BenchmarkInteractor.buyBenchmarkByPlan benchmark getPrice
             |> getPositionSummaries
             |> Seq.head
@@ -110,11 +108,9 @@ module Controllers =
         ]
         |> JSON)
 
-    let diversification getEvents = warbler (fun _ -> 
-        let events = getEvents() 
-        
+    let diversification (store:EventStore.Api) = warbler (fun _ -> 
         let report =
-            events
+            store.Get()
             |> PositionsInteractor.getPositions 
             |> StatisticsInteractor.getDiversification
 
@@ -132,55 +128,66 @@ module ExcelStoreReader =
 
     type private Sheet = ExcelFile<"../../etc/Events.xlsx">
 
-    let load (store:EventStore.Api) (error:string * obj list -> unit) path =
+    let load path =
         let sheet = new Sheet(path)
 
-        sheet.Data
-        |> Seq.filter(fun r -> String.IsNullOrEmpty(r.Event) |> not)
-        |> Seq.iter(fun r -> 
-            let asArray (r:Sheet.Row) : obj list = [r.Event;r.Date;r.ID; r.Name; r.Value; r.Fee; r.Count; r.Comment]
+        let error msg (r:Sheet.Row) = 
+            let payload : obj list = [r.Date;r.ID; r.Name; r.Value; r.Fee; r.Count; r.Comment]
+            sprintf "%s: Event=%s Payload=%A" msg r.Event payload
 
+        let tryRead (r:Sheet.Row) =
+            match r.Event with
+            | EqualsI "StockBought" _ -> 
+                { StockBought.Date = r.Date
+                  Isin = r.ID
+                  Name = r.Name
+                  Count = r.Count |> decimal
+                  Price = (r.Value |> decimal) * 1.0M<Currency>
+                  Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> StockBought |> Some
+            | EqualsI "StockSold" _ -> 
+                { StockSold.Date = r.Date
+                  Isin = r.ID
+                  Name = r.Name
+                  Count = r.Count |> decimal
+                  Price = (r.Value |> decimal) * 1.0M<Currency>
+                  Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> StockSold |> Some
+            | EqualsI "DividendReceived" _ -> 
+                { DividendReceived.Date = r.Date
+                  Isin = r.ID
+                  Name = r.Name
+                  Value = (r.Value |> decimal) * 1.0M<Currency>
+                  Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> DividendReceived |> Some
+            | EqualsI "DepositAccounted" _ -> 
+                { DepositAccounted.Date = r.Date
+                  Value = (r.Value |> decimal) * 1.0M<Currency>} |> DepositAccounted |> Some
+            | EqualsI "DisbursementAccounted" _ -> 
+                { DisbursementAccounted.Date = r.Date
+                  Value = (r.Value |> decimal) * 1.0M<Currency>} |> DisbursementAccounted |> Some
+            | EqualsI "InterestReceived" _ -> 
+                { InterestReceived.Date = r.Date
+                  Value = (r.Value |> decimal) * 1.0M<Currency>} |> InterestReceived |> Some
+            | EqualsI "PositionClosed" _ -> 
+                { PositionClosed.Date = DateTime.Today
+                  Isin = r.ID
+                  Name = r.Name
+                  Price = (r.Value |> decimal) * 1.0M<Currency>
+                  Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> PositionClosed |> Some
+            | x -> None
+
+        let tryParseEvent errors (r:Sheet.Row) =
             try
-                match r.Event with
-                | EqualsI "StockBought" _ -> 
-                    { StockBought.Date = r.Date
-                      Isin = r.ID
-                      Name = r.Name
-                      Count = r.Count |> decimal
-                      Price = (r.Value |> decimal) * 1.0M<Currency>
-                      Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> StockBought |> store.Post
-                | EqualsI "StockSold" _ -> 
-                    { StockSold.Date = r.Date
-                      Isin = r.ID
-                      Name = r.Name
-                      Count = r.Count |> decimal
-                      Price = (r.Value |> decimal) * 1.0M<Currency>
-                      Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> StockSold |> store.Post
-                | EqualsI "DividendReceived" _ -> 
-                    { DividendReceived.Date = r.Date
-                      Isin = r.ID
-                      Name = r.Name
-                      Value = (r.Value |> decimal) * 1.0M<Currency>
-                      Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> DividendReceived |> store.Post
-                | EqualsI "DepositAccounted" _ -> 
-                    { DepositAccounted.Date = r.Date
-                      Value = (r.Value |> decimal) * 1.0M<Currency>} |> DepositAccounted |> store.Post
-                | EqualsI "DisbursementAccounted" _ -> 
-                    { DisbursementAccounted.Date = r.Date
-                      Value = (r.Value |> decimal) * 1.0M<Currency>} |> DisbursementAccounted |> store.Post
-                | EqualsI "InterestReceived" _ -> 
-                    { InterestReceived.Date = r.Date
-                      Value = (r.Value |> decimal) * 1.0M<Currency>} |> InterestReceived |> store.Post
-                | EqualsI "PositionClosed" _ -> 
-                    { PositionClosed.Date = DateTime.Today
-                      Isin = r.ID
-                      Name = r.Name
-                      Price = (r.Value |> decimal) * 1.0M<Currency>
-                      Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> PositionClosed |> store.Post
-                | x -> error((sprintf "Unknown event: %s" r.Event), r |> asArray)
+                match r |> tryRead with
+                | Some e -> Some(e),errors
+                | None -> None, (error "Unknown event type" r)::errors
             with 
-                | ex -> error((sprintf "Failed parsing event: %A" (ex |> dumpException)), r |> asArray) 
-        )
+                | ex -> None, (error "Failed to parse event" r)::errors
+
+        let events, errors =  
+            sheet.Data
+            |> Seq.filter(fun r -> String.IsNullOrEmpty(r.Event) |> not)
+            |> Seq.mapFold tryParseEvent []
+        
+        (events |> Seq.choose id |> Seq.rev |> List.ofSeq), errors
 
 module HistoricalPrices =
     open System
