@@ -128,7 +128,7 @@ module EventsReader =
                   Value = (r.Value |> decimal) * 1.0M<Currency>} |> InterestReceived |> Some
             | EqualsI "PositionClosed" _
             | EqualsI "StockPriced" _ -> 
-                { StockPriced.Date = DateTime.Today
+                { StockPriced.Date = r.Date
                   Isin = r.ID |> Isin
                   Name = r.Name
                   Price = (r.Value |> decimal) * 1.0M<Currency> } |> StockPriced |> Some
@@ -147,7 +147,7 @@ module EventsReader =
             |> Seq.filter(fun r -> String.IsNullOrEmpty(r.Event) |> not)
             |> Seq.mapFold tryParseEvent []
         
-        (events |> Seq.choose id |> Seq.rev |> List.ofSeq), errors
+        (events |> Seq.choose id |> List.ofSeq), errors
 
 module HistoricalPricesReader =
     open System

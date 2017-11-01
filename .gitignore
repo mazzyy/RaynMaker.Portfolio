@@ -2,6 +2,7 @@
 **/obj/**
 .vs/**
 /*.suo
+build/.fake/
 /TestResult.xml
 /TestResults/**
 /RaynMaker.Portfolio.gc.*

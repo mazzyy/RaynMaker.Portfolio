@@ -97,7 +97,9 @@ let start projectFile =
     
     let depot = Depot.create (store.Get)
 
-    let lastPriceOf = Events.LastPriceOf (store.Get())
+    let lastPriceOf isin = 
+        let events = store.Get()
+        Events.LastPriceOf events isin
 
     let app = 
         let log = request (fun r -> printfn "%s" r.path; succeed)
