@@ -41,7 +41,7 @@ module Controllers =
         |> List.map(fun p -> 
             dict [
                 "name" => p.Position.Name
-                "isin" => p.Position.Isin
+                "isin" => (p.Position.Isin |> Str.ofIsin)
                 "open" => (p.Position.OpenedAt |> formatDate)
                 "pricedAt" => (p.PricedAt |> formatDate)
                 "duration" => (p.PricedAt - p.Position.OpenedAt |> formatTimespan)
@@ -96,7 +96,7 @@ module Controllers =
 
         dict [
             "name" => benchmark.Name
-            "isin" => benchmark.Isin
+            "isin" => (benchmark.Isin |> Str.ofIsin)
             "buyInstead" => dict [
                 "totalProfit" => (b1.MarketProfit + b1.DividendProfit)
                 "totalRoi" => (b1.MarketRoi + b1.DividendRoi)
