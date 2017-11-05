@@ -70,9 +70,11 @@ module Controllers =
         |> JSON)
             
     let benchmark (store:EventStore.Api) broker savingsPlan (historicalPrices:HistoricalPrices.Api) (benchmark:Benchmark) = warbler (fun _ -> 
-        let getPrice = 
+        let getPrice day = 
             let history = benchmark.Isin |> historicalPrices.Get
-            Prices.getPrice history
+            match Prices.getPrice 4.0 history day with
+            | Some p -> p
+            | None -> failwithf "Could not get a price for: %A" day
 
         let eval = BenchmarkInteractor.evaluate benchmark getPrice broker (store.Get())
 

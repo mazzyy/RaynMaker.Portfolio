@@ -93,11 +93,19 @@ module Events =
             | _ -> None)
 
 module Prices = 
-    let getPrice prices day =
-        match prices |> Seq.skipWhile(fun (p:Price) -> p.Day < day) |> Seq.tryHead with
-        | Some p -> p.Value
-        | None -> let last = prices |> List.last
-                  last.Value
+    let getPrice tolerance prices day =
+        match prices with
+        | [] -> None
+        | prices ->
+            let p = 
+                match prices |> Seq.skipWhile(fun (p:Price) -> p.Day < day) |> Seq.tryHead with
+                | Some p -> p 
+                | None -> prices |> List.last
+
+            if (day - p.Day).TotalDays <= tolerance then
+                p.Value |> Some
+            else
+                None
 
 type Broker = {
     Name : string
