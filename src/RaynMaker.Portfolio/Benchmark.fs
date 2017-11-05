@@ -57,7 +57,6 @@ module BenchmarkInteractor =
 
     /// Simulate buying a benchmark whenever a deposit was made considering the cash limit
     let buyBenchmarkByPlan savingsPlan (benchmark:Benchmark) getPrice (store:DomainEvent list) =
-
         let buy day  =
             let price = day |> getPrice
             let value = savingsPlan.Rate
@@ -86,4 +85,11 @@ module BenchmarkInteractor =
         }
         |> List.ofSeq
 
+    let evaluate benchmark getPrice broker (store:DomainEvent list) eval =  
+        let events = store |> eval benchmark getPrice
+            
+        events
+        |> Positions.create
+        |> PositionsInteractor.evaluatePositions broker (Events.LastPriceOf events)
+        |> Seq.head
 

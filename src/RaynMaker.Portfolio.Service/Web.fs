@@ -70,29 +70,14 @@ module Controllers =
         |> JSON)
             
     let benchmark (store:EventStore.Api) broker savingsPlan (historicalPrices:HistoricalPrices.Api) (benchmark:Benchmark) = warbler (fun _ -> 
-        let history = benchmark.Isin |> historicalPrices.Get
+        let getPrice = 
+            let history = benchmark.Isin |> historicalPrices.Get
+            Prices.getPrice history
 
-        let getPrice day =
-            match history |> Seq.skipWhile(fun (p:Price) -> p.Day < day) |> Seq.tryHead with
-            | Some p -> p.Value
-            | None -> let last = history |> List.last
-                      last.Value
+        let eval = BenchmarkInteractor.evaluate benchmark getPrice broker (store.Get())
 
-        let b1 =
-            let events = store.Get() |> BenchmarkInteractor.buyBenchmarkInstead broker benchmark getPrice
-            
-            events
-            |> Positions.create
-            |> PositionsInteractor.evaluatePositions broker (Events.LastPriceOf events)
-            |> Seq.head
-
-        let b2 =
-            let events = store.Get() |> BenchmarkInteractor.buyBenchmarkByPlan savingsPlan benchmark getPrice
-            
-            events
-            |> Positions.create
-            |> PositionsInteractor.evaluatePositions broker (Events.LastPriceOf events)
-            |> Seq.head
+        let b1 = eval (BenchmarkInteractor.buyBenchmarkInstead broker)
+        let b2 = eval (BenchmarkInteractor.buyBenchmarkByPlan savingsPlan)
 
         dict [
             "name" => benchmark.Name

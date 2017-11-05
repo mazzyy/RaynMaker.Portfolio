@@ -69,7 +69,7 @@ type DomainEvent =
 type Price = {
     Day : DateTime
     Value : decimal<Currency>
-    }
+}
 
 module Events =
     let GetDate event =
@@ -91,6 +91,13 @@ module Events =
             | StockSold e when e.Isin = isin -> { Day = e.Date; Value = e.Price } |> Some 
             | StockPriced e when e.Isin = isin -> { Day = e.Date; Value = e.Price } |> Some 
             | _ -> None)
+
+module Prices = 
+    let getPrice prices day =
+        match prices |> Seq.skipWhile(fun (p:Price) -> p.Day < day) |> Seq.tryHead with
+        | Some p -> p.Value
+        | None -> let last = prices |> List.last
+                  last.Value
 
 type Broker = {
     Name : string

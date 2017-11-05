@@ -1,12 +1,11 @@
 
-- should we have explicit dependencies between event store agent and position agent?
 
 - write more tests for position creation
   - esp. for the single position functions
 
-- controllers are no interactors 
-  - move as much out of controllers so that they become data transformators only
 
+
+- benchmark: anual fee not considered
 
 
 - over all performance
