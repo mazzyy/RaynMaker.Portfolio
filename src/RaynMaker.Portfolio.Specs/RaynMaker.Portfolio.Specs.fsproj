@@ -16,7 +16,9 @@
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="PositionsInteractorSpecs.fs" />
+    <Compile Include="FakeBroker.fs" />
+    <Compile Include="EntitiesSpecs.fs" />
+    <Compile Include="PositionsSpecs.fs" />
     <Content Include="App.config" />
     <Content Include="packages.config" />
   </ItemGroup>
