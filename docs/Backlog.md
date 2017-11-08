@@ -1,7 +1,11 @@
 
 
-- write more tests for position creation
-  - esp. for the single position functions
+- add more tests
+  - positions
+  - interactors
+  - gateways
+    - ExcelStoreReader: success and errors
+	- HistoricalPrices
 
 
 
@@ -13,12 +17,6 @@
   - TWR
   - MWR
 
-- add more tests
-  - for the interactors
-  - broker.getfee
-  - gateways
-    - ExcelStoreReader: success and errors
-	- HistoricalPrices
 
 
 

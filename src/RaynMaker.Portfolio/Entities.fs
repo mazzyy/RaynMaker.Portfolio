@@ -144,7 +144,7 @@ module Positions =
             Dividends = 0.0M<Currency>
         }
 
-    let buy p (evt:StockBought) =
+    let accountBuy p (evt:StockBought) =
         Contract.requires (fun () -> p.Isin = evt.Isin) "evt.Isin = p.Isin"
         Contract.requires (fun () -> evt.Count > 0.0M) "evt.Count > 0"
 
@@ -159,7 +159,7 @@ module Positions =
                  Payouts = payouts
                  Count = p.Count + evt.Count }
     
-    let sell p (evt:StockSold) =
+    let accountSell p (evt:StockSold) =
         Contract.requires (fun () -> p.Isin = evt.Isin) "evt.Isin = p.Isin"
         Contract.requires (fun () -> evt.Count > 0.0M) "evt.Count > 0"
         Contract.requires (fun () -> p.ClosedAt |> Option.isNone) "position is closed"
@@ -184,11 +184,11 @@ module Positions =
 
         let buyStock (evt:StockBought) positions =
             let p = positions |> Map.tryFind evt.Isin |? openNew evt.Date evt.Isin evt.Name
-            buy p evt
+            accountBuy p evt
             
         let sellStock (evt:StockSold) positions =
             let p = positions |> Map.tryFind evt.Isin |! (sprintf "Cannot sell stock %s (Isin: %s). No position exists" evt.Name (Str.ofIsin evt.Isin))
-            sell p evt
+            accountSell p evt
 
         let receiveDividend (evt:DividendReceived) positions =
             let p = positions |> Map.tryFind evt.Isin |!(sprintf "Cannot get dividends for stock %s (Isin: %s). No position exists" evt.Name (Str.ofIsin evt.Isin))

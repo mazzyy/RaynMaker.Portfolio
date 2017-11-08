@@ -14,6 +14,10 @@ module ``Given some stock transactions`` =
         MinFee = 10.0M<Currency>
         MaxFee = 25.0M<Currency> }
 
+    let buy a b c d = FakeBroker.buy a b c d |> StockBought
+    let sell a b c d = FakeBroker.sell a b c d |> StockSold
+    let price a b c = FakeBroker.price a b c |> StockPriced
+
     [<Test>]
     let ``<When> stock only bought <Then> position is open and full invest is sumed up``() =
         let positions =
@@ -28,7 +32,7 @@ module ``Given some stock transactions`` =
         positions.[0].OpenedAt |> should equal (at 2016 10 10)
         positions.[0].ClosedAt |> should equal None
         positions.[0].Count |> should equal 15
-        positions.[0].Invested |> should equal ((10.0M * 10.0M<Currency> + fee) + (5.0M * 15.0M<Currency> + fee))
+        positions.[0].Invested |> should equal ((10.0M * 10.0M<Currency> + FakeBroker.fee) + (5.0M * 15.0M<Currency> + FakeBroker.fee))
         positions.[0].Payouts |> should equal 0.0M<Currency>
         positions.[0].Dividends |> should equal 0.0M<Currency>
 
@@ -48,8 +52,8 @@ module ``Given some stock transactions`` =
 
         summary |> should haveLength 1
 
-        let investedMoney = 175.0M<Currency> + (2.0M * fee)
-        let profit = 300.0M<Currency> - fee - investedMoney
+        let investedMoney = 175.0M<Currency> + (2.0M * FakeBroker.fee)
+        let profit = 300.0M<Currency> - FakeBroker.fee - investedMoney
         let roi = profit / investedMoney * 100.0M<Percentage>
 
         summary.[0].PricedAt |> should equal (at 2016 01 01)

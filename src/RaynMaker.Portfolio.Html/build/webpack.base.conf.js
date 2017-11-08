@@ -54,7 +54,10 @@ module.exports = {
       {
         test: /\.js$/,
         loader: 'babel-loader',
-        include: [resolve('src'), resolve('test')]
+        include: [resolve('src'), resolve('test')],
+        options: {
+          cacheDirectory: true,
+        }
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,

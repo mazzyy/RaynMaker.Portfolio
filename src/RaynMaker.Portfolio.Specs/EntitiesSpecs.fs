@@ -7,6 +7,10 @@ open RaynMaker.Portfolio.Entities
 
 [<TestFixture>]
 module ``Given a sequence of events`` =
+    let buy a b c d = FakeBroker.buy a b c d |> StockBought
+    let sell a b c d = FakeBroker.sell a b c d |> StockSold
+    let price a b c = FakeBroker.price a b c |> StockPriced
+
     [<Test>]
     let ``<When> empty <Then> no price found``() =
         [] 
@@ -109,22 +113,29 @@ module ``Given a broker`` =
         |> Broker.getFee broker
         |> should equal 12.5M<Currency>
 
-//[<TestFixture>]
-//module ``Given a position`` =
-   
-//    [<Test>]
-//    let ``<When> buying new shares <Then> share count and cashflow is correctly updated``() =
-//        let position = Positions.openNew (at 2015 01 01) (isin "Joe Inc") "Joe Inc"
+[<TestFixture>]
+module ``Given a position`` =
+    let openNew at = Positions.openNew at (isin "Joe Inc") "Joe Inc"
+    let buy = FakeBroker.buy "Joe Inc"
+    let sell = FakeBroker.sell "Joe Inc"
 
-//        let newPosition =
-//            { StockBought.Date = date 
-//              Name = company
-//              Isin = company |> isin
-//              Count = count |> decimal
-//              Price = 1.0M<Currency> * (price |> decimal)
-//              Fee = fee
-//            } 
-//            |> Positions.buy position
+    [<Test>]
+    let ``<When> buying new shares <Then> share count and cashflow is correctly updated``() =
+        let position = openNew (at 2015 01 01)
 
-//        newPosition.Count |> should equal 17
+        let newPosition =
+            [
+                at 2015 04 01 |> buy  5 17.5 
+                at 2015 06 01 |> buy  7 18.9 
+                at 2015 08 01 |> buy 13 21.0 
+            ]
+            |> Seq.fold Positions.accountBuy position
+
+        newPosition.Count |> should equal 25
+        newPosition.Invested |> should equal ((5M * 17.5M<Currency> + FakeBroker.fee) + 
+                                              (7M * 18.9M<Currency> + FakeBroker.fee) + 
+                                              (13M * 21.0M<Currency> + FakeBroker.fee))
+        newPosition.Dividends |> should equal 0.0M<Currency>
+        newPosition.Payouts |> should equal 0.0M<Currency>
+
 
