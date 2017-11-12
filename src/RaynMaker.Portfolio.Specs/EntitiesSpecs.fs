@@ -118,24 +118,59 @@ module ``Given a position`` =
     let openNew at = Positions.openNew at (isin "Joe Inc") "Joe Inc"
     let buy = FakeBroker.buy "Joe Inc"
     let sell = FakeBroker.sell "Joe Inc"
+    let dividends = FakeBroker.dividends "Joe Inc"
 
     [<Test>]
     let ``<When> buying new shares <Then> share count and cashflow is correctly updated``() =
-        let position = openNew (at 2015 01 01)
+        let p = openNew (at 2015 01 01)
 
-        let newPosition =
+        let p =
             [
                 at 2015 04 01 |> buy  5 17.5 
                 at 2015 06 01 |> buy  7 18.9 
-                at 2015 08 01 |> buy 13 21.0 
             ]
-            |> Seq.fold Positions.accountBuy position
+            |> Seq.fold Positions.accountBuy p
 
-        newPosition.Count |> should equal 25
-        newPosition.Invested |> should equal ((5M * 17.5M<Currency> + FakeBroker.fee) + 
-                                              (7M * 18.9M<Currency> + FakeBroker.fee) + 
-                                              (13M * 21.0M<Currency> + FakeBroker.fee))
-        newPosition.Dividends |> should equal 0.0M<Currency>
-        newPosition.Payouts |> should equal 0.0M<Currency>
+        p.Count |> should equal 12
+        p.Invested |> should equal ((5M * 17.5M<Currency> + FakeBroker.fee) + (7M * 18.9M<Currency> + FakeBroker.fee))
+        p.Dividends |> should equal 0.0M<Currency>
+        p.Payouts |> should equal 0.0M<Currency>
+
+    [<Test>]
+    let ``<When> selling some shares <Then> share count and cashflow is correctly updated``() =
+        let p = openNew (at 2015 01 01)
+
+        let p = at 2015 04 01 |> buy  5 17.5 |> Positions.accountBuy p 
+        let p = at 2015 06 01 |> sell 2 18.9 |> Positions.accountSell p
+
+        p.Count |> should equal 3
+        p.Invested |> should equal (5M * 17.5M<Currency> + FakeBroker.fee)
+        p.Dividends |> should equal 0.0M<Currency>
+        p.Payouts |> should equal (2M * 18.9M<Currency> - FakeBroker.fee)
+
+    [<Test>]
+    let ``<When> selling all shares <Then> position is closed with share count and cashflow is correctly updated``() =
+        let p = openNew (at 2015 01 01)
+
+        let p = at 2015 04 01 |> buy  5 17.5 |> Positions.accountBuy p 
+        let p = at 2015 06 01 |> sell 5 18.9 |> Positions.accountSell p
+
+        p.Count |> should equal 0
+        p.ClosedAt |> should equal (at 2015 06 01 |> Some)
+        p.Invested |> should equal (5M * 17.5M<Currency> + FakeBroker.fee)
+        p.Dividends |> should equal 0.0M<Currency>
+        p.Payouts |> should equal (5M * 18.9M<Currency> - FakeBroker.fee)
+
+    [<Test>]
+    let ``<When> receiving dividends <Then> cashflow is correctly updated``() =
+        let p = openNew (at 2015 01 01)
+
+        let p = at 2015 04 01 |> buy  5 17.5 |> Positions.accountBuy p 
+        let p = at 2015 06 01 |> dividends 23.4 |> Positions.accountDividends p
+
+        p.Count |> should equal 5
+        p.Invested |> should equal (5M * 17.5M<Currency> + FakeBroker.fee)
+        p.Dividends |> should equal (23.4M<Currency> - FakeBroker.fee)
+        p.Payouts |> should equal 0.0M<Currency>
 
 

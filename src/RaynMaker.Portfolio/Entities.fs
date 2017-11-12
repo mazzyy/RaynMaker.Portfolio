@@ -147,6 +147,8 @@ module Positions =
     let accountBuy p (evt:StockBought) =
         Contract.requires (fun () -> p.Isin = evt.Isin) "evt.Isin = p.Isin"
         Contract.requires (fun () -> evt.Count > 0.0M) "evt.Count > 0"
+        Contract.requires (fun () -> evt.Price > 0.0M<Currency>) "evt.Price > 0"
+        Contract.requires (fun () -> evt.Fee >= 0.0M<Currency>) "evt.Fee >= 0"
 
         let investment = evt.Count * evt.Price + evt.Fee
         let newInvestment,payouts = 
@@ -154,27 +156,50 @@ module Positions =
                 investment - p.Payouts,0.0M<Currency>
             else
                 0.0M<Currency>,p.Payouts - investment
+        
+        let newP =
+            { p with Invested = p.Invested + newInvestment
+                     Payouts = payouts
+                     Count = p.Count + evt.Count }
 
-        { p with Invested = p.Invested + newInvestment
-                 Payouts = payouts
-                 Count = p.Count + evt.Count }
+        Contract.ensures (fun () -> newP.Count > 0.0M) "new count > 0"
+        Contract.ensures (fun () -> newP.Invested > 0.0M<Currency>) "new invested > 0"
+        Contract.ensures (fun () -> newP.Payouts >= 0.0M<Currency>) "new payouts >= 0"
+
+        newP    
     
     let accountSell p (evt:StockSold) =
         Contract.requires (fun () -> p.Isin = evt.Isin) "evt.Isin = p.Isin"
         Contract.requires (fun () -> evt.Count > 0.0M) "evt.Count > 0"
+        Contract.requires (fun () -> evt.Price > 0.0M<Currency>) "evt.Price > 0"
+        Contract.requires (fun () -> evt.Fee >= 0.0M<Currency>) "evt.Fee >= 0"
         Contract.requires (fun () -> p.ClosedAt |> Option.isNone) "position is closed"
 
         let count = p.Count - evt.Count
-        { p with Payouts = p.Payouts + evt.Count * evt.Price - evt.Fee
-                 Count = count
-                 ClosedAt = if count = 0.0M then evt.Date |> Some else None }
+        let newP =
+            { p with Payouts = p.Payouts + evt.Count * evt.Price - evt.Fee
+                     Count = count
+                     ClosedAt = if count = 0.0M then evt.Date |> Some else None }
 
-    let addDividends p (evt:DividendReceived) =
+        Contract.ensures (fun () -> newP.Count >= 0.0M) "new count >= 0"
+        Contract.ensures (fun () -> newP.Invested >= 0.0M<Currency>) "new invested >= 0"
+        Contract.ensures (fun () -> newP.Payouts > 0.0M<Currency>) "new payouts > 0"
+         
+        newP
+
+    let accountDividends p (evt:DividendReceived) =
         Contract.requires (fun () -> p.Isin = evt.Isin) "evt.Isin = p.Isin"
         Contract.requires (fun () -> p.ClosedAt |> Option.isNone) "position is closed"
+        Contract.requires (fun () -> evt.Value > 0.0M<Currency>) "evt.Value > 0"
+        Contract.requires (fun () -> evt.Fee >= 0.0M<Currency>) "evt.Fee >= 0"
 
-        { p with Dividends = p.Dividends + evt.Value - evt.Fee }
+        let newP =
+            { p with Dividends = p.Dividends + evt.Value - evt.Fee }
     
+        Contract.ensures (fun () -> newP.Dividends > 0.0M<Currency>) "new Dividends > 0"
+
+        newP
+
     let create store =
         let update f positions =
             let p = positions |> f
@@ -192,7 +217,7 @@ module Positions =
 
         let receiveDividend (evt:DividendReceived) positions =
             let p = positions |> Map.tryFind evt.Isin |!(sprintf "Cannot get dividends for stock %s (Isin: %s). No position exists" evt.Name (Str.ofIsin evt.Isin))
-            addDividends p evt
+            accountDividends p evt
 
         let processEvent positions evt =
             match evt with

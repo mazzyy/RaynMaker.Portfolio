@@ -7,8 +7,6 @@
     - ExcelStoreReader: success and errors
 	- HistoricalPrices
 
-
-
 - benchmark
   - anual fee not considered
 
@@ -37,20 +35,12 @@
     (similar to account report)
   - add overview on disposals per year
 
-
-- sanity checks
-  - value is never negative - the event type defines whether it has to be substracted or summed up
-
 - refactor core positions logic
   - move to dedicated interactor and make buy and sell methods public so that we can test individually
 
 - anual roi actually is no simple math average ...
 
-- fix anual fee in benchmark
-
 - show negative numbers in red
-
-- test and impl event invariants (e.g. cannot sell more than i have)
 
 - refactor to EventSourcing and CQRS with agents
 

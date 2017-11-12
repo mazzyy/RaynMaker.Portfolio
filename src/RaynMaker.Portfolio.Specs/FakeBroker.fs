@@ -18,8 +18,7 @@ module internal FakeBroker =
           Isin = company |> isin
           Count = count |> decimal
           Price = 1.0M<Currency> * (price |> decimal)
-          Fee = fee
-        } 
+          Fee = fee } 
 
     let sell company count (price:float) date =
         { StockSold.Date = date 
@@ -27,14 +26,19 @@ module internal FakeBroker =
           Isin = sprintf "US%i" (company.GetHashCode()) |> Isin
           Count = count |> decimal
           Price = 1.0M<Currency> * (price |> decimal)
-          Fee = fee
-        } 
+          Fee = fee } 
 
     let price company (price:float) date =
         { StockPriced.Date = date 
           Name = company
           Isin = sprintf "US%i" (company.GetHashCode()) |> Isin
-          Price = 1.0M<Currency> * (price |> decimal)
-        }
+          Price = 1.0M<Currency> * (price |> decimal) }
+
+    let dividends company (value:float) date =
+        { DividendReceived.Date = date 
+          Name = company
+          Isin = sprintf "US%i" (company.GetHashCode()) |> Isin
+          Value = 1.0M<Currency> * (value |> decimal)
+          Fee = fee }
 
 
