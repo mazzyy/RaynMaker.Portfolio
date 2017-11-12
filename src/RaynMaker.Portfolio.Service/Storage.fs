@@ -128,7 +128,7 @@ module EventsReader =
                   Value = (r.Value |> decimal) * 1.0M<Currency>} |> InterestReceived |> Some
             | EqualsI "PositionClosed" _
             | EqualsI "StockPriced" _ -> 
-                { StockPriced.Date = r.Date
+                { StockPriced.Date = if r.Date = DateTime.MinValue then DateTime.Today else r.Date
                   Isin = r.ID |> Isin
                   Name = r.Name
                   Price = (r.Value |> decimal) * 1.0M<Currency> } |> StockPriced |> Some
