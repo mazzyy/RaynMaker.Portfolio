@@ -19,24 +19,6 @@ module ``Given some stock transactions`` =
     let price a b c = FakeBroker.price a b c |> StockPriced
 
     [<Test>]
-    let ``<When> stock only bought <Then> position is open and full invest is sumed up``() =
-        let positions =
-            [
-                at 2016 10 10 |> buy "Joe Inc" 10 10.0
-                at 2016 12 12 |> buy "Joe Inc" 5 15.0
-            ]
-            |> Positions.create
-
-        positions |> should haveLength 1
-
-        positions.[0].OpenedAt |> should equal (at 2016 10 10)
-        positions.[0].ClosedAt |> should equal None
-        positions.[0].Count |> should equal 15
-        positions.[0].Invested |> should equal ((10.0M * 10.0M<Currency> + FakeBroker.fee) + (5.0M * 15.0M<Currency> + FakeBroker.fee))
-        positions.[0].Payouts |> should equal 0.0M<Currency>
-        positions.[0].Dividends |> should equal 0.0M<Currency>
-
-    [<Test>]
     let ``<When> an open position is closed <Then> position summary shows profits and ROIs``() =
         let events =
             [

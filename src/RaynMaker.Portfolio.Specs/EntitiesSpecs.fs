@@ -173,4 +173,18 @@ module ``Given a position`` =
         p.Dividends |> should equal (23.4M<Currency> - FakeBroker.fee)
         p.Payouts |> should equal 0.0M<Currency>
 
+[<TestFixture>]
+module ``Given a list of stock events`` =
+    let buy a b c d = FakeBroker.buy a b c d |> StockBought
+    let sell a b c d = FakeBroker.sell a b c d |> StockSold
+    let dividend a b c = FakeBroker.dividends a b c |> DividendReceived
+
+    [<Test>]
+    let ``<When> multipe stocks are bought <Then> multiple positions are created``() =
+        ()
+
+    [<Test>]
+    let ``<When> multipe buy, sell and dividend events for same positions occur <Then> then cashflow is correctly accounted``() =
+        ()
+
 
