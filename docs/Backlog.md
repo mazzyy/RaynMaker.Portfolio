@@ -1,8 +1,13 @@
 
+- reorg code
+  - files with interactors are "usecases.abc" modules
+  - domainmodel ==> entities
+  - gateways.
+
 
 - add more tests
   - positions
-  - interactors
+  - usecases
   - gateways
     - ExcelStoreReader: success and errors
 	- HistoricalPrices
@@ -16,7 +21,7 @@
   - MWR
 
 
-
+=== > 1.0 ==================
 
 
 - do we want to introduce an entity called stock? 
