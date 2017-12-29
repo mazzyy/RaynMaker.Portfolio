@@ -121,7 +121,7 @@ module ``Given a position`` =
     let dividends = FakeBroker.dividends "Joe Inc"
 
     [<Test>]
-    let ``<When> buying new shares <Then> share count and cashflow is correctly updated``() =
+    let ``<When> buying new shares <Then> share count and position value increased by bought shares``() =
         let p = openNew (at 2015 01 01)
 
         let p =
@@ -137,7 +137,7 @@ module ``Given a position`` =
         p.Payouts |> should equal 0.0M<Currency>
 
     [<Test>]
-    let ``<When> selling some shares <Then> share count and cashflow is correctly updated``() =
+    let ``<When> selling some shares <Then> share count and position value decreased by the sold shares``() =
         let p = openNew (at 2015 01 01)
 
         let p = at 2015 04 01 |> buy  5 17.5 |> Positions.accountBuy p 
@@ -149,7 +149,7 @@ module ``Given a position`` =
         p.Payouts |> should equal (2M * 18.9M<Currency> - FakeBroker.fee)
 
     [<Test>]
-    let ``<When> selling all shares <Then> position is closed with share count and cashflow is correctly updated``() =
+    let ``<When> selling all shares <Then> position is closed, share count is zero and position value is calculated by sold price``() =
         let p = openNew (at 2015 01 01)
 
         let p = at 2015 04 01 |> buy  5 17.5 |> Positions.accountBuy p 
@@ -162,7 +162,7 @@ module ``Given a position`` =
         p.Payouts |> should equal (5M * 18.9M<Currency> - FakeBroker.fee)
 
     [<Test>]
-    let ``<When> receiving dividends <Then> cashflow is correctly updated``() =
+    let ``<When> receiving dividends <Then> position dividends value is increased by dividend``() =
         let p = openNew (at 2015 01 01)
 
         let p = at 2015 04 01 |> buy  5 17.5 |> Positions.accountBuy p 
@@ -170,7 +170,7 @@ module ``Given a position`` =
 
         p.Count |> should equal 5
         p.Invested |> should equal (5M * 17.5M<Currency> + FakeBroker.fee)
-        p.Dividends |> should equal (23.4M<Currency> - FakeBroker.fee)
+        p.Dividends |> should equal (23.4M<Currency> * (1.0M - FakeBroker.dividendFee))
         p.Payouts |> should equal 0.0M<Currency>
 
 [<TestFixture>]
@@ -181,10 +181,37 @@ module ``Given a list of stock events`` =
 
     [<Test>]
     let ``<When> multipe stocks are bought <Then> multiple positions are created``() =
-        ()
+        let positions =
+            [
+                at 2015 04 01 |> buy  "A Inc" 100 17.5 
+                at 2015 06 01 |> buy  "C Limited" 5 102.0
+                at 2015 10 01 |> dividend "A Inc" 2.1
+                at 2016 01 01 |> buy  "B Corp" 20 42.1 
+                at 2016 06 01 |> buy  "B Corp" 10 51.7 
+                at 2016 10 01 |> dividend "A Inc" 2.9
+                at 2016 12 01 |> sell  "C Limited" 5 202.0
+            ]
+            |> Positions.create
 
-    [<Test>]
-    let ``<When> multipe buy, sell and dividend events for same positions occur <Then> then cashflow is correctly accounted``() =
-        ()
-
-
+        positions |> should haveLength 3
+        
+        let ``A Inc`` = positions |> Seq.find(fun p -> p.Name = "A Inc")
+        ``A Inc``.ClosedAt |> should equal None 
+        ``A Inc``.Count |> should equal 100
+        ``A Inc``.Dividends |> should equal (2.1M<Currency> * (1.0M - FakeBroker.dividendFee) + 2.9M<Currency> * (1.0M - FakeBroker.dividendFee))
+        ``A Inc``.Invested |> should equal (17.5M<Currency> * 100.0M + FakeBroker.fee)
+        ``A Inc``.Payouts |> should equal 0.0M<Currency>
+        
+        let ``B Corp`` = positions |> Seq.find(fun p -> p.Name = "B Corp")
+        ``B Corp``.ClosedAt |> should equal None
+        ``B Corp``.Count |> should equal 30.0M
+        ``B Corp``.Dividends |> should equal 0.0M<Currency>
+        ``B Corp``.Invested |> should equal (42.1M<Currency> * 20.0M + FakeBroker.fee + 51.7M<Currency> * 10.0M + FakeBroker.fee)
+        ``B Corp``.Payouts |> should equal 0.0M<Currency>
+        
+        let ``C Limited`` = positions |> Seq.find(fun p -> p.Name = "C Limited")
+        ``C Limited``.ClosedAt |> should equal (at 2016 12 01 |> Some)
+        ``C Limited``.Count |> should equal 0.0M
+        ``C Limited``.Dividends |> should equal 0.0M<Currency>
+        ``C Limited``.Invested |> should equal (102M<Currency> * 5.0M + FakeBroker.fee)
+        ``C Limited``.Payouts |> should equal (202.0M<Currency> * 5.0M - FakeBroker.fee);

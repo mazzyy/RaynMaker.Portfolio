@@ -11,6 +11,7 @@ module internal DSL =
 
 module internal FakeBroker = 
     let fee = 9.9M<Currency> 
+    let dividendFee = 0.15M
 
     let buy company count (price:float) date =
         { StockBought.Date = date 
@@ -35,10 +36,11 @@ module internal FakeBroker =
           Price = 1.0M<Currency> * (price |> decimal) }
 
     let dividends company (value:float) date =
+        let value = 1.0M<Currency> * (value |> decimal)
         { DividendReceived.Date = date 
           Name = company
           Isin = sprintf "US%i" (company.GetHashCode()) |> Isin
-          Value = 1.0M<Currency> * (value |> decimal)
-          Fee = fee }
+          Value = value
+          Fee =  value * dividendFee}
 
 

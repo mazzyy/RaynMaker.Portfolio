@@ -1,22 +1,32 @@
 
 
 - add more tests
-  - entities
-    - positions
   - usecases
-    - all
-  - gateways
-    - ExcelStoreReader: success and errors
-	- HistoricalPrices
+    - eventstore
+    - depot
+    - positioninteractor
+    - performanceinteractor
+    - statisticsinteractor
+    - historicalprices
+    - benchmarkinteractor
+
+
+- add documentation
+  -  where?
+
+
+=== > 1.0 ==================
 
 - benchmark
   - anual fee not considered
+    // TODO: anual fee
+    // -> what about just inventing an event because it could then be calculated when walking the positions
+  - how do we hande cash in general in the system?
 
 
 - over all performance
   - TWR
   - MWR
-
 
 === > 1.0 ==================
 
