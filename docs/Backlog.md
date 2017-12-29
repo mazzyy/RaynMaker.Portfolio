@@ -1,14 +1,5 @@
 
 
-
-
-- get more code into usecases
-  - combined usecases?
-  - presenter must not know framework!! - make it clear by naming
-  - storage
-    - isnt event store also domain service? (see DDD) 
-      (or storage technology independent repository?)
-
 - add more tests
   - entities
     - positions

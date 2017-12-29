@@ -2,9 +2,8 @@
 
 module Controllers =
     open System
-    open RaynMaker.Portfolio.UseCases
     open RaynMaker.Portfolio.Entities
-    open RaynMaker.Portfolio.Storage
+    open RaynMaker.Portfolio.UseCases
     open RaynMaker.Portfolio.UseCases.BenchmarkInteractor
     
     [<AutoOpen>]
@@ -17,7 +16,7 @@ module Controllers =
             | x when x > 90.0 -> sprintf "%.2f months" (span.TotalDays / 30.0)
             | x -> sprintf "%.0f days" span.TotalDays
         
-    let positions (depot:Depot.Api) broker lastPriceOf = 
+    let listPositions (depot:Depot.Api) broker lastPriceOf = 
         depot.Get() 
         |> PositionsInteractor.evaluatePositions broker lastPriceOf
         |> List.map(fun p -> 
@@ -39,7 +38,7 @@ module Controllers =
                 "isClosed" => (p.Position.ClosedAt |> Option.isSome) 
             ])
     
-    let performance (store:EventStore.Api) (depot:Depot.Api) broker lastPriceOf = 
+    let getPerformanceIndicators (store:EventStore.Api) (depot:Depot.Api) broker lastPriceOf = 
         depot.Get()
         |> PositionsInteractor.evaluatePositions broker lastPriceOf
         |> PerformanceInteractor.getPerformance (store.Get())
@@ -49,39 +48,32 @@ module Controllers =
                 "totalProfit" => p.TotalProfit
             ]
             
-    let benchmark (store:EventStore.Api) broker savingsPlan (historicalPrices:HistoricalPrices.Api) (benchmark:Benchmark) = 
-        let getPrice day = 
-            let history = benchmark.Isin |> historicalPrices.Get
-            match Prices.getPrice 300.0 history day with
-            | Some p -> p
-            | None -> failwithf "Could not get a price for: %A" day
-
-        let eval = BenchmarkInteractor.evaluate benchmark getPrice broker (store.Get())
-
-        let b1 = eval (BenchmarkInteractor.buyBenchmarkInstead broker)
-        let b2 = eval (BenchmarkInteractor.buyBenchmarkByPlan savingsPlan)
-
-        dict [
-            "name" => benchmark.Name
-            "isin" => (benchmark.Isin |> Str.ofIsin)
-            "buyInstead" => dict [
-                "totalProfit" => (b1.MarketProfit + b1.DividendProfit)
-                "totalRoi" => (b1.MarketRoi + b1.DividendRoi)
-                "totalRoiAnual" => (b1.MarketRoiAnual + b1.DividendRoiAnual) 
+    let getBenchmarkPerformance (store:EventStore.Api) broker savingsPlan (historicalPrices:HistoricalPrices.Api) (benchmark:Benchmark) = 
+        benchmark
+        |> BenchmarkInteractor.getBenchmarkPerformance store broker savingsPlan historicalPrices
+        |> fun r -> 
+            dict [
+                "name" => benchmark.Name
+                "isin" => (benchmark.Isin |> Str.ofIsin)
+                "buyInstead" => dict [
+                    "totalProfit" => (r.BuyInstead.MarketProfit + r.BuyInstead.DividendProfit)
+                    "totalRoi" => (r.BuyInstead.MarketRoi + r.BuyInstead.DividendRoi)
+                    "totalRoiAnual" => (r.BuyInstead.MarketRoiAnual + r.BuyInstead.DividendRoiAnual) 
+                ]
+                "buyPlan" => dict [
+                    "totalProfit" => (r.BuyPlan.MarketProfit + r.BuyPlan.DividendProfit)
+                    "totalRoi" => (r.BuyPlan.MarketRoi + r.BuyPlan.DividendRoi)
+                    "totalRoiAnual" => (r.BuyPlan.MarketRoiAnual + r.BuyPlan.DividendRoiAnual) 
+                    "rate" => savingsPlan.Rate
+                ]
             ]
-            "buyPlan" => dict [
-                "totalProfit" => (b2.MarketProfit + b2.DividendProfit)
-                "totalRoi" => (b2.MarketRoi + b2.DividendRoi)
-                "totalRoiAnual" => (b2.MarketRoiAnual + b2.DividendRoiAnual) 
-                "rate" => savingsPlan.Rate
+
+    let getDiversification (depot:Depot.Api) = 
+        depot.Get() 
+        |> StatisticsInteractor.getDiversification
+        |> fun r ->
+            dict [
+                "labels" => (r.Positions |> List.map fst)
+                "data" => (r.Positions |> List.map snd)
             ]
-        ]
-
-    let diversification (depot:Depot.Api) = 
-        let report = depot.Get() |> StatisticsInteractor.getDiversification
-
-        dict [
-            "labels" => (report.Positions |> List.map fst)
-            "data" => (report.Positions |> List.map snd)
-        ]
             

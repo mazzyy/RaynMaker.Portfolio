@@ -1,6 +1,6 @@
 ﻿module RaynMaker.Portfolio.Frameworks
 
-module Web =
+module SuaveOperators =
     open Suave
     open Suave.Successful
     open Suave.Operators
@@ -19,7 +19,6 @@ module Httpd =
     open Suave
     open System.Net
     open System.Threading
-    open Suave.Logging
     
     let start app =
         let port = 2525us

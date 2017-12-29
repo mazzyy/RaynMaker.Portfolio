@@ -1,9 +1,49 @@
 ﻿namespace RaynMaker.Portfolio.UseCases
 
+module HistoricalPrices =
+    open RaynMaker.Portfolio
+    open RaynMaker.Portfolio.Entities
+
+    type private Msg = 
+        | Get of Isin * AsyncReplyChannel<Price list>
+        | Stop 
+
+    type Api = {
+        Get: Isin -> Price list
+        Stop: unit -> unit
+    }
+
+    let create read =
+        let agent = Agent<Msg>.Start(fun inbox ->
+            let rec loop store =
+                async {
+                    let! msg = inbox.Receive()
+
+                    match msg with
+                    | Get(isin, replyChannel) -> 
+                        let newStore, prices = 
+                            match store |> Map.tryFind isin with
+                            | Some prices -> store, prices
+                            | None -> let prices = read isin
+                                      (store |> Map.add isin prices), prices
+
+                        replyChannel.Reply prices
+
+                        return! loop newStore
+                    | Stop -> return ()
+                }
+            loop Map.empty ) 
+
+        agent.Error.Add(handleLastChanceException)
+        
+        { Get = fun isin -> agent.PostAndReply( fun replyChannel -> (isin,replyChannel) |> Get)
+          Stop = fun () -> agent.Post Stop }
+
 module BenchmarkInteractor =
     open System
     open RaynMaker.Portfolio
     open RaynMaker.Portfolio.Entities
+    open PositionsInteractor
 
     type SavingsPlan = {
         Fee : decimal<Percentage>
@@ -93,3 +133,20 @@ module BenchmarkInteractor =
         |> PositionsInteractor.evaluatePositions broker (Events.LastPriceOf events)
         |> Seq.head
 
+    type Performance = {
+        BuyInstead : PositionEvaluation
+        BuyPlan : PositionEvaluation }
+    
+    let getBenchmarkPerformance (store:EventStore.Api) broker savingsPlan (historicalPrices:HistoricalPrices.Api) (benchmark:Benchmark) = 
+        let getPrice day = 
+            let history = benchmark.Isin |> historicalPrices.Get
+            match Prices.getPrice 300.0 history day with
+            | Some p -> p
+            | None -> failwithf "Could not get a price for: %A" day
+
+        let eval = evaluate benchmark getPrice broker (store.Get())
+
+        {
+            BuyInstead = eval (buyBenchmarkInstead broker)
+            BuyPlan = eval (buyBenchmarkByPlan savingsPlan)
+        }
