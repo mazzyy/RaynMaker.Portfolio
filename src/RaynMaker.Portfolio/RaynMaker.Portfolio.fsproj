@@ -18,8 +18,8 @@
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Foundation.fs" />
     <Compile Include="Entities.fs" />
-    <Compile Include="Positions.fs" />
-    <Compile Include="Benchmark.fs" />
+    <Compile Include="UseCases.Positions.fs" />
+    <Compile Include="UseCases.Benchmark.fs" />
     <Content Include="App.config" />
     <Content Include="packages.config" />
   </ItemGroup>

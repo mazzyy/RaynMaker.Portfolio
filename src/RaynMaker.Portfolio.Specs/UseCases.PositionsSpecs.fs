@@ -4,7 +4,7 @@ open System
 open NUnit.Framework
 open FsUnit
 open RaynMaker.Portfolio.Entities
-open RaynMaker.Portfolio.Interactors
+open RaynMaker.Portfolio.UseCases
 
 [<TestFixture>]
 module ``Given some stock transactions`` =

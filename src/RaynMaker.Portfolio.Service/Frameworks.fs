@@ -1,5 +1,20 @@
 ﻿module RaynMaker.Portfolio.Frameworks
 
+module Web =
+    open Suave
+    open Suave.Successful
+    open Suave.Operators
+    open Newtonsoft.Json
+    open Newtonsoft.Json.Serialization
+
+    let JSON v =
+        let jsonSerializerSettings = new JsonSerializerSettings()
+        jsonSerializerSettings.ContractResolver <- new CamelCasePropertyNamesContractResolver()
+
+        JsonConvert.SerializeObject(v, jsonSerializerSettings)
+        |> OK
+        >=> Writers.setMimeType "application/json; charset=utf-8"
+
 module Httpd =
     open Suave
     open System.Net

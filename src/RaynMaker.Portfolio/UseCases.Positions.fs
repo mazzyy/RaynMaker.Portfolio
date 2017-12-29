@@ -1,4 +1,4 @@
-﻿namespace RaynMaker.Portfolio.Interactors
+﻿namespace RaynMaker.Portfolio.UseCases
 
 module Depot =
     open RaynMaker.Portfolio

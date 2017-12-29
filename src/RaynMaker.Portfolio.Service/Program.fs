@@ -11,12 +11,13 @@ open Suave.Filters
 open Suave.Redirection
 open RaynMaker.Portfolio.Frameworks
 open RaynMaker.Portfolio.Gateways
-open RaynMaker.Portfolio.Interactors.BenchmarkInteractor
+open RaynMaker.Portfolio.UseCases.BenchmarkInteractor
 open RaynMaker.Portfolio.Entities
 open System.Diagnostics
 open Suave.RequestErrors
 open RaynMaker.Portfolio.Storage
-open RaynMaker.Portfolio.Interactors
+open RaynMaker.Portfolio.UseCases
+open RaynMaker.Portfolio.Frameworks.Web
 
 type Project = JsonProvider<"../../etc/Portfolio.json">
 
@@ -110,10 +111,10 @@ let start projectFile =
                     path "/" >=> redirect "/Client/index.html"
                     pathScan "/Client/%s" (fun f -> Files.file (sprintf "%s/Client/%s" home f))
                     pathScan "/static/%s" (fun f -> Files.file (sprintf "%s/Client/static/%s" home f))
-                    path "/api/positions" >=> Controllers.positions depot broker lastPriceOf
-                    path "/api/performance" >=> Controllers.performance store depot broker lastPriceOf
-                    path "/api/benchmark" >=> Controllers.benchmark store broker savingsPlan historicalPrices benchmark 
-                    path "/api/diversification" >=> Controllers.diversification depot 
+                    path "/api/positions" >=> warbler (fun _ -> Controllers.positions depot broker lastPriceOf |> JSON)
+                    path "/api/performance" >=> warbler (fun _ -> Controllers.performance store depot broker lastPriceOf |> JSON)
+                    path "/api/benchmark" >=> warbler (fun _ -> Controllers.benchmark store broker savingsPlan historicalPrices benchmark |> JSON)
+                    path "/api/diversification" >=> warbler (fun _ -> Controllers.diversification depot |> JSON)
                     NOT_FOUND "Resource not found."
                 ]
         ]

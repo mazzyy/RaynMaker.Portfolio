@@ -1,13 +1,19 @@
 
-- reorg code
-  - files with interactors are "usecases.abc" modules
-  - domainmodel ==> entities
-  - gateways.
 
+
+
+- get more code into usecases
+  - combined usecases?
+  - presenter must not know framework!! - make it clear by naming
+  - storage
+    - isnt event store also domain service? (see DDD) 
+      (or storage technology independent repository?)
 
 - add more tests
-  - positions
+  - entities
+    - positions
   - usecases
+    - all
   - gateways
     - ExcelStoreReader: success and errors
 	- HistoricalPrices
@@ -23,6 +29,7 @@
 
 === > 1.0 ==================
 
+- njsproj: npm install not running automatically with plainion.ci ...
 
 - do we want to introduce an entity called stock? 
   (or stock id?)
