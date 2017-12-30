@@ -55,8 +55,7 @@ module Controllers =
     
     let getPerformanceIndicators (store:EventStore.Api) (depot:Depot.Api) broker lastPriceOf = 
         depot.Get()
-        |> PositionsInteractor.evaluatePositions broker lastPriceOf
-        |> PerformanceInteractor.getPerformance (store.Get())
+        |> PerformanceInteractor.getPerformance (store.Get()) broker lastPriceOf
         |> fun p -> 
             dict [
                 "totalInvestment" => p.TotalInvestment

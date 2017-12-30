@@ -89,8 +89,8 @@ module PerformanceInteractor =
         TotalProfit : decimal<Currency>
         }
 
-    let getPerformance store (positions:PositionEvaluation list) =
-        let processEvent total evt =
+    let getPerformance store broker getLastPrice positions =
+        let sumInvestment total evt =
             match evt with
             | DepositAccounted evt -> printfn "%A - %A = %A" evt.Date evt.Value total; total + evt.Value
             | DisbursementAccounted evt -> printfn "%A - %A = %A" evt.Date evt.Value total; total - evt.Value
@@ -98,10 +98,11 @@ module PerformanceInteractor =
 
         let investment =
             store
-            |> List.fold processEvent 0.0M<Currency>
+            |> List.fold sumInvestment 0.0M<Currency>
 
         let totalProfit = 
             positions
+            |> PositionsInteractor.evaluatePositions broker getLastPrice
             |> Seq.sumBy(fun p -> p.MarketProfit + p.DividendProfit)
 
         { TotalInvestment = investment

@@ -81,4 +81,43 @@ module ``Given a position to evaluate`` =
         summary.[0].MarketRoi |> should equal roi
         summary.[0].MarketRoiAnual |> should equal (roi / 2.0M)
 
+[<TestFixture>]
+module ``Given a set of positions`` =
+    open FakeBroker
 
+    [<Test>]
+    let ``<When> diversification is calculated <Then> closed positions are ignored``() =
+        let events =
+            [
+                at 2014 01 01 |> buy "Joe Inc" 5 10.0 |> toDomainEvent
+                at 2015 01 01 |> sell "Joe Inc" 5 15.0 |> toDomainEvent
+                at 2016 01 01 |> buy "Jack Corp" 10 20.0 |> toDomainEvent
+            ]
+
+        let report =
+            events
+            |> Positions.create
+            |> StatisticsInteractor.getDiversification
+
+        report.Positions |> should haveLength 1
+
+    [<Test>]
+    let ``<When> diversification is calculated <Then> positions are valued based on invested capital``() =
+        let events =
+            [
+                at 2014 01 01 |> buy "Joe Inc" 5 10.0 |> toDomainEvent
+                at 2016 01 01 |> buy "Jack Corp" 10 20.0 |> toDomainEvent
+            ]
+
+        let report =
+            events
+            |> Positions.create
+            |> StatisticsInteractor.getDiversification
+
+        let chunks =
+            [
+                "Joe Inc", (withFee 50.0M<Currency>)
+                "Jack Corp", (withFee 200.0M<Currency>)
+            ]
+
+        report.Positions |> should equalList chunks

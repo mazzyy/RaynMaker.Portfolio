@@ -2,8 +2,6 @@
 
 - add more tests
   - usecases
-    - performanceinteractor
-    - statisticsinteractor
     - historicalprices
     - benchmarkinteractor
 
@@ -15,6 +13,7 @@
     - describe excel format
     - how to benchmark
     - limitations
+      - performance calc is too naive
   - separate contributions stuff
     - we use clean architecture
     - suave IO
@@ -32,8 +31,11 @@
 
 
 - over all performance
+  - current implementation is too naive (we cannot just substract disbursement - we could have invested it in between ...)
   - TWR
   - MWR
+
+- add tests for performance calculation
 
 === > 1.0 ==================
 
