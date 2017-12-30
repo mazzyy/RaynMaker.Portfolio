@@ -54,11 +54,11 @@ module BenchmarkInteractor =
         Isin : Isin
         Name : string }
 
-    let private pricePosition benchmark getPrice =
-        { StockPriced.Date = DateTime.Today
+    let private pricePosition benchmark getPrice day =
+        { StockPriced.Date = day
           Name = benchmark.Name
           Isin = benchmark.Isin
-          Price = DateTime.Today |> getPrice } 
+          Price = day |> getPrice } 
 
     /// Based on the original buy & sell events new benchmarking events are generated which simulate 
     /// the performance one could have achived by buying the benchmark asset (e.g. an ETF) instead
@@ -85,18 +85,19 @@ module BenchmarkInteractor =
               Price = price
               Count = count }
         
+        let lastDay = store |> List.last |> Events.GetDate
         seq {
             yield! store
                     |> Seq.choose (function
                         | StockBought e -> buy e.Date (e.Price * e.Count + e.Fee) |> StockBought |> Some
                         | StockSold e -> sell e.Date (e.Price * e.Count) |> StockSold |> Some
                         | _ -> None)
-            yield pricePosition benchmark getPrice |> StockPriced
+            yield lastDay |> pricePosition benchmark getPrice |> StockPriced
         }
         |> List.ofSeq
 
     /// Simulate buying a benchmark whenever a deposit was made considering the cash limit
-    let buyBenchmarkByPlan savingsPlan (benchmark:Benchmark) getPrice (store:DomainEvent list) =
+    let buyBenchmarkByPlan savingsPlan (benchmark:Benchmark) getPrice (start:DateTime) (stop:DateTime) =
         let buy day  =
             let price = day |> getPrice
             let value = savingsPlan.Rate
@@ -112,26 +113,15 @@ module BenchmarkInteractor =
         // TODO: anual fee
         // -> what about just inventing an event because it could then be calculated when walking the positions
     
-        let start = store.Head |> Events.GetDate
-        let stop = DateTime.Today
-        let numMonths = (stop.Year - start.Year) * 12 + (stop.Month - start.Month + 1)
+        let numMonths = (stop.Year - start.Year) * 12 + (stop.Month - start.Month)
         
         seq {
             yield!  [0 .. numMonths]
                     |> Seq.map(fun m -> (new DateTime(start.Year, start.Month, 1)).AddMonths(m))
-                    |> Seq.map workingDay
                     |> Seq.map(fun day -> day |> buy |> StockBought)
-            yield pricePosition benchmark getPrice |> StockPriced
+            yield stop |> pricePosition benchmark getPrice |> StockPriced
         }
         |> List.ofSeq
-
-    let evaluate benchmark getPrice broker (store:DomainEvent list) eval =  
-        let events = store |> eval benchmark getPrice
-            
-        events
-        |> Positions.create
-        |> PositionsInteractor.evaluatePositions broker (Events.LastPriceOf events)
-        |> Seq.head
 
     type Performance = {
         BuyInstead : PositionEvaluation
@@ -140,13 +130,22 @@ module BenchmarkInteractor =
     let getBenchmarkPerformance (store:EventStore.Api) broker savingsPlan (historicalPrices:HistoricalPrices.Api) (benchmark:Benchmark) = 
         let getPrice day = 
             let history = benchmark.Isin |> historicalPrices.Get
-            match Prices.getPrice 300.0 history day with
+            match Prices.getPrice 30.0 history day with
             | Some p -> p
             | None -> failwithf "Could not get a price for: %A" day
 
-        let eval = evaluate benchmark getPrice broker (store.Get())
+        let eval events = 
+            events
+            |> Positions.create
+            |> PositionsInteractor.evaluatePositions broker (Events.LastPriceOf events)
+            |> Seq.head
+
+        let events = store.Get()
 
         {
-            BuyInstead = eval (buyBenchmarkInstead broker)
-            BuyPlan = eval (buyBenchmarkByPlan savingsPlan)
+            BuyInstead = events |> buyBenchmarkInstead broker benchmark getPrice |> eval
+            BuyPlan = 
+                let start = events.Head |> Events.GetDate
+                let stop = events |> List.last |> Events.GetDate
+                buyBenchmarkByPlan savingsPlan benchmark getPrice start stop |> eval
         }

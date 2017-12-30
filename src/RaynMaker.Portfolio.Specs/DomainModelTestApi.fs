@@ -22,35 +22,37 @@ module internal FakeBroker =
 
     let dividendFee = 0.15M
 
-    let buy company count (price:float) date =
+    let buyd company count (price:float) date =
         let price' = 1.0M<Currency> * (price |> decimal)
         { StockBought.Date = date 
           Name = company
           Isin = company |> isin
-          Count = count |> decimal
+          Count = count
           Price = price'
           Fee = price' |> getFee } 
+    let buy company count (price:float) date = buyd company (count |> decimal) price date
 
-    let sell company count (price:float) date =
+    let selld company count (price:float) date =
         let price' = 1.0M<Currency> * (price |> decimal)
         { StockSold.Date = date 
           Name = company
-          Isin = sprintf "US%i" (company.GetHashCode()) |> Isin
-          Count = count |> decimal
+          Isin = company  |> isin
+          Count = count 
           Price = price'
           Fee = price' |> getFee } 
+    let sell company count (price:float) date = selld company (count |> decimal) price date
 
     let price company (price:float) date =
         { StockPriced.Date = date 
           Name = company
-          Isin = sprintf "US%i" (company.GetHashCode()) |> Isin
+          Isin = company  |> isin
           Price = 1.0M<Currency> * (price |> decimal) }
 
     let dividends company (value:float) date =
         let value = 1.0M<Currency> * (value |> decimal)
         { DividendReceived.Date = date 
           Name = company
-          Isin = sprintf "US%i" (company.GetHashCode()) |> Isin
+          Isin = company  |> isin
           Value = value
           Fee =  value * dividendFee}
 

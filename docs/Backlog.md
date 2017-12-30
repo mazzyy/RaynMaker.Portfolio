@@ -1,11 +1,5 @@
 
 
-- add more tests
-  - usecases
-    - historicalprices
-    - benchmarkinteractor
-
-
 - add documentation
   -  under "docs"
   - create screenshot

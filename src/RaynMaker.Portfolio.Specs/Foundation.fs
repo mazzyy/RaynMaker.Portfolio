@@ -1,6 +1,5 @@
 ﻿[<AutoOpen>]
-module RaynMaker.Portfolio.Specs.Foundations
-    open FsUnit
+module RaynMaker.Portfolio.Specs.Foundation
     open NUnit.Framework.Constraints
 
     let equalList x =
