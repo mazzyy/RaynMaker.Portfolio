@@ -43,4 +43,8 @@ module internal FakeBroker =
           Value = value
           Fee =  value * dividendFee}
 
-
+module internal FakeEvents = 
+    let buy a b c d = FakeBroker.buy a b c d |> StockBought
+    let sell a b c d = FakeBroker.sell a b c d |> StockSold
+    let price a b c = FakeBroker.price a b c |> StockPriced
+    let dividend a b c = FakeBroker.dividends a b c |> DividendReceived

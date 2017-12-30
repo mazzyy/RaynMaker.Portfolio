@@ -16,7 +16,7 @@
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="FakeBroker.fs" />
+    <Compile Include="DomainModelTestApi.fs" />
     <Compile Include="EntitiesSpecs.fs" />
     <Compile Include="UseCases.RepositorieSpecs.fs" />
     <Compile Include="UseCases.PositionsSpecs.fs" />

@@ -7,9 +7,7 @@ open RaynMaker.Portfolio.Entities
 
 [<TestFixture>]
 module ``Given a sequence of events`` =
-    let buy a b c d = FakeBroker.buy a b c d |> StockBought
-    let sell a b c d = FakeBroker.sell a b c d |> StockSold
-    let price a b c = FakeBroker.price a b c |> StockPriced
+    open FakeEvents
 
     [<Test>]
     let ``<When> empty <Then> no price found``() =
@@ -175,10 +173,7 @@ module ``Given a position`` =
 
 [<TestFixture>]
 module ``Given a list of stock events`` =
-    let buy a b c d = FakeBroker.buy a b c d |> StockBought
-    let sell a b c d = FakeBroker.sell a b c d |> StockSold
-    let dividend a b c = FakeBroker.dividends a b c |> DividendReceived
-
+    open FakeEvents
     [<Test>]
     let ``<When> multipe stocks are bought <Then> multiple positions are created``() =
         let positions =

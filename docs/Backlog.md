@@ -2,7 +2,6 @@
 
 - add more tests
   - usecases
-    - eventstore
     - depot
     - positioninteractor
     - performanceinteractor

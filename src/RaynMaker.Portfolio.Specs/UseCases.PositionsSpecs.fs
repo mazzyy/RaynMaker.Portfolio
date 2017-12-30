@@ -8,15 +8,13 @@ open RaynMaker.Portfolio.UseCases
 
 [<TestFixture>]
 module ``Given some stock transactions`` =
+    open FakeEvents
+
     let broker = { 
         Name = "Dummy"
         Fee = 0.25M<Percentage>
         MinFee = 10.0M<Currency>
         MaxFee = 25.0M<Currency> }
-
-    let buy a b c d = FakeBroker.buy a b c d |> StockBought
-    let sell a b c d = FakeBroker.sell a b c d |> StockSold
-    let price a b c = FakeBroker.price a b c |> StockPriced
 
     [<Test>]
     let ``<When> an open position is closed <Then> position summary shows profits and ROIs``() =
