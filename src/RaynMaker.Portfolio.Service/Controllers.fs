@@ -8,6 +8,20 @@ module Controllers =
     
     [<AutoOpen>]
     module private Impl =
+        open Suave
+        open Suave.Successful
+        open Suave.Operators
+        open Newtonsoft.Json
+        open Newtonsoft.Json.Serialization
+
+        let JSON v =
+            let jsonSerializerSettings = new JsonSerializerSettings()
+            jsonSerializerSettings.ContractResolver <- new CamelCasePropertyNamesContractResolver()
+
+            JsonConvert.SerializeObject(v, jsonSerializerSettings)
+            |> OK
+            >=> Writers.setMimeType "application/json; charset=utf-8"
+
         let (=>) k v = k,v |> box
         let formatDate (date:DateTime) = date.ToString("yyyy-MM-dd")
         let formatTimespan (span:TimeSpan) = 
@@ -37,6 +51,7 @@ module Controllers =
                 "totalRoiAnual" => (p.MarketRoiAnual + p.DividendRoiAnual)
                 "isClosed" => (p.Position.ClosedAt |> Option.isSome) 
             ])
+        |> JSON
     
     let getPerformanceIndicators (store:EventStore.Api) (depot:Depot.Api) broker lastPriceOf = 
         depot.Get()
@@ -47,7 +62,8 @@ module Controllers =
                 "totalInvestment" => p.TotalInvestment
                 "totalProfit" => p.TotalProfit
             ]
-            
+        |> JSON
+
     let getBenchmarkPerformance (store:EventStore.Api) broker savingsPlan (historicalPrices:HistoricalPrices.Api) (benchmark:Benchmark) = 
         benchmark
         |> BenchmarkInteractor.getBenchmarkPerformance store broker savingsPlan historicalPrices
@@ -67,6 +83,7 @@ module Controllers =
                     "rate" => savingsPlan.Rate
                 ]
             ]
+        |> JSON
 
     let getDiversification (depot:Depot.Api) = 
         depot.Get() 
@@ -76,4 +93,5 @@ module Controllers =
                 "labels" => (r.Positions |> List.map fst)
                 "data" => (r.Positions |> List.map snd)
             ]
+        |> JSON
             

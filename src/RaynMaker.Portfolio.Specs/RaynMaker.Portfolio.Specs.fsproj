@@ -18,6 +18,7 @@
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="FakeBroker.fs" />
     <Compile Include="EntitiesSpecs.fs" />
+    <Compile Include="UseCases.RepositorieSpecs.fs" />
     <Compile Include="UseCases.PositionsSpecs.fs" />
     <Content Include="App.config" />
     <Content Include="packages.config" />

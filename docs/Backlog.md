@@ -12,7 +12,17 @@
 
 
 - add documentation
-  -  where?
+  -  under "docs"
+  - create screenshot
+  - Getting started
+    - describe excel format
+    - how to benchmark
+    - limitations
+  - separate contributions stuff
+    - we use clean architecture
+    - suave IO
+    - Vue.js
+    - BDD
 
 
 === > 1.0 ==================
