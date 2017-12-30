@@ -2,8 +2,6 @@
 
 - add more tests
   - usecases
-    - depot
-    - positioninteractor
     - performanceinteractor
     - statisticsinteractor
     - historicalprices
