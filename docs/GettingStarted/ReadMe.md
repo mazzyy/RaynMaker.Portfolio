@@ -6,7 +6,7 @@ To install the application just download latest release and start "RaynMaker.Por
 An initial "Portfolio.json" you can find [here](../../etc/Portfolio.json).
 
 Your portfolio content you need to specify as "transactions" in an excel sheet. The format 
-you can find [here](../../etc/Events.xslx).
+you can find [here](../../etc/Events.xlsx).
 
 ## Limitations
 

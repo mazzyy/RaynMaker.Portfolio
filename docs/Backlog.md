@@ -1,22 +1,4 @@
 
-
-- add documentation
-  -  under "docs"
-  - create screenshot
-  - Getting started
-    - describe excel format
-    - how to benchmark
-    - limitations
-      - performance calc is too naive
-  - separate contributions stuff
-    - we use clean architecture
-    - suave IO
-    - Vue.js
-    - BDD
-
-
-=== > 1.0 ==================
-
 - benchmark
   - anual fee not considered
     // TODO: anual fee
