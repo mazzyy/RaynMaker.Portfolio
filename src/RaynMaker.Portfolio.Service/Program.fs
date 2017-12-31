@@ -113,7 +113,7 @@ let start projectFile =
                     path "/api/performance" >=> warbler (fun _ -> Controllers.getPerformanceIndicators store depot broker lastPriceOf)
                     path "/api/benchmark" >=> warbler (fun _ -> Controllers.getBenchmarkPerformance store broker savingsPlan historicalPrices benchmark)
                     path "/api/diversification" >=> warbler (fun _ -> Controllers.getDiversification depot)
-                    path "/api/cashflow" >=> warbler (fun _ -> Controllers.listCashflow store)
+                    path "/api/cashflow" >=> warbler (fun ctx -> Controllers.listCashflow ctx.request store)
                     NOT_FOUND "Resource not found."
                 ]
         ]
@@ -135,8 +135,10 @@ let stop instance =
 let getProjectFileFromCommandLine argv =
     let home = getHome()
 
+    argv |> printf "Cmd line: %A"
+
     match argv with
-    | [|path|] -> path 
+    | [| path |] -> path 
     | x -> Path.Combine(home, "..", "..", "docs", "Samples", "Portfolio.json")
     |> Path.GetFullPath
 

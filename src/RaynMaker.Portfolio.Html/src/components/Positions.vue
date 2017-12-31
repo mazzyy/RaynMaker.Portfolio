@@ -3,7 +3,8 @@
     <h1>Positions</h1>
 
     <form id="filter">
-        Filter <input name="query" v-model="filter">
+      <label>Filter: </label>
+      <input name="query" v-model="filter">
     </form>
 
     <positions-grid :data="positions" :columns="properties" :filter-key="filter" :column-headers="headers" style="margin-top:10px"></positions-grid>

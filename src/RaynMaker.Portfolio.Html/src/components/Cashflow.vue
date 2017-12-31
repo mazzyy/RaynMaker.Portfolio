@@ -2,6 +2,9 @@
   <div>
     <h1>Cashflow</h1>
 
+    <label>Limit: </label>
+    <input v-model="limit" @keyup.enter="onLimitChanged">
+
     <table>
       <thead>
         <tr>
@@ -17,7 +20,7 @@
             {{ t.date }}
           </td>
           <td class="comment" style="padding-left:100px;padding-right:100px;">
-            <b>{{ t.type }}</b><br/>
+            <b>{{ t.type }}</b><br />
             {{ t.comment }}
           </td>
           <td class="value">
@@ -39,13 +42,24 @@
     name: 'Cashflow',
     data () {
       return {
-        transactions: null
+        transactions: null,
+        limit: 25
       }
     },
     created: function () {
-      this.get(this, '/api/cashflow', {}, function (that, response) {
-        that.transactions = response
-      })
+      this.onLimitChanged()
+    },
+    methods: {
+      onLimitChanged: function () {
+        this.get(this, '/api/cashflow', { limit: this.limit }, function (that, response) {
+          that.transactions = response
+        })
+      }
+    },
+    watch: {
+      limit: function (value) {
+        this.onLimitChanged()
+      }
     },
     filters: {
       formatValue: my.formatValue
@@ -55,21 +69,23 @@
 </script>
 
 <style scoped>
-.date {
-  text-align:left;
-}
-.value {
-  text-align:right;
-}
-.comment {
-  text-align:center;
-}
+  .date {
+    text-align: left;
+  }
 
-th,td {
-  padding:10px;
-}
+  .value {
+    text-align: right;
+  }
 
-td{
-  vertical-align:top;
-}
+  .comment {
+    text-align: center;
+  }
+
+  th, td {
+    padding: 10px;
+  }
+
+  td {
+    vertical-align: top;
+  }
 </style>

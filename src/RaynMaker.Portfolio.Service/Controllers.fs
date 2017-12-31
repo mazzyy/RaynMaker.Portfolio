@@ -5,6 +5,7 @@ module Controllers =
     open RaynMaker.Portfolio.Entities
     open RaynMaker.Portfolio.UseCases
     open RaynMaker.Portfolio.UseCases.BenchmarkInteractor
+    open Suave.Http
     
     [<AutoOpen>]
     module private Impl =
@@ -94,9 +95,13 @@ module Controllers =
             ]
         |> JSON
             
-    let listCashflow (store:EventStore.Api) = 
+    let listCashflow (request:HttpRequest) (store:EventStore.Api) = 
+        let limit = 
+            match request.queryParam "limit" with
+            | Choice1Of2 x -> x |> System.Int32.Parse
+            | Choice2Of2 _ -> 25
         store.Get() 
-        |> CashflowInteractor.getTransactions 25
+        |> CashflowInteractor.getTransactions limit
         |> List.map(fun t ->
             dict [
                 "date" => (t.Date |> formatDate)
