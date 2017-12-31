@@ -10,6 +10,9 @@
             <li>
               <router-link to="/Performance">Performance</router-link>
             </li>
+            <li>
+              <router-link to="/Cashflow">Cashflow</router-link>
+            </li>
           </ul>
         </div>
       </nav>

@@ -21,6 +21,7 @@
     <Compile Include="UseCases.Repositories.fs" />
     <Compile Include="UseCases.Positions.fs" />
     <Compile Include="UseCases.Benchmark.fs" />
+    <Compile Include="UseCases.Cashflow.fs" />
     <Content Include="App.config" />
     <Content Include="packages.config" />
   </ItemGroup>

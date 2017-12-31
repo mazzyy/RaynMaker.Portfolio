@@ -17,7 +17,7 @@ open System.Diagnostics
 open Suave.RequestErrors
 open RaynMaker.Portfolio.UseCases
 
-type Project = JsonProvider<"../../etc/Portfolio.json">
+type Project = JsonProvider<"../../docs/Samples/Portfolio.json">
 
 let private getHome () =
     let location = Assembly.GetExecutingAssembly().Location
@@ -113,6 +113,7 @@ let start projectFile =
                     path "/api/performance" >=> warbler (fun _ -> Controllers.getPerformanceIndicators store depot broker lastPriceOf)
                     path "/api/benchmark" >=> warbler (fun _ -> Controllers.getBenchmarkPerformance store broker savingsPlan historicalPrices benchmark)
                     path "/api/diversification" >=> warbler (fun _ -> Controllers.getDiversification depot)
+                    path "/api/cashflow" >=> warbler (fun _ -> Controllers.listCashflow store)
                     NOT_FOUND "Resource not found."
                 ]
         ]
@@ -136,7 +137,7 @@ let getProjectFileFromCommandLine argv =
 
     match argv with
     | [|path|] -> path 
-    | x -> Path.Combine(home, "..", "..", "etc", "Portfolio.json")
+    | x -> Path.Combine(home, "..", "..", "docs", "Samples", "Portfolio.json")
     |> Path.GetFullPath
 
 [<EntryPoint>]

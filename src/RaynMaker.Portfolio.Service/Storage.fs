@@ -6,7 +6,7 @@ module EventsReader =
     open RaynMaker.Portfolio
     open RaynMaker.Portfolio.Entities
 
-    type private Sheet = ExcelFile<"../../etc/Events.xlsx">
+    type private Sheet = ExcelFile<"../../docs/Samples/Events.xlsx">
 
     let readExcel path =
         let sheet = new Sheet(path)
@@ -74,7 +74,7 @@ module HistoricalPricesReader =
     open FSharp.Data
     open RaynMaker.Portfolio.Entities
 
-    type private Sheet = CsvProvider<"../../etc/FR0011079466.history.csv",";">
+    type private Sheet = CsvProvider<"../../docs/Samples/FR0011079466.history.csv",";">
     
     let readCsv (path:string) =
         let sheet = Sheet.Load(path)

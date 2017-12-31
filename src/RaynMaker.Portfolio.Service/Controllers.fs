@@ -94,3 +94,19 @@ module Controllers =
             ]
         |> JSON
             
+    let listCashflow (store:EventStore.Api) = 
+        store.Get() 
+        |> CashflowInteractor.getTransactions 10
+        |> fun r ->
+            dict [
+                "transactions" => (r.Transactions |> List.map(fun t ->
+                        dict [
+                            "date" => (t.Date |> formatDate)
+                            "type" => t.Type
+                            "comment" => t.Comment
+                            "value" => t.Value 
+                        ]))
+                "total" => r.Total
+            ]
+        |> JSON
+            

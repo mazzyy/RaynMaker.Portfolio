@@ -1,6 +1,5 @@
 
-- create accounting page showing at minimum the current cash
-  (later also bookings)
+move "formatValue" into controller/presenter
 
 =====================
 
