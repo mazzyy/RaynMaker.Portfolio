@@ -15,6 +15,7 @@ module CashflowInteractor =
         Transactions : Transaction list
         Total : decimal<Currency> }
 
+    /// As commonly used in accounting the list is returned in reverse order
     let getTransactions limit (store:DomainEvent list) =
         let createTransaction =
             let comment name isin = sprintf "%s (Isin: %s)" name (isin |> Str.ofIsin)
@@ -61,5 +62,5 @@ module CashflowInteractor =
             store
             |> List.choose createTransaction
         
-        { Transactions = transactions |> List.rev |> List.take limit |> List.rev
+        { Transactions = transactions |> List.rev |> List.take limit
           Total = transactions |> List.sumBy(fun t -> t.Value) }
