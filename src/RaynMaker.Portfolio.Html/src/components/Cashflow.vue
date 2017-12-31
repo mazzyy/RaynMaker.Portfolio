@@ -2,15 +2,13 @@
   <div>
     <h1>Cashflow</h1>
 
-    <p>
-      <label>Total: </label> {{ total | formatValue }}
-    </p>
     <table>
       <thead>
         <tr>
           <th class="date">Date</th>
           <th class="comment">Type/Comment</th>
           <th class="value">Value</th>
+          <th class="value">Balance</th>
         </tr>
       </thead>
       <tbody>
@@ -25,6 +23,9 @@
           <td class="value">
             {{ t.value | formatValue }}
           </td>
+          <td class="value">
+            {{ t.balance | formatValue }}
+          </td>
         </tr>
       </tbody>
     </table>
@@ -38,14 +39,12 @@
     name: 'Cashflow',
     data () {
       return {
-        transactions: null,
-        total: null
+        transactions: null
       }
     },
     created: function () {
       this.get(this, '/api/cashflow', {}, function (that, response) {
-        that.transactions = response.transactions
-        that.total = response.total
+        that.transactions = response
       })
     },
     filters: {
