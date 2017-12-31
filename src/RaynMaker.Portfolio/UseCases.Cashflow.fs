@@ -22,7 +22,7 @@ module CashflowInteractor =
                 { Date = e.Date
                   Type = "Stock bought"
                   Comment = comment e.Name e.Isin
-                  Value = -1.0M * e.Count * e.Price + e.Fee 
+                  Value = -1.0M * (e.Count * e.Price + e.Fee)
                   Balance = 0.0M<Currency> } 
                 |> Some
             | StockSold e ->
