@@ -1,4 +1,11 @@
 
+- create accounting page showing at minimum the current cash
+  (later also bookings)
+
+=====================
+
+- for router link highlighting see vue cookbook page 292
+
 - benchmark
   - anual fee not considered
     // TODO: anual fee
@@ -13,7 +20,7 @@
 
 - add tests for performance calculation
 
-=== > 1.0 ==================
+=====================
 
 - njsproj: npm install not running automatically with plainion.ci ...
 
