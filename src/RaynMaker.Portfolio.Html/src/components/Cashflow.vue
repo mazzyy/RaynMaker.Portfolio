@@ -82,7 +82,7 @@
   }
 
   th, td {
-    padding: 10px;
+    padding: 15px;
   }
 
   td {
