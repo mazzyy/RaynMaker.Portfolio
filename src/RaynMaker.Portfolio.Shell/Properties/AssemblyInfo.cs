@@ -4,7 +4,7 @@ using System.Reflection;
 [assembly: AssemblyTitleAttribute("RaynMaker.Portfolio.Shell")]
 [assembly: AssemblyProductAttribute("RaynMaker.Portfolio")]
 [assembly: AssemblyDescriptionAttribute("RaynMaker.Portfolio")]
-[assembly: AssemblyCopyrightAttribute("Copyright @ 2017")]
+[assembly: AssemblyCopyrightAttribute("Copyright @ 2018")]
 [assembly: AssemblyVersionAttribute("1.1")]
 [assembly: AssemblyFileVersionAttribute("1.1")]
 namespace System {
@@ -12,7 +12,7 @@ namespace System {
         internal const System.String AssemblyTitle = "RaynMaker.Portfolio.Shell";
         internal const System.String AssemblyProduct = "RaynMaker.Portfolio";
         internal const System.String AssemblyDescription = "RaynMaker.Portfolio";
-        internal const System.String AssemblyCopyright = "Copyright @ 2017";
+        internal const System.String AssemblyCopyright = "Copyright @ 2018";
         internal const System.String AssemblyVersion = "1.1";
         internal const System.String AssemblyFileVersion = "1.1";
     }

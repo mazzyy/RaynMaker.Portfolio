@@ -1,6 +1,17 @@
 
 move "formatValue" into controller/presenter
 
+document in BDD style
+- vision statement
+- business goals
+- stakeholders
+- features
+- examples/scenarios
+
+- create a website and clearly document how to use it
+
+- separate user and project doc
+
 =====================
 
 - for router link highlighting see vue cookbook page 292
