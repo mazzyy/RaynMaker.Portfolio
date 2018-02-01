@@ -10,6 +10,9 @@
     <positions-grid :data="positions" :columns="properties" :filter-key="filter" :column-headers="headers" style="margin-top:10px"></positions-grid>
 
     <h2>Diversification</h2>
+    <p>
+      Based on share count and last price
+    </p>
     <pie-chart :width="500" :height="500" :data="diversification.data" :labels="diversification.labels"></pie-chart>
   </div>
 </template>

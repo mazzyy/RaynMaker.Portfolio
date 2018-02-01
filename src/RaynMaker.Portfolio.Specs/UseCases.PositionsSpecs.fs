@@ -97,27 +97,28 @@ module ``Given a set of positions`` =
         let report =
             events
             |> Positions.create
-            |> StatisticsInteractor.getDiversification
+            |> StatisticsInteractor.getDiversification (Events.LastPriceOf events)
 
         report.Positions |> should haveLength 1
 
     [<Test>]
-    let ``<When> diversification is calculated <Then> positions are valued based on invested capital``() =
+    let ``<When> diversification is calculated <Then> positions are valued based on currently invested capital``() =
         let events =
             [
-                at 2014 01 01 |> buy "Joe Inc" 5 10.0 |> toDomainEvent
+                at 2014 01 01 |> buy "Joe Inc" 5 100.0 |> toDomainEvent
+                at 2015 01 01 |> sell "Joe Inc" 2 80.0 |> toDomainEvent
                 at 2016 01 01 |> buy "Jack Corp" 10 20.0 |> toDomainEvent
             ]
 
         let report =
             events
             |> Positions.create
-            |> StatisticsInteractor.getDiversification
+            |> StatisticsInteractor.getDiversification (Events.LastPriceOf events)
 
         let chunks =
             [
-                "Joe Inc", (withFee 50.0M<Currency>)
-                "Jack Corp", (withFee 200.0M<Currency>)
+                "Joe Inc", (80.0M<Currency> * 3.0M)
+                "Jack Corp", (20.0M<Currency> * 10.0M)
             ]
 
         report.Positions |> should equalList chunks

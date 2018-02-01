@@ -116,11 +116,15 @@ module StatisticsInteractor =
         Positions : (string*decimal<Currency>) list
         }
 
-    let getDiversification (positions:Position list) =
+    /// gets diversification report according to current value of the position 
+    /// based on last price and share count
+    let getDiversification getLastPrice (positions:Position list) =
         let investmentPerPositions =
             positions
             |> Seq.filter(fun p -> p.ClosedAt |> Option.isNone)        
-            |> Seq.map(fun p -> p.Name,p.Invested)  
+            |> Seq.map(fun p -> 
+                let price = p.Isin |> getLastPrice |> Option.get // there has to be a price otherwise there would be no position
+                p.Name, p.Count * price.Value)  
             |> List.ofSeq
         
         { Positions = investmentPerPositions } 

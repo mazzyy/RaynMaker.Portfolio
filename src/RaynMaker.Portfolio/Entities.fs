@@ -183,7 +183,9 @@ module Positions =
 
         Contract.ensures (fun () -> newP.Count >= 0.0M) "new count >= 0"
         Contract.ensures (fun () -> newP.Invested >= 0.0M<Currency>) "new invested >= 0"
-        Contract.ensures (fun () -> newP.Payouts > 0.0M<Currency>) "new payouts > 0"
+        
+        // unrealistic but it could be that we sell that less that it is equal to the fee
+        //Contract.ensures (fun () -> newP.Payouts > 0.0M<Currency>) "new payouts > 0"
          
         newP
 

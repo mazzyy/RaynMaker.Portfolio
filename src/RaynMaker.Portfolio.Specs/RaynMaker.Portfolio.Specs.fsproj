@@ -19,7 +19,7 @@
     <Compile Include="Foundation.fs" />
     <Compile Include="DomainModelTestApi.fs" />
     <Compile Include="EntitiesSpecs.fs" />
-    <Compile Include="UseCases.RepositorieSpecs.fs" />
+    <Compile Include="UseCases.RepositoriesSpecs.fs" />
     <Compile Include="UseCases.PositionsSpecs.fs" />
     <Compile Include="UseCases.BenchMarkSpecs.fs" />
     <Content Include="App.config" />

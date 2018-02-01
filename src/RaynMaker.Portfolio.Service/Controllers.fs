@@ -85,9 +85,9 @@ module Controllers =
             ]
         |> JSON
 
-    let getDiversification (depot:Depot.Api) = 
+    let getDiversification (depot:Depot.Api) lastPriceOf = 
         depot.Get() 
-        |> StatisticsInteractor.getDiversification
+        |> StatisticsInteractor.getDiversification lastPriceOf
         |> fun r ->
             dict [
                 "labels" => (r.Positions |> List.map fst)
