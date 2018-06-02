@@ -8,9 +8,11 @@
         <th colspan="3" style="text-align:center">Anual (%)</th>
       </tr>
       <tr>
-        <th v-for="(key,idx) in columns"
-            @click="sortBy(key)"
-            :class="{ sortedBy: sortKey == key }">
+        <th @click="sortBy('name')" :class="{ sortedBy: sortKey == 'name' }">
+          Name / Isin
+          <span class="arrow" :class="sortOrders['name'] > 0 ? 'asc' : 'dsc'"></span>
+        </th>
+        <th v-for="(key,idx) in columns" @click="sortBy(key)" :class="{ sortedBy: sortKey == key }">
           {{ columnHeaders[idx] }}
           <span class="arrow" :class="sortOrders[key] > 0 ? 'asc' : 'dsc'"></span>
         </th>
@@ -18,6 +20,10 @@
     </thead>
     <tbody>
       <tr v-for="entry in filteredData" :class="{ closed: entry.isClosed }">
+        <td>
+          {{ entry.name }} <br/>
+          {{ entry.Isin }}
+        </td>
         <td v-for="key in columns">
           {{ entry[key] | formatValue }}
         </td>
