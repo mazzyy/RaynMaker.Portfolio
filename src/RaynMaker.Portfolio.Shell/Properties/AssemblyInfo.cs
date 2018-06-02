@@ -5,15 +5,15 @@ using System.Reflection;
 [assembly: AssemblyProductAttribute("RaynMaker.Portfolio")]
 [assembly: AssemblyDescriptionAttribute("RaynMaker.Portfolio")]
 [assembly: AssemblyCopyrightAttribute("Copyright @ 2018")]
-[assembly: AssemblyVersionAttribute("1.2")]
-[assembly: AssemblyFileVersionAttribute("1.2")]
+[assembly: AssemblyVersionAttribute("1.3")]
+[assembly: AssemblyFileVersionAttribute("1.3")]
 namespace System {
     internal static class AssemblyVersionInformation {
         internal const System.String AssemblyTitle = "RaynMaker.Portfolio.Shell";
         internal const System.String AssemblyProduct = "RaynMaker.Portfolio";
         internal const System.String AssemblyDescription = "RaynMaker.Portfolio";
         internal const System.String AssemblyCopyright = "Copyright @ 2018";
-        internal const System.String AssemblyVersion = "1.2";
-        internal const System.String AssemblyFileVersion = "1.2";
+        internal const System.String AssemblyVersion = "1.3";
+        internal const System.String AssemblyFileVersion = "1.3";
     }
 }
