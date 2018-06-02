@@ -8,8 +8,19 @@
         </th>
         <th colspan="3"></th>
         <th>Buying Price</th>
-        <th colspan="3" style="text-align:center">Profit</th>
-        <th colspan="3" style="text-align:center">ROI (%)</th>
+        <th>Price</th>
+        <th @click="sortBy('marketProfit')" :class="{ sortedBy: sortKey == 'marketProfit' }">
+          Profit
+          <span class="arrow" :class="sortOrders['marketProfit'] > 0 ? 'asc' : 'dsc'"></span>
+        </th>
+        <th @click="sortBy('dividendProfit')" :class="{ sortedBy: sortKey == 'dividendProfit' }">
+          Dividend
+          <span class="arrow" :class="sortOrders['dividendProfit'] > 0 ? 'asc' : 'dsc'"></span>
+        </th>
+        <th @click="sortBy('totalProfit')" :class="{ sortedBy: sortKey == 'totalProfit' }">
+          Total
+          <span class="arrow" :class="sortOrders['totalProfit'] > 0 ? 'asc' : 'dsc'"></span>
+        </th>
         <th colspan="3" style="text-align:center">Anual (%)</th>
       </tr>
       <tr>
@@ -18,6 +29,19 @@
         <th>Duration</th>
         <th>Priced At</th>
         <th>Buying Value</th>
+        <th>Value</th>
+        <th @click="sortBy('marketRoi')" :class="{ sortedBy: sortKey == 'marketRoi' }">
+          %
+          <span class="arrow" :class="sortOrders['marketRoi'] > 0 ? 'asc' : 'dsc'"></span>
+        </th>
+        <th @click="sortBy('dividendRoi')" :class="{ sortedBy: sortKey == 'dividendRoi' }">
+          %
+          <span class="arrow" :class="sortOrders['dividendRoi'] > 0 ? 'asc' : 'dsc'"></span>
+        </th>
+        <th @click="sortBy('totalRoi')" :class="{ sortedBy: sortKey == 'totalRoi' }">
+          %
+          <span class="arrow" :class="sortOrders['totalRoi'] > 0 ? 'asc' : 'dsc'"></span>
+        </th>
         <th v-for="(key,idx) in columns" @click="sortBy(key)" :class="{ sortedBy: sortKey == key }">
           {{ columnHeaders[idx] }}
           <span class="arrow" :class="sortOrders[key] > 0 ? 'asc' : 'dsc'"></span>
@@ -36,6 +60,22 @@
         <td>
           {{ entry.buyingPrice }} <br />
           {{ entry.buyingValue }}
+        </td>
+        <td>
+          {{ entry.currentPrice }} <br />
+          {{ entry.currentValue }}
+        </td>
+        <td>
+          {{ entry.marketProfit }} <br />
+          {{ entry.marketRoi }}
+        </td>
+        <td>
+          {{ entry.dividendProfit }} <br />
+          {{ entry.dividendRoi }}
+        </td>
+        <td>
+          {{ entry.totalProfit }} <br />
+          {{ entry.totalRoi }}
         </td>
         <td v-for="key in columns">
           {{ entry[key] | formatValue }}
@@ -59,6 +99,12 @@
     data () {
       var sortOrders = {}
       sortOrders['name'] = 1
+      sortOrders['marketProfit'] = 1
+      sortOrders['dividendProfit'] = 1
+      sortOrders['totalProfit'] = 1
+      sortOrders['marketRoi'] = 1
+      sortOrders['dividendRoi'] = 1
+      sortOrders['totalRoi'] = 1
       this.columns.forEach(function (key) {
         sortOrders[key] = 1
       })

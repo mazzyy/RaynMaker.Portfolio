@@ -127,7 +127,9 @@ type Position = {
     Isin : Isin
     Name : string
     Count : decimal
-    Invested : decimal<Currency> 
+    /// Ever invested money
+    Invested : decimal<Currency>
+    /// meanwhile taken out money
     Payouts : decimal<Currency>  
     Dividends : decimal<Currency> }
 

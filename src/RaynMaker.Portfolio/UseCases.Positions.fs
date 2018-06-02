@@ -46,6 +46,8 @@ module PositionsInteractor =
         PricedAt : DateTime
         BuyingPrice : decimal<Currency> option
         BuyingValue : decimal<Currency> option
+        CurrentPrice : decimal<Currency>
+        CurrentValue : decimal<Currency>
         MarketProfit : decimal<Currency>
         DividendProfit : decimal<Currency>
         MarketRoi : decimal<Percentage>
@@ -70,6 +72,8 @@ module PositionsInteractor =
                 PricedAt = pricedAt
                 BuyingPrice = if p.Count <> 0.0M then (p.Invested - p.Payouts) / p.Count |> Some else None
                 BuyingValue = if p.Count <> 0.0M then p.Invested - p.Payouts |> Some else None
+                CurrentPrice = (p.Isin |> getLastPrice |> Option.get).Value
+                CurrentValue = (p.Isin |> getLastPrice |> Option.get).Value * p.Count
                 MarketProfit = value - p.Invested
                 DividendProfit = p.Dividends
                 MarketRoi = marketRoi

@@ -32,6 +32,7 @@ module Controllers =
             | x -> sprintf "%.0f days" span.TotalDays
         let formatCount = sprintf "%.2f"
         let formatPrice = sprintf "%.2f"
+        let formatPercentage = sprintf "%.2f"
         
     let listPositions (depot:Depot.Api) broker lastPriceOf = 
         depot.Get() 
@@ -41,17 +42,19 @@ module Controllers =
                 "name" => p.Position.Name
                 "isin" => (p.Position.Isin |> Str.ofIsin)
                 "shares" => (p.Position.Count |> formatCount)
-                "pricedAt" => (p.PricedAt |> formatDate)
                 "duration" => (p.PricedAt - p.Position.OpenedAt |> formatTimespan)
                 "buyingPrice" => (p.BuyingPrice |> Option.map formatPrice |> Option.defaultValue "n.a.")
                 "buyingValue" => (p.BuyingValue |> Option.map formatPrice |> Option.defaultValue "n.a.")
-                "marketProfit" => p.MarketProfit
-                "dividendProfit" => p.DividendProfit
-                "totalProfit" => (p.MarketProfit + p.DividendProfit)
-                "marketRoi" => p.MarketRoi
-                "dividendRoi" => p.DividendRoi
-                "totalRoi" => (p.MarketRoi + p.DividendRoi)
-                "marketRoiAnual" => p.MarketRoiAnual
+                "pricedAt" => (p.PricedAt |> formatDate)
+                "currentPrice" => (p.CurrentPrice |> formatPrice)
+                "currentValue" => (p.CurrentValue |> formatPrice)
+                "marketProfit" => (p.MarketProfit |> formatPrice)
+                "dividendProfit" => (p.DividendProfit |> formatPrice)
+                "totalProfit" => (p.MarketProfit + p.DividendProfit |> formatPrice)
+                "marketRoi" => (p.MarketRoi |> formatPercentage)
+                "dividendRoi" => (p.DividendRoi |> formatPercentage)
+                "totalRoi" => (p.MarketRoi + p.DividendRoi |> formatPercentage)
+                "marketRoiAnual" => p.MarketRoiAnual 
                 "dividendRoiAnual" => p.DividendRoiAnual
                 "totalRoiAnual" => (p.MarketRoiAnual + p.DividendRoiAnual)
                 "isClosed" => (p.Position.ClosedAt |> Option.isSome) 
