@@ -28,9 +28,9 @@
       return {
         positions: [],
         filter: '',
-        properties: ['pricedAt', 'duration', 'marketProfit', 'dividendProfit', 'totalProfit',
+        properties: ['marketProfit', 'dividendProfit', 'totalProfit',
           'marketRoi', 'dividendRoi', 'totalRoi', 'marketRoiAnual', 'dividendRoiAnual', 'totalRoiAnual'],
-        headers: ['Priced At', 'Duration', 'Market', 'Dividend', 'Total',
+        headers: [ 'Market', 'Dividend', 'Total',
           'Market', 'Dividend', 'Total', 'Market', 'Dividend', 'Total'],
         diversification: {
           data: null,

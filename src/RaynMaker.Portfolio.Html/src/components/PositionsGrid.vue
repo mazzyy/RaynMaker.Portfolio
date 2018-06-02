@@ -2,16 +2,22 @@
   <table class="table table-bordered">
     <thead>
       <tr>
-        <th colspan="5"></th>
+        <th @click="sortBy('name')" :class="{ sortedBy: sortKey == 'name' }">
+          Name
+          <span class="arrow" :class="sortOrders['name'] > 0 ? 'asc' : 'dsc'"></span>
+        </th>
+        <th colspan="3"></th>
+        <th>Buying Price</th>
         <th colspan="3" style="text-align:center">Profit</th>
         <th colspan="3" style="text-align:center">ROI (%)</th>
         <th colspan="3" style="text-align:center">Anual (%)</th>
       </tr>
       <tr>
-        <th @click="sortBy('name')" :class="{ sortedBy: sortKey == 'name' }">
-          Name / Isin
-          <span class="arrow" :class="sortOrders['name'] > 0 ? 'asc' : 'dsc'"></span>
-        </th>
+        <th>Isin</th>
+        <th>Shares</th>
+        <th>Duration</th>
+        <th>Priced At</th>
+        <th>Buying Value</th>
         <th v-for="(key,idx) in columns" @click="sortBy(key)" :class="{ sortedBy: sortKey == key }">
           {{ columnHeaders[idx] }}
           <span class="arrow" :class="sortOrders[key] > 0 ? 'asc' : 'dsc'"></span>
@@ -21,8 +27,15 @@
     <tbody>
       <tr v-for="entry in filteredData" :class="{ closed: entry.isClosed }">
         <td>
-          {{ entry.name }} <br/>
+          {{ entry.name }} <br />
           {{ entry.isin }}
+        </td>
+        <td>{{ entry.shares }}</td>
+        <td>{{ entry.duration }}</td>
+        <td>{{ entry.pricedAt }}</td>
+        <td>
+          {{ entry.buyingPrice }} <br />
+          {{ entry.buyingValue }}
         </td>
         <td v-for="key in columns">
           {{ entry[key] | formatValue }}
@@ -45,6 +58,7 @@
     },
     data () {
       var sortOrders = {}
+      sortOrders['name'] = 1
       this.columns.forEach(function (key) {
         sortOrders[key] = 1
       })

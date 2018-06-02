@@ -44,6 +44,8 @@ module PositionsInteractor =
     type PositionEvaluation = {
         Position : Position
         PricedAt : DateTime
+        BuyingPrice : decimal<Currency> option
+        BuyingValue : decimal<Currency> option
         MarketProfit : decimal<Currency>
         DividendProfit : decimal<Currency>
         MarketRoi : decimal<Percentage>
@@ -53,21 +55,22 @@ module PositionsInteractor =
         
     let evaluatePositions broker getLastPrice positions =
         let evaluate (p:Position) =
-            let p,pricedAt = 
+            let value,pricedAt = 
                 match p.ClosedAt with
-                | Some c -> p,c
+                | Some c -> p.Payouts,c
                 | None -> let price = p.Isin |> getLastPrice |> Option.get // there has to be a price otherwise there would be no position
-                          { p with Payouts = p.Payouts + p.Count * price.Value - (Broker.getFee broker price.Value)
-                                   Count = 0.0M }, price.Day
+                          (p.Payouts + p.Count * price.Value - (Broker.getFee broker price.Value), price.Day)
 
             let investedYears = (pricedAt - p.OpenedAt).TotalDays / 365.0 |> decimal
-            let marketRoi = (p.Payouts - p.Invested) / p.Invested * 100.0M<Percentage>
+            let marketRoi = (value - p.Invested) / p.Invested * 100.0M<Percentage>
             let dividendRoi = p.Dividends / p.Invested * 100.0M<Percentage>
             
             { 
                 Position = p
                 PricedAt = pricedAt
-                MarketProfit = p.Payouts - p.Invested
+                BuyingPrice = if p.Count <> 0.0M then (p.Invested - p.Payouts) / p.Count |> Some else None
+                BuyingValue = if p.Count <> 0.0M then p.Invested - p.Payouts |> Some else None
+                MarketProfit = value - p.Invested
                 DividendProfit = p.Dividends
                 MarketRoi = marketRoi
                 DividendRoi = dividendRoi

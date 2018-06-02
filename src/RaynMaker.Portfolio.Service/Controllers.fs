@@ -30,6 +30,8 @@ module Controllers =
             | x when x > 365.0 -> sprintf "%.2f years" (span.TotalDays / 365.0)
             | x when x > 90.0 -> sprintf "%.2f months" (span.TotalDays / 30.0)
             | x -> sprintf "%.0f days" span.TotalDays
+        let formatCount = sprintf "%.2f"
+        let formatPrice = sprintf "%.2f"
         
     let listPositions (depot:Depot.Api) broker lastPriceOf = 
         depot.Get() 
@@ -38,8 +40,11 @@ module Controllers =
             dict [
                 "name" => p.Position.Name
                 "isin" => (p.Position.Isin |> Str.ofIsin)
+                "shares" => (p.Position.Count |> formatCount)
                 "pricedAt" => (p.PricedAt |> formatDate)
                 "duration" => (p.PricedAt - p.Position.OpenedAt |> formatTimespan)
+                "buyingPrice" => (p.BuyingPrice |> Option.map formatPrice |> Option.defaultValue "n.a.")
+                "buyingValue" => (p.BuyingValue |> Option.map formatPrice |> Option.defaultValue "n.a.")
                 "marketProfit" => p.MarketProfit
                 "dividendProfit" => p.DividendProfit
                 "totalProfit" => (p.MarketProfit + p.DividendProfit)
