@@ -38,7 +38,6 @@ module Controllers =
             dict [
                 "name" => p.Position.Name
                 "isin" => (p.Position.Isin |> Str.ofIsin)
-                "open" => (p.Position.OpenedAt |> formatDate)
                 "pricedAt" => (p.PricedAt |> formatDate)
                 "duration" => (p.PricedAt - p.Position.OpenedAt |> formatTimespan)
                 "marketProfit" => p.MarketProfit

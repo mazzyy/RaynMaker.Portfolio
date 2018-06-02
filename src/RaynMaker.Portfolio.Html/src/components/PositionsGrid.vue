@@ -22,7 +22,7 @@
       <tr v-for="entry in filteredData" :class="{ closed: entry.isClosed }">
         <td>
           {{ entry.name }} <br/>
-          {{ entry.Isin }}
+          {{ entry.isin }}
         </td>
         <td v-for="key in columns">
           {{ entry[key] | formatValue }}
