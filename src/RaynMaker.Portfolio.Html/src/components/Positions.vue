@@ -7,7 +7,7 @@
       <input name="query" v-model="filter">
     </form>
 
-    <positions-grid :data="positions" :columns="properties" :filter-key="filter" :column-headers="headers" style="margin-top:10px"></positions-grid>
+    <positions-grid :data="positions" :filter-key="filter" style="margin-top:10px"></positions-grid>
 
     <h2>Diversification</h2>
     <p>
@@ -28,8 +28,6 @@
       return {
         positions: [],
         filter: '',
-        properties: ['marketRoiAnual', 'dividendRoiAnual', 'totalRoiAnual'],
-        headers: ['Market', 'Dividend', 'Total'],
         diversification: {
           data: null,
           labels: null
@@ -48,9 +46,6 @@
         that.diversification.data = response.data
         that.diversification.labels = response.labels
       })
-    },
-    filters: {
-      formatValue: my.formatValue
     },
     mixins: [ my.webApi ]
   }

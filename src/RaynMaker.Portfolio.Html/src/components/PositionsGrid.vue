@@ -21,7 +21,18 @@
           Total
           <span class="arrow" :class="sortOrders['totalProfit'] > 0 ? 'asc' : 'dsc'"></span>
         </th>
-        <th colspan="3" style="text-align:center">Anual (%)</th>
+        <th @click="sortBy('marketProfitAnual')" :class="{ sortedBy: sortKey == 'marketProfitAnual' }">
+          Profit Anual
+          <span class="arrow" :class="sortOrders['marketProfitAnual'] > 0 ? 'asc' : 'dsc'"></span>
+        </th>
+        <th @click="sortBy('dividendProfitAnual')" :class="{ sortedBy: sortKey == 'dividendProfitAnual' }">
+          Dividend Anual
+          <span class="arrow" :class="sortOrders['dividendProfitAnual'] > 0 ? 'asc' : 'dsc'"></span>
+        </th>
+        <th @click="sortBy('totalProfitAnual')" :class="{ sortedBy: sortKey == 'totalProfitAnual' }">
+          Total Anual
+          <span class="arrow" :class="sortOrders['totalProfitAnual'] > 0 ? 'asc' : 'dsc'"></span>
+        </th>
       </tr>
       <tr>
         <th>Isin</th>
@@ -42,9 +53,17 @@
           %
           <span class="arrow" :class="sortOrders['totalRoi'] > 0 ? 'asc' : 'dsc'"></span>
         </th>
-        <th v-for="(key,idx) in columns" @click="sortBy(key)" :class="{ sortedBy: sortKey == key }">
-          {{ columnHeaders[idx] }}
-          <span class="arrow" :class="sortOrders[key] > 0 ? 'asc' : 'dsc'"></span>
+        <th @click="sortBy('marketRoiAnual')" :class="{ sortedBy: sortKey == 'marketRoiAnual' }">
+          %
+          <span class="arrow" :class="sortOrders['marketRoiAnual'] > 0 ? 'asc' : 'dsc'"></span>
+        </th>
+        <th @click="sortBy('dividendRoiAnual')" :class="{ sortedBy: sortKey == 'dividendRoiAnual' }">
+          %
+          <span class="arrow" :class="sortOrders['dividendRoiAnual'] > 0 ? 'asc' : 'dsc'"></span>
+        </th>
+        <th @click="sortBy('totalRoiAnual')" :class="{ sortedBy: sortKey == 'totalRoiAnual' }">
+          %
+          <span class="arrow" :class="sortOrders['totalRoiAnual'] > 0 ? 'asc' : 'dsc'"></span>
         </th>
       </tr>
     </thead>
@@ -66,19 +85,32 @@
           {{ entry.currentValue }}
         </td>
         <td>
-          {{ entry.marketProfit }} <br />
-          {{ entry.marketRoi }}
+          {{ entry.marketProfit | formatValue }} <br />
+          {{ entry.marketRoi | formatValue }}
         </td>
         <td>
-          {{ entry.dividendProfit }} <br />
-          {{ entry.dividendRoi }}
+          {{ entry.dividendProfit | formatValue }} <br />
+          {{ entry.dividendRoi | formatValue }}
+        </td>
+        <td :class="entry.totalProfit > 0 ? 'win' : 'loss'">
+          <b>
+            {{ entry.totalProfit | formatValue }} <br />
+            {{ entry.totalRoi | formatValue }}
+          </b>
         </td>
         <td>
-          {{ entry.totalProfit }} <br />
-          {{ entry.totalRoi }}
+          {{ entry.marketProfitAnual | formatValue }} <br />
+          {{ entry.marketRoiAnual | formatValue }}
         </td>
-        <td v-for="key in columns">
-          {{ entry[key] | formatValue }}
+        <td>
+          {{ entry.dividendProfitAnual | formatValue }} <br />
+          {{ entry.dividendRoiAnual | formatValue }}
+        </td>
+        <td :class="entry.totalProfitAnual > 0 ? 'win' : 'loss'">
+          <b>
+            {{ entry.totalProfitAnual | formatValue }} <br />
+            {{ entry.totalRoiAnual | formatValue }}
+          </b>
         </td>
       </tr>
     </tbody>
@@ -92,8 +124,6 @@
     name: 'positions-grid',
     props: {
       data: Array,
-      columns: Array,
-      columnHeaders: Array,
       filterKey: String
     },
     data () {
@@ -105,11 +135,14 @@
       sortOrders['marketRoi'] = 1
       sortOrders['dividendRoi'] = 1
       sortOrders['totalRoi'] = 1
-      this.columns.forEach(function (key) {
-        sortOrders[key] = 1
-      })
+      sortOrders['marketProfitAnual'] = 1
+      sortOrders['dividendProfitAnual'] = 1
+      sortOrders['totalProfitAnual'] = 1
+      sortOrders['marketRoiAnual'] = 1
+      sortOrders['dividendRoiAnual'] = 1
+      sortOrders['totalRoiAnual'] = 1
       return {
-        sortKey: '',
+        sortKey: 'name',
         sortOrders: sortOrders
       }
     },

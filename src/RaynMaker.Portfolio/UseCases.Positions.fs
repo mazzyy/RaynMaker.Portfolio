@@ -52,6 +52,8 @@ module PositionsInteractor =
         DividendProfit : decimal<Currency>
         MarketRoi : decimal<Percentage>
         DividendRoi : decimal<Percentage>
+        MarketProfitAnual : decimal<Currency>
+        DividendProfitAnual : decimal<Currency>
         MarketRoiAnual : decimal<Percentage>
         DividendRoiAnual : decimal<Percentage> }
         
@@ -78,6 +80,8 @@ module PositionsInteractor =
                 DividendProfit = p.Dividends
                 MarketRoi = marketRoi
                 DividendRoi = dividendRoi
+                MarketProfitAnual = (value - p.Invested) / investedYears
+                DividendProfitAnual = p.Dividends / investedYears
                 MarketRoiAnual = marketRoi / investedYears 
                 DividendRoiAnual = dividendRoi / investedYears
             }

@@ -34,3 +34,11 @@ th {
         border-right: 4px solid transparent;
         border-top: 4px solid black;
     }
+
+.win {
+    color: green;
+}
+
+.loss {
+    color: red;
+}
