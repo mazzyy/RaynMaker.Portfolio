@@ -6,19 +6,9 @@
           Name
           <span class="arrow" :class="sortOrders['name'] > 0 ? 'asc' : 'dsc'"></span>
         </th>
-        <th colspan="3"></th>
-        <th>Buying Price</th>
-        <th>Price</th>
-        <th @click="sortBy('marketProfit')" :class="{ sortedBy: sortKey == 'marketProfit' }">
-          Profit
-          <span class="arrow" :class="sortOrders['marketProfit'] > 0 ? 'asc' : 'dsc'"></span>
-        </th>
-        <th @click="sortBy('dividendProfit')" :class="{ sortedBy: sortKey == 'dividendProfit' }">
-          Dividend
-          <span class="arrow" :class="sortOrders['dividendProfit'] > 0 ? 'asc' : 'dsc'"></span>
-        </th>
+        <th></th>
         <th @click="sortBy('totalProfit')" :class="{ sortedBy: sortKey == 'totalProfit' }">
-          Total
+          Total Profit
           <span class="arrow" :class="sortOrders['totalProfit'] > 0 ? 'asc' : 'dsc'"></span>
         </th>
         <th @click="sortBy('marketProfitAnnual')" :class="{ sortedBy: sortKey == 'marketProfitAnnual' }">
@@ -36,19 +26,7 @@
       </tr>
       <tr>
         <th>Isin</th>
-        <th>Shares</th>
         <th>Duration</th>
-        <th>Priced At</th>
-        <th>Buying Value</th>
-        <th>Value</th>
-        <th @click="sortBy('marketRoi')" :class="{ sortedBy: sortKey == 'marketRoi' }">
-          %
-          <span class="arrow" :class="sortOrders['marketRoi'] > 0 ? 'asc' : 'dsc'"></span>
-        </th>
-        <th @click="sortBy('dividendRoi')" :class="{ sortedBy: sortKey == 'dividendRoi' }">
-          %
-          <span class="arrow" :class="sortOrders['dividendRoi'] > 0 ? 'asc' : 'dsc'"></span>
-        </th>
         <th @click="sortBy('totalRoi')" :class="{ sortedBy: sortKey == 'totalRoi' }">
           %
           <span class="arrow" :class="sortOrders['totalRoi'] > 0 ? 'asc' : 'dsc'"></span>
@@ -73,25 +51,7 @@
           {{ entry.name }} <br />
           {{ entry.isin }}
         </td>
-        <td>{{ entry.shares }}</td>
         <td>{{ entry.duration }}</td>
-        <td>{{ entry.pricedAt }}</td>
-        <td>
-          {{ entry.buyingPrice }} <br />
-          {{ entry.buyingValue }}
-        </td>
-        <td>
-          {{ entry.currentPrice }} <br />
-          {{ entry.currentValue }}
-        </td>
-        <td>
-          {{ entry.marketProfit | formatValue }} <br />
-          {{ entry.marketRoi | formatValue }}
-        </td>
-        <td>
-          {{ entry.dividendProfit | formatValue }} <br />
-          {{ entry.dividendRoi | formatValue }}
-        </td>
         <td :class="entry.totalProfit > 0 ? 'win' : 'loss'">
           <b>
             {{ entry.totalProfit | formatValue }} <br />
@@ -121,7 +81,7 @@
   import * as my from '../assets/js/site.js'
 
   export default {
-    name: 'positions-grid',
+    name: 'closed-positions-grid',
     props: {
       data: Array,
       filterKey: String

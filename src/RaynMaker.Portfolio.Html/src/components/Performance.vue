@@ -19,11 +19,11 @@
       <label>Total ROI: </label> {{ benchmark.buyInstead.totalRoi | formatValue }}
     </p>
     <p>
-      <label>Anual ROI: </label> {{ benchmark.buyInstead.totalRoiAnual | formatValue }}
+      <label>Annual ROI: </label> {{ benchmark.buyInstead.totalRoiAnnual | formatValue }}
     </p>
 
     <p>
-      If you would have bought the benchmark "{{ benchmark.name }}" (Isin: {{ benchmark.isin }}) every month with a rate of {{ benchmark.buyPlan.rate }} yout would have gained:
+      If you would have bought the benchmark "{{ benchmark.name }}" (Isin: {{ benchmark.isin }}) every month with a rate of {{ benchmark.buyPlan.rate }} you would have gained:
     </p>
     <p>
       <label>Total profit: </label> {{ benchmark.buyPlan.totalProfit | formatValue }}
@@ -32,7 +32,7 @@
       <label>Total ROI: </label> {{ benchmark.buyPlan.totalRoi | formatValue }}
     </p>
     <p>
-      <label>Anual ROI: </label> {{ benchmark.buyPlan.totalRoiAnual | formatValue }}
+      <label>Annual ROI: </label> {{ benchmark.buyPlan.totalRoiAnnual | formatValue }}
     </p>
   </div>
 </template>

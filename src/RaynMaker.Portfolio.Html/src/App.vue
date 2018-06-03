@@ -13,6 +13,9 @@
             <li>
               <router-link to="/Cashflow">Cashflow</router-link>
             </li>
+            <li>
+              <router-link to="/ClosedPositions">History</router-link>
+            </li>
           </ul>
         </div>
       </nav>

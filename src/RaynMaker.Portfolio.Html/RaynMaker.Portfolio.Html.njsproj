@@ -45,8 +45,10 @@
     <Content Include="src\assets\css\site.css" />
     <Content Include="src\components\Cashflow.vue" />
     <Content Include="src\components\Performance.vue" />
+    <Content Include="src\components\ClosedPositions.vue" />
     <Content Include="src\components\Positions.vue" />
     <Content Include="src\components\PieChart.vue" />
+    <Content Include="src\components\ClosedPositionsGrid.vue" />
     <Content Include="src\components\PositionsGrid.vue">
       <SubType>Code</SubType>
     </Content>

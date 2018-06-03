@@ -87,7 +87,7 @@ module ``Given a benchmark and a list of domain events`` =
         let start = at 2015 01 01 
         let stop = at 2015 06 01 
 
-        let plan = { SavingsPlan.Fee = 0.45M<Percentage>; AnualFee = 0.45M<Percentage>; Rate = 500.0M<Currency> }
+        let plan = { SavingsPlan.Fee = 0.45M<Percentage>; AnnualFee = 0.45M<Percentage>; Rate = 500.0M<Currency> }
 
         let buy company day =
             let price = day |> getPrice

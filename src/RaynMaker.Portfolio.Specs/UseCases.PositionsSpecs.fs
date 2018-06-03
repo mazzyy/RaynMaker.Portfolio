@@ -25,11 +25,11 @@ module ``Given some Depot`` =
         depot.Get() |> should equal positions 
 
 [<TestFixture>]
-module ``Given a position to evaluate`` =
+module ``Given a closed position to evaluate`` =
     open FakeBroker
 
     [<Test>]
-    let ``<When> is closed <Then> profit is evaluated on closed price``() =
+    let ``<When> provit is calcualted <Then> it is based on closed price``() =
         let events =
             [
                 at 2014 01 01 |> buy "Joe Inc" 10 10.0 |> toDomainEvent
@@ -40,7 +40,7 @@ module ``Given a position to evaluate`` =
         let summary =
             events
             |> Positions.create
-            |> PositionsInteractor.evaluatePositions FakeBroker.instance (Events.LastPriceOf events)
+            |> PositionsInteractor.evaluateClosedPositions
 
         summary |> should haveLength 1
 
@@ -48,15 +48,17 @@ module ``Given a position to evaluate`` =
         let profit = (withoutFee 300.0M<Currency>) - investedMoney
         let roi = profit / investedMoney * 100.0M<Percentage>
 
-        summary.[0].PricedAt |> should equal (at 2016 01 01)
         summary.[0].Position.ClosedAt |> should equal (at 2016 01 01 |> Some)
-        summary.[0].MarketProfit |> should equal profit
-        summary.[0].MarketRoi |> should equal roi
-        summary.[0].MarketRoiAnual |> should equal (roi / 2.0M)
+        summary.[0].TotalProfit |> should equal profit
+        summary.[0].TotalRoi |> should equal roi
+        summary.[0].MarketRoiAnnual |> should equal (roi / 2.0M)
 
+[<TestFixture>]
+module ``Given an open position to evaluate`` =
+    open FakeBroker
 
     [<Test>]
-    let ``<When> is open <Then> profit is evaluated based on last price found in events``() =
+    let ``<When> profit is calculated <Then> it is based on last price found in events``() =
         let events =
             [
                 at 2014 01 01 |> buy "Joe Inc" 10 10.0 |> toDomainEvent
@@ -67,7 +69,7 @@ module ``Given a position to evaluate`` =
         let summary =
             events
             |> Positions.create
-            |> PositionsInteractor.evaluatePositions FakeBroker.instance (Events.LastPriceOf events)
+            |> PositionsInteractor.evaluateOpenPositions FakeBroker.instance (Events.LastPriceOf events)
 
         summary |> should haveLength 1
 
@@ -79,7 +81,7 @@ module ``Given a position to evaluate`` =
         summary.[0].Position.ClosedAt |> should equal None
         summary.[0].MarketProfit |> should equal profit
         summary.[0].MarketRoi |> should equal roi
-        summary.[0].MarketRoiAnual |> should equal (roi / 2.0M)
+        summary.[0].MarketRoiAnnual |> should equal (roi / 2.0M)
 
 [<TestFixture>]
 module ``Given a set of positions`` =

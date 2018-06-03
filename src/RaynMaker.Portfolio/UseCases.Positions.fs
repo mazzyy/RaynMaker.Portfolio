@@ -41,7 +41,7 @@ module PositionsInteractor =
     open RaynMaker.Portfolio.Entities
     open System
 
-    type PositionEvaluation = {
+    type OpenPositionEvaluation = {
         Position : Position
         PricedAt : DateTime
         BuyingPrice : decimal<Currency> option
@@ -52,18 +52,16 @@ module PositionsInteractor =
         DividendProfit : decimal<Currency>
         MarketRoi : decimal<Percentage>
         DividendRoi : decimal<Percentage>
-        MarketProfitAnual : decimal<Currency>
-        DividendProfitAnual : decimal<Currency>
-        MarketRoiAnual : decimal<Percentage>
-        DividendRoiAnual : decimal<Percentage> }
+        MarketProfitAnnual : decimal<Currency>
+        DividendProfitAnnual : decimal<Currency>
+        MarketRoiAnnual : decimal<Percentage>
+        DividendRoiAnnual : decimal<Percentage> }
         
-    let evaluatePositions broker getLastPrice positions =
+    let evaluateOpenPositions broker getLastPrice positions =
         let evaluate (p:Position) =
             let value,pricedAt = 
-                match p.ClosedAt with
-                | Some c -> p.Payouts,c
-                | None -> let price = p.Isin |> getLastPrice |> Option.get // there has to be a price otherwise there would be no position
-                          p.Payouts + p.Count * price.Value - (Broker.getFee broker price.Value), price.Day
+                let price = p.Isin |> getLastPrice |> Option.get // there has to be a price otherwise there would be no position
+                p.Payouts + p.Count * price.Value - (Broker.getFee broker price.Value), price.Day
 
             let investedYears = (pricedAt - p.OpenedAt).TotalDays / 365.0 |> decimal
             let marketRoi = (value - p.Invested) / p.Invested * 100.0M<Percentage>
@@ -82,15 +80,94 @@ module PositionsInteractor =
                 DividendProfit = p.Dividends
                 MarketRoi = marketRoi
                 DividendRoi = dividendRoi
-                MarketProfitAnual = (value - p.Invested) / investedYears
-                DividendProfitAnual = p.Dividends / investedYears
-                MarketRoiAnual = marketRoi / investedYears 
-                DividendRoiAnual = dividendRoi / investedYears
+                MarketProfitAnnual = (value - p.Invested) / investedYears
+                DividendProfitAnnual = p.Dividends / investedYears
+                MarketRoiAnnual = marketRoi / investedYears 
+                DividendRoiAnnual = dividendRoi / investedYears
+            }
+
+        positions
+        |> Seq.filter(fun p -> p.ClosedAt |> Option.isNone)
+        |> Seq.map evaluate
+        |> List.ofSeq
+
+    type ClosedPositionEvaluation = {
+        Position : Position
+        Duration : TimeSpan
+        TotalProfit : decimal<Currency>
+        TotalRoi : decimal<Percentage>
+        MarketProfitAnnual : decimal<Currency>
+        DividendProfitAnnual : decimal<Currency>
+        MarketRoiAnnual : decimal<Percentage>
+        DividendRoiAnnual : decimal<Percentage> }
+
+    let evaluateClosedPositions positions =
+        let evaluate (p:Position) =
+            let value,pricedAt = p.Payouts,(p.ClosedAt |> Option.get)
+
+            let investedYears = (pricedAt - p.OpenedAt).TotalDays / 365.0 |> decimal
+            let marketRoi = (value - p.Invested) / p.Invested * 100.0M<Percentage>
+            // TODO: this is not 100% correct: we would have to compare the dividends to the 
+            // invested capital in that point in time when we got the dividend
+            let dividendRoi = p.Dividends / p.Invested * 100.0M<Percentage>
+            
+            { 
+                ClosedPositionEvaluation.Position = p
+                Duration = pricedAt - p.OpenedAt
+                TotalProfit = value - p.Invested + p.Dividends
+                TotalRoi = marketRoi + dividendRoi
+                MarketProfitAnnual = (value - p.Invested) / investedYears
+                DividendProfitAnnual = p.Dividends / investedYears
+                MarketRoiAnnual = marketRoi / investedYears 
+                DividendRoiAnnual = dividendRoi / investedYears
+            }
+
+        positions
+        |> Seq.filter(fun p -> p.ClosedAt |> Option.isSome)
+        |> Seq.map evaluate
+        |> List.ofSeq
+
+    let evaluateTotalProfit broker getLastPrice positions =
+        let evaluate (p:Position) =
+            let value = 
+                match p.ClosedAt with
+                | Some c -> p.Payouts
+                | None -> let price = p.Isin |> getLastPrice |> Option.get // there has to be a price otherwise there would be no position
+                          p.Payouts + p.Count * price.Value - (Broker.getFee broker price.Value)
+            
+            value - p.Invested + p.Dividends
+
+        positions
+        |> Seq.map evaluate
+        |> Seq.sum
+
+    type ProfitEvaluation = {
+        Profit : decimal<Currency>
+        Roi : decimal<Percentage>
+        RoiAnnual : decimal<Percentage> }
+
+    let evaluateProfit broker getLastPrice positions =
+        let evaluate (p:Position) =
+            let value,pricedAt = 
+                match p.ClosedAt with
+                | Some c -> p.Payouts,c
+                | None -> let price = p.Isin |> getLastPrice |> Option.get // there has to be a price otherwise there would be no position
+                          p.Payouts + p.Count * price.Value - (Broker.getFee broker price.Value),price.Day
+
+            let investedYears = (pricedAt - p.OpenedAt).TotalDays / 365.0 |> decimal
+            let marketRoi = (value - p.Invested) / p.Invested * 100.0M<Percentage>
+            // TODO: this is not 100% correct: we would have to compare the dividends to the 
+            // invested capital in that point in time when we got the dividend
+            let dividendRoi = p.Dividends / p.Invested * 100.0M<Percentage>
+            
+            { 
+                Profit = value - p.Invested + p.Dividends
+                Roi = marketRoi + dividendRoi
+                RoiAnnual = (marketRoi / investedYears + dividendRoi / investedYears)
             }
 
         positions
         |> Seq.map evaluate
-        |> Seq.sortByDescending(fun p -> p.MarketRoiAnual + p.DividendRoiAnual)
         |> List.ofSeq
 
 module PerformanceInteractor =
@@ -115,8 +192,7 @@ module PerformanceInteractor =
 
         let totalProfit = 
             positions
-            |> PositionsInteractor.evaluatePositions broker getLastPrice
-            |> Seq.sumBy(fun p -> p.MarketProfit + p.DividendProfit)
+            |> PositionsInteractor.evaluateTotalProfit broker getLastPrice
 
         { TotalInvestment = investment
           TotalProfit = totalProfit }

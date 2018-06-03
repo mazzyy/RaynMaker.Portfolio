@@ -47,7 +47,7 @@ module BenchmarkInteractor =
 
     type SavingsPlan = {
         Fee : decimal<Percentage>
-        AnualFee : decimal<Percentage>
+        AnnualFee : decimal<Percentage>
         Rate : decimal<Currency> }
     
     type Benchmark = {
@@ -61,7 +61,7 @@ module BenchmarkInteractor =
           Price = day |> getPrice } 
 
     /// Based on the original buy & sell events new benchmarking events are generated which simulate 
-    /// the performance one could have achived by buying the benchmark asset (e.g. an ETF) instead
+    /// the performance one could have achieved by buying the benchmark asset (e.g. an ETF) instead
     let buyBenchmarkInstead broker (benchmark:Benchmark) getPrice (store:DomainEvent list) =
         let buy day (value:decimal<Currency>) =
             let price = day |> getPrice
@@ -110,7 +110,7 @@ module BenchmarkInteractor =
               Price = price
               Count = count }
 
-        // TODO: anual fee
+        // TODO: annual fee
         // -> what about just inventing an event because it could then be calculated when walking the positions
     
         let numMonths = (stop.Year - start.Year) * 12 + (stop.Month - start.Month)
@@ -124,8 +124,8 @@ module BenchmarkInteractor =
         |> List.ofSeq
 
     type Performance = {
-        BuyInstead : PositionEvaluation
-        BuyPlan : PositionEvaluation }
+        BuyInstead : ProfitEvaluation
+        BuyPlan : ProfitEvaluation }
     
     let getBenchmarkPerformance (store:EventStore.Api) broker savingsPlan (historicalPrices:HistoricalPrices.Api) (benchmark:Benchmark) = 
         let getPrice day = 
@@ -137,7 +137,7 @@ module BenchmarkInteractor =
         let eval events = 
             events
             |> Positions.create
-            |> PositionsInteractor.evaluatePositions broker (Events.LastPriceOf events)
+            |> PositionsInteractor.evaluateProfit broker (Events.LastPriceOf events)
             |> Seq.head
 
         let events = store.Get()

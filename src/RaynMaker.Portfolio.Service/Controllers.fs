@@ -32,11 +32,10 @@ module Controllers =
             | x -> sprintf "%.0f days" span.TotalDays
         let formatCount = sprintf "%.2f"
         let formatPrice = sprintf "%.2f"
-        let formatPercentage = sprintf "%.2f"
         
-    let listPositions (depot:Depot.Api) broker lastPriceOf = 
+    let listOpenPositions (depot:Depot.Api) broker lastPriceOf = 
         depot.Get() 
-        |> PositionsInteractor.evaluatePositions broker lastPriceOf
+        |> PositionsInteractor.evaluateOpenPositions broker lastPriceOf
         |> List.map(fun p -> 
             dict [
                 "name" => p.Position.Name
@@ -54,13 +53,31 @@ module Controllers =
                 "marketRoi" => (p.MarketRoi)
                 "dividendRoi" => (p.DividendRoi)
                 "totalRoi" => (p.MarketRoi + p.DividendRoi)
-                "marketProfitAnual" => (p.MarketProfitAnual)
-                "dividendProfitAnual" => (p.DividendProfitAnual)
-                "totalProfitAnual" => (p.MarketProfitAnual + p.DividendProfitAnual)
-                "marketRoiAnual" => (p.MarketRoiAnual)
-                "dividendRoiAnual" => (p.DividendRoiAnual)
-                "totalRoiAnual" => (p.MarketRoiAnual + p.DividendRoiAnual)
-                "isClosed" => (p.Position.ClosedAt |> Option.isSome) 
+                "marketProfitAnnual" => (p.MarketProfitAnnual)
+                "dividendProfitAnnual" => (p.DividendProfitAnnual)
+                "totalProfitAnnual" => (p.MarketProfitAnnual + p.DividendProfitAnnual)
+                "marketRoiAnnual" => (p.MarketRoiAnnual)
+                "dividendRoiAnnual" => (p.DividendRoiAnnual)
+                "totalRoiAnnual" => (p.MarketRoiAnnual + p.DividendRoiAnnual)
+            ])
+        |> JSON
+        
+    let listClosedPositions (depot:Depot.Api) broker lastPriceOf = 
+        depot.Get() 
+        |> PositionsInteractor.evaluateClosedPositions
+        |> List.map(fun p -> 
+            dict [
+                "name" => p.Position.Name
+                "isin" => (p.Position.Isin |> Str.ofIsin)
+                "duration" => (p.Duration |> formatTimespan)
+                "totalProfit" => p.TotalProfit
+                "totalRoi" => p.TotalRoi
+                "marketProfitAnnual" => (p.MarketProfitAnnual)
+                "dividendProfitAnnual" => (p.DividendProfitAnnual)
+                "totalProfitAnnual" => (p.MarketProfitAnnual + p.DividendProfitAnnual)
+                "marketRoiAnnual" => (p.MarketRoiAnnual)
+                "dividendRoiAnnual" => (p.DividendRoiAnnual)
+                "totalRoiAnnual" => (p.MarketRoiAnnual + p.DividendRoiAnnual)
             ])
         |> JSON
     
@@ -82,14 +99,14 @@ module Controllers =
                 "name" => benchmark.Name
                 "isin" => (benchmark.Isin |> Str.ofIsin)
                 "buyInstead" => dict [
-                    "totalProfit" => (r.BuyInstead.MarketProfit + r.BuyInstead.DividendProfit)
-                    "totalRoi" => (r.BuyInstead.MarketRoi + r.BuyInstead.DividendRoi)
-                    "totalRoiAnual" => (r.BuyInstead.MarketRoiAnual + r.BuyInstead.DividendRoiAnual) 
+                    "totalProfit" => (r.BuyInstead.Profit)
+                    "totalRoi" => (r.BuyInstead.Roi)
+                    "totalRoiAnnual" => (r.BuyInstead.RoiAnnual) 
                 ]
                 "buyPlan" => dict [
-                    "totalProfit" => (r.BuyPlan.MarketProfit + r.BuyPlan.DividendProfit)
-                    "totalRoi" => (r.BuyPlan.MarketRoi + r.BuyPlan.DividendRoi)
-                    "totalRoiAnual" => (r.BuyPlan.MarketRoiAnual + r.BuyPlan.DividendRoiAnual) 
+                    "totalProfit" => (r.BuyPlan.Profit)
+                    "totalRoi" => (r.BuyPlan.Roi)
+                    "totalRoiAnnual" => (r.BuyPlan.RoiAnnual) 
                     "rate" => savingsPlan.Rate
                 ]
             ]

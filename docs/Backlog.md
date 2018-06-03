@@ -1,5 +1,6 @@
 
-move "formatValue" into controller/presenter
+- move "formatValue" into controller/presenter
+  - but then sorting is difficult ...
 
 document in BDD style
 - vision statement
@@ -17,8 +18,8 @@ document in BDD style
 - for router link highlighting see vue cookbook page 292
 
 - benchmark
-  - anual fee not considered
-    // TODO: anual fee
+  - annual fee not considered
+    // TODO: annual fee
     // -> what about just inventing an event because it could then be calculated when walking the positions
   - how do we hande cash in general in the system?
 
@@ -53,7 +54,7 @@ document in BDD style
 - refactor core positions logic
   - move to dedicated interactor and make buy and sell methods public so that we can test individually
 
-- anual roi actually is no simple math average ...
+- annual roi actually is no simple math average ...
 
 - show negative numbers in red
 

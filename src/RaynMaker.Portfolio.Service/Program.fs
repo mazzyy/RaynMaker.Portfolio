@@ -86,7 +86,7 @@ let start projectFile =
         Name = project.Benchmark.Name }
     
     let savingsPlan = { SavingsPlan.Fee = project.Benchmark.SavingsPlan.Fee * 1.0M<Percentage>
-                        AnualFee = project.Benchmark.SavingsPlan.AnualFee * 1.0M<Percentage>
+                        AnnualFee = project.Benchmark.SavingsPlan.AnnualFee * 1.0M<Percentage>
                         Rate = (decimal project.Benchmark.SavingsPlan.Rate) * 1.0M<Currency> }
 
     let broker = { Broker.Name = project.Broker.Name
@@ -109,11 +109,12 @@ let start projectFile =
                     path "/" >=> redirect "/Client/index.html"
                     pathScan "/Client/%s" (fun f -> Files.file (sprintf "%s/Client/%s" home f))
                     pathScan "/static/%s" (fun f -> Files.file (sprintf "%s/Client/static/%s" home f))
-                    path "/api/positions" >=> warbler (fun _ -> Controllers.listPositions depot broker lastPriceOf)
+                    path "/api/positions" >=> warbler (fun _ -> Controllers.listOpenPositions depot broker lastPriceOf)
                     path "/api/performance" >=> warbler (fun _ -> Controllers.getPerformanceIndicators store depot broker lastPriceOf)
                     path "/api/benchmark" >=> warbler (fun _ -> Controllers.getBenchmarkPerformance store broker savingsPlan historicalPrices benchmark)
                     path "/api/diversification" >=> warbler (fun _ -> Controllers.getDiversification depot lastPriceOf)
                     path "/api/cashflow" >=> warbler (fun ctx -> Controllers.listCashflow ctx.request store)
+                    path "/api/closedPositions" >=> warbler (fun _ -> Controllers.listClosedPositions depot broker lastPriceOf)
                     NOT_FOUND "Resource not found."
                 ]
         ]

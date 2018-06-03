@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Positions from '@/components/Positions'
 import Performance from '@/components/Performance'
 import Cashflow from '@/components/Cashflow'
+import ClosedPositions from '@/components/ClosedPositions'
 
 Vue.use(Router)
 
@@ -11,7 +12,8 @@ export default new Router({
   routes: [
     { path: '/Positions', alias: '/', component: Positions },
     { path: '/Performance', component: Performance },
-    { path: '/Cashflow', component: Cashflow }
+    { path: '/Cashflow', component: Cashflow },
+    { path: '/ClosedPositions', component: ClosedPositions }
   ],
   linkActiveClass: 'active',
   linkExactActiveClass: 'active'

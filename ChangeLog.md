@@ -1,6 +1,8 @@
 ## 1.3 - 2018-06-02 
 
 - Positions table improved
+- Typo in "Anual" fixed - also in config json
+- Open and closed positions splitted
 
 ## 1.2 - 2018-02-01 
 
