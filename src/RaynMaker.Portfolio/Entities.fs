@@ -127,9 +127,9 @@ type Position = {
     Isin : Isin
     Name : string
     Count : decimal
-    /// Ever invested money
+    /// All the money ever invested into this position
     Invested : decimal<Currency>
-    /// meanwhile taken out money
+    /// All the money already taken out of this position
     Payouts : decimal<Currency>  
     Dividends : decimal<Currency> }
 
@@ -151,17 +151,9 @@ module Positions =
         Contract.requires (fun () -> evt.Count > 0.0M) "evt.Count > 0"
         Contract.requires (fun () -> evt.Price > 0.0M<Currency>) "evt.Price > 0"
         Contract.requires (fun () -> evt.Fee >= 0.0M<Currency>) "evt.Fee >= 0"
-
-        let investment = evt.Count * evt.Price + evt.Fee
-        let newInvestment,payouts = 
-            if investment > p.Payouts then 
-                investment - p.Payouts,0.0M<Currency>
-            else
-                0.0M<Currency>,p.Payouts - investment
         
         let newP =
-            { p with Invested = p.Invested + newInvestment
-                     Payouts = payouts
+            { p with Invested = p.Invested + (evt.Count * evt.Price + evt.Fee)
                      Count = p.Count + evt.Count }
 
         Contract.ensures (fun () -> newP.Count > 0.0M) "new count > 0"
@@ -179,7 +171,7 @@ module Positions =
 
         let count = p.Count - evt.Count
         let newP =
-            { p with Payouts = p.Payouts + evt.Count * evt.Price - evt.Fee
+            { p with Payouts = p.Payouts + (evt.Count * evt.Price - evt.Fee)
                      Count = count
                      ClosedAt = if count = 0.0M then evt.Date |> Some else None }
 

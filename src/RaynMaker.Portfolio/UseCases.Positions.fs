@@ -63,10 +63,12 @@ module PositionsInteractor =
                 match p.ClosedAt with
                 | Some c -> p.Payouts,c
                 | None -> let price = p.Isin |> getLastPrice |> Option.get // there has to be a price otherwise there would be no position
-                          (p.Payouts + p.Count * price.Value - (Broker.getFee broker price.Value), price.Day)
+                          p.Payouts + p.Count * price.Value - (Broker.getFee broker price.Value), price.Day
 
             let investedYears = (pricedAt - p.OpenedAt).TotalDays / 365.0 |> decimal
             let marketRoi = (value - p.Invested) / p.Invested * 100.0M<Percentage>
+            // TODO: this is not 100% correct: we would have to compare the dividends to the 
+            // invested capital in that point in time when we got the dividend
             let dividendRoi = p.Dividends / p.Invested * 100.0M<Percentage>
             
             { 
