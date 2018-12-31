@@ -16,8 +16,6 @@
     <StartWebBrowser>True</StartWebBrowser>
     <LastActiveSolutionConfig>Debug|Any CPU</LastActiveSolutionConfig>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
-  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
   <ItemGroup>
     <Content Include="debug.js" />
     <Content Include="index.html" />

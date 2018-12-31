@@ -8,13 +8,6 @@
     <RootNamespace>RaynMaker.Portfolio</RootNamespace>
     <AssemblyName>RaynMaker.Portfolio.Service</AssemblyName>
     <Name>RaynMaker.Portfolio.Service</Name>
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
-    <TargetFrameworkProfile />
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <Prefer32Bit>true</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <Import Project="$(FSharpTargetsPath)" />
