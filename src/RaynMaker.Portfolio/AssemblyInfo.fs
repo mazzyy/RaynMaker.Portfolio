@@ -5,7 +5,7 @@ open System.Reflection
 [<assembly: AssemblyTitleAttribute("RaynMaker.Portfolio")>]
 [<assembly: AssemblyProductAttribute("RaynMaker.Portfolio")>]
 [<assembly: AssemblyDescriptionAttribute("RaynMaker.Portfolio")>]
-[<assembly: AssemblyCopyrightAttribute("Copyright @ 2018")>]
+[<assembly: AssemblyCopyrightAttribute("Copyright @ 2019")>]
 [<assembly: AssemblyVersionAttribute("1.3")>]
 [<assembly: AssemblyFileVersionAttribute("1.3")>]
 do ()
@@ -14,6 +14,6 @@ module internal AssemblyVersionInformation =
     let [<Literal>] AssemblyTitle = "RaynMaker.Portfolio"
     let [<Literal>] AssemblyProduct = "RaynMaker.Portfolio"
     let [<Literal>] AssemblyDescription = "RaynMaker.Portfolio"
-    let [<Literal>] AssemblyCopyright = "Copyright @ 2018"
+    let [<Literal>] AssemblyCopyright = "Copyright @ 2019"
     let [<Literal>] AssemblyVersion = "1.3"
     let [<Literal>] AssemblyFileVersion = "1.3"

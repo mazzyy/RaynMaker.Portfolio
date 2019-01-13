@@ -34,7 +34,7 @@ type Instance = {
     services : obj 
 }
 
-let start projectFile =
+let start errorHandler projectFile =
     let location = Assembly.GetExecutingAssembly().Location
     let home = getHome()
     printfn "Home: %s" home
@@ -119,12 +119,15 @@ let start projectFile =
                 ]
         ]
 
-    let port,cts = Httpd.start app
+    let port,cts = Httpd.start errorHandler app
 
     { port = port
       services = { suaveCts = cts 
                    eventStore = store
                    historicalPrices = historicalPrices } }
+
+let startCSharp (errorHandler:System.Action<string,Exception>) projectFile =
+    start (fun msg ex -> errorHandler.Invoke(msg,ex)) projectFile
 
 let stop instance =
     let services = instance.services :?> Services
@@ -140,7 +143,8 @@ let getProjectFileFromCommandLine argv =
 
     match argv with
     | [| path |] -> path 
-    | x -> Path.Combine(home, "..", "..", "docs", "Samples", "Portfolio.json")
+    //| _ -> Path.Combine(home, "..", "..", "docs", "Samples", "Portfolio.json")
+    | _ -> @"x:\OneLife\Investor\Portfolio.json"
     |> Path.GetFullPath
 
 [<EntryPoint>]
@@ -148,7 +152,7 @@ let main argv =
     let instance = 
         argv
         |> getProjectFileFromCommandLine
-        |> start 
+        |> start (fun _ _ -> ())
 
     Browser.start instance.port
 

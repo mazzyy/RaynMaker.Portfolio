@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
+using Microsoft.FSharp.Core;
 using Plainion;
 using static RaynMaker.Portfolio.Main;
 
@@ -18,11 +19,10 @@ namespace RaynMaker.Portfolio.Shell
 
         protected override void OnStartup(StartupEventArgs e)
         {
-            Debugger.Launch();
             DispatcherUnhandledException += OnUnhandledException;
 
             var projectFile = RaynMaker.Portfolio.Main.getProjectFileFromCommandLine(Environment.GetCommandLineArgs().Skip(1).ToArray());
-            myInstance = RaynMaker.Portfolio.Main.start(projectFile);
+            myInstance = RaynMaker.Portfolio.Main.startCSharp((msg,ex) => MessageBox.Show(msg + Environment.NewLine + ex.Dump(), "Unhandled exception", MessageBoxButton.OK, MessageBoxImage.Error), projectFile);
             Port = myInstance.port;
 
             base.OnStartup(e);
