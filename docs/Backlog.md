@@ -1,4 +1,13 @@
 
+- buying price is not correctly calculated when some parts of the position got sold
+- errors from Agents cannot be shown as message box in Shell
+  - anyhow we should maybe have a "log window" instead with error, warning and info logs
+  - or even better: have it in the web page itself
+- we definitively need much more tests!
+
+
+
+
 - move "formatValue" into controller/presenter
   - but then sorting is difficult ...
 

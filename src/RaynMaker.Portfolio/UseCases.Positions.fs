@@ -80,10 +80,10 @@ module PositionsInteractor =
                 DividendProfit = p.Dividends
                 MarketRoi = marketRoi
                 DividendRoi = dividendRoi
-                MarketProfitAnnual = (value - p.Invested) / investedYears
-                DividendProfitAnnual = p.Dividends / investedYears
-                MarketRoiAnnual = marketRoi / investedYears 
-                DividendRoiAnnual = dividendRoi / investedYears
+                MarketProfitAnnual = if investedYears = 0.0M then 0.0M<Currency> else (value - p.Invested) / investedYears
+                DividendProfitAnnual = if investedYears = 0.0M then 0.0M<Currency> else p.Dividends / investedYears
+                MarketRoiAnnual = if investedYears = 0.0M then 0.0M<Percentage> else marketRoi / investedYears 
+                DividendRoiAnnual = if investedYears = 0.0M then 0.0M<Percentage> else dividendRoi / investedYears
             }
 
         positions

@@ -143,8 +143,7 @@ let getProjectFileFromCommandLine argv =
 
     match argv with
     | [| path |] -> path 
-    //| _ -> Path.Combine(home, "..", "..", "docs", "Samples", "Portfolio.json")
-    | _ -> @"x:\OneLife\Investor\Portfolio.json"
+    | _ -> Path.Combine(home, "..", "..", "docs", "Samples", "Portfolio.json")
     |> Path.GetFullPath
 
 [<EntryPoint>]
