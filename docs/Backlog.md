@@ -6,6 +6,7 @@
 - we definitively need much more tests!
 
 
+- total return per year = (total return + 1)^(1/years)-1
 
 
 - move "formatValue" into controller/presenter

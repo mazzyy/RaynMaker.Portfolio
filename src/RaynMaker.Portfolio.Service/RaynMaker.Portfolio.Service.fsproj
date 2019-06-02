@@ -14,6 +14,7 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Controllers.fs" />
+    <Compile Include="TestAPI.fs" />
     <Compile Include="Storage.fs" />
     <Compile Include="Frameworks.Web.fs" />
     <Compile Include="Program.fs" />

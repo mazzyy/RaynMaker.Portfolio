@@ -227,3 +227,6 @@ module Positions =
         |> Map.toSeq
         |> Seq.map snd
         |> List.ofSeq
+
+    let buyingValue p =
+        if p.Count <> 0.0M then p.Invested - p.Payouts |> Some else None

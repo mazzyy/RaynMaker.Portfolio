@@ -14,6 +14,7 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Foundation.fs" />
+    <Compile Include="Buying stocks.fs" />
     <Compile Include="DomainModelTestApi.fs" />
     <Compile Include="EntitiesSpecs.fs" />
     <Compile Include="UseCases.RepositoriesSpecs.fs" />
@@ -38,6 +39,11 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\RaynMaker.Portfolio.Service\RaynMaker.Portfolio.Service.fsproj">
+      <Name>RaynMaker.Portfolio.Service</Name>
+      <Project>{343e3582-f5d1-4a99-922a-a8129b4e19fd}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\RaynMaker.Portfolio\RaynMaker.Portfolio.fsproj">
       <Name>RaynMaker.Portfolio</Name>
       <Project>{fb545ea0-6567-4392-9d68-b19eb27b84db}</Project>

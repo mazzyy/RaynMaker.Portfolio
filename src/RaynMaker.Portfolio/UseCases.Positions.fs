@@ -44,6 +44,7 @@ module PositionsInteractor =
     type OpenPositionEvaluation = {
         Position : Position
         PricedAt : DateTime
+        // TODO: why is there an option? if count is zero then the position is closed
         BuyingPrice : decimal<Currency> option
         BuyingValue : decimal<Currency> option
         CurrentPrice : decimal<Currency>
@@ -73,7 +74,7 @@ module PositionsInteractor =
                 Position = p
                 PricedAt = pricedAt
                 BuyingPrice = if p.Count <> 0.0M then (p.Invested - p.Payouts) / p.Count |> Some else None
-                BuyingValue = if p.Count <> 0.0M then p.Invested - p.Payouts |> Some else None
+                BuyingValue = p |> Positions.buyingValue
                 CurrentPrice = (p.Isin |> getLastPrice |> Option.get).Value
                 CurrentValue = (p.Isin |> getLastPrice |> Option.get).Value * p.Count
                 MarketProfit = value - p.Invested
