@@ -41,6 +41,11 @@ let deposit value date =
         Value = value }
     |> DepositAccounted 
 
+let disbursement value date =
+    {   DisbursementAccounted.Date = date
+        Value = value }
+    |> DisbursementAccounted 
+
 let priced company price date =
     {   StockPriced.Date = date 
         Name = company
@@ -66,4 +71,17 @@ let getMostRecentPrice company events =
     |> Events.LastPriceOf <| isin company
     |> Option.map(fun x -> x.Value)
 
-let getFee broker    = Broker.getFee broker
+let getFee broker = Broker.getFee broker
+
+let fixedFeeBroker fee = { Name = "FixedFee"; Fee = 0.0M<Percentage>; MinFee = fee; MaxFee = fee }
+
+let private ignoreBroker = fixedFeeBroker 0.0M<Currency>
+
+let getBuyingPrice company events = 
+    let getPrice = Events.LastPriceOf events
+    events
+    |> (getPosition company >> List.singleton >> PositionsInteractor.evaluateOpenPositions ignoreBroker getPrice)
+    |> Seq.head
+    |> fun x -> x.BuyingPrice
+    |> Option.get
+

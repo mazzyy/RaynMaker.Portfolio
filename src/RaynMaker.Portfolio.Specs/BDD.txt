@@ -1,11 +1,5 @@
 ﻿
-- Making a cash deposit
-- Making a disbursement
 
-- evaluate open positions
-  - buying price and value
-  - profit (market, dividend, total) (absolute,relative)
-  - annual profit (market, dividend, total) (absolute,relative)
 - evaluate closed positions
   - profit (market, dividend, total) (absolute,relative)
   - annual profit (market, dividend, total) (absolute,relative)

@@ -20,6 +20,8 @@
     <Compile Include="Receiving dividends.fs" />
     <Compile Include="Getting most recent price.fs" />
     <Compile Include="Calculating a broker fee.fs" />
+    <Compile Include="Adding and removing cash.fs" />
+    <Compile Include="Evaluate open positions.fs" />
     <Content Include="App.config" />
     <Content Include="packages.config" />
   </ItemGroup>
