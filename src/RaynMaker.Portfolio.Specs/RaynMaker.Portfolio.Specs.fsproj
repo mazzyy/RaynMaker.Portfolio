@@ -18,11 +18,8 @@
     <Compile Include="Buying stocks.fs" />
     <Compile Include="Selling stocks.fs" />
     <Compile Include="Receiving dividends.fs" />
-    <Compile Include="DomainModelTestApi.fs" />
-    <Compile Include="EntitiesSpecs.fs" />
-    <Compile Include="UseCases.RepositoriesSpecs.fs" />
-    <Compile Include="UseCases.PositionsSpecs.fs" />
-    <Compile Include="UseCases.BenchMarkSpecs.fs" />
+    <Compile Include="Getting most recent price.fs" />
+    <Compile Include="Calculating a broker fee.fs" />
     <Content Include="App.config" />
     <Content Include="packages.config" />
   </ItemGroup>

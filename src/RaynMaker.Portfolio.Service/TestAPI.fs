@@ -41,6 +41,13 @@ let deposit value date =
         Value = value }
     |> DepositAccounted 
 
+let priced company price date =
+    {   StockPriced.Date = date 
+        Name = company
+        Isin = company  |> isin
+        Price = price}
+    |> StockPriced
+
 let private getPosition company events = 
     events
     |> Positions.create 
@@ -53,3 +60,10 @@ let getOwningStockCount company = getPosition company >> fun x -> x.Count
 let getBalance = CashflowInteractor.getTransactions 1 >> Seq.head >> fun x -> x.Balance
 
 let getNettoDividend company = getPosition company >> fun x -> x.Dividends
+
+let getMostRecentPrice company events = 
+    events 
+    |> Events.LastPriceOf <| isin company
+    |> Option.map(fun x -> x.Value)
+
+let getFee broker    = Broker.getFee broker
