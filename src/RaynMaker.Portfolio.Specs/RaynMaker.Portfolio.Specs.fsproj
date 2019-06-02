@@ -17,6 +17,7 @@
     <Content Include="BDD.txt" />
     <Compile Include="Buying stocks.fs" />
     <Compile Include="Selling stocks.fs" />
+    <Compile Include="Receiving dividends.fs" />
     <Compile Include="DomainModelTestApi.fs" />
     <Compile Include="EntitiesSpecs.fs" />
     <Compile Include="UseCases.RepositoriesSpecs.fs" />

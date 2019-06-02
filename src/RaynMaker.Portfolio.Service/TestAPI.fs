@@ -28,6 +28,14 @@ let sell company count price fee date =
         Fee = fee } 
     |> StockSold
 
+let receiveDividend company value fee date =
+    {   DividendReceived.Date = date 
+        Name = company
+        Isin = company |> isin
+        Value = value
+        Fee = fee } 
+    |> DividendReceived
+
 let deposit value date =
     {   DepositAccounted.Date = date
         Value = value }
@@ -43,3 +51,5 @@ let getActiveInvestment company = getPosition company >> Positions.activeInvestm
 let getOwningStockCount company = getPosition company >> fun x -> x.Count
 
 let getBalance = CashflowInteractor.getTransactions 1 >> Seq.head >> fun x -> x.Balance
+
+let getNettoDividend company = getPosition company >> fun x -> x.Dividends

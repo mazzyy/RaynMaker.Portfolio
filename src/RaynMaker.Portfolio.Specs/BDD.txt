@@ -1,6 +1,4 @@
 ﻿
-- Receiving a dividend
-
 - Making a cash deposit
 - Making a disbursement
 
