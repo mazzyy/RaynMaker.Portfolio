@@ -38,7 +38,7 @@ let private getPosition company events =
     |> Positions.create 
     |> Seq.find(fun x -> x.Name = company)
 
-let getActiveInvestment company = getPosition company >> Positions.buyingValue
+let getActiveInvestment company = getPosition company >> Positions.activeInvestment
 
 let getOwningStockCount company = getPosition company >> fun x -> x.Count
 

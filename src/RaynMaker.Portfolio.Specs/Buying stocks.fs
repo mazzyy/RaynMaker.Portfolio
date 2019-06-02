@@ -4,19 +4,6 @@ open NUnit.Framework
 open FsUnit
 open RaynMaker.Portfolio.Entities
 
-(*
-- Closing a position
-- Selling stocks of a position without closing it
-
-- Receiving a dividend
-
-- Making a cash deposit
-- Making a disbursement
-
-- evaluate open positions
-- evaluate closed positions
-*)
-
 [<TestFixture>]
 module ``Feature: Buying stocks`` =
     open RaynMaker.Portfolio.TestAPI

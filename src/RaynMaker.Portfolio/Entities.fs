@@ -228,5 +228,8 @@ module Positions =
         |> Seq.map snd
         |> List.ofSeq
 
-    let buyingValue p =
-        if p.Count <> 0.0M then p.Invested - p.Payouts |> Some else None
+    let activeInvestment p =
+        if p.ClosedAt |> Option.isNone then
+            p.Invested - p.Payouts
+        else
+            0.0M<Currency>
