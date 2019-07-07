@@ -28,7 +28,7 @@ let sell company count price fee date =
         Fee = fee } 
     |> StockSold
 
-let receiveDividend company value fee date =
+let dividend company value fee date =
     {   DividendReceived.Date = date 
         Name = company
         Isin = company |> isin
@@ -58,6 +58,9 @@ let private getPosition company events =
     |> Positions.create 
     |> Seq.find(fun x -> x.Name = company)
 
+// TODO: is this too detailed?
+// i think we can return "entities" here - those are tha UL in DDD - we can use those in BDD
+
 let getActiveInvestment company = getPosition company >> Positions.activeInvestment
 
 let getOwningStockCount company = getPosition company >> fun x -> x.Count
@@ -77,11 +80,9 @@ let fixedFeeBroker fee = { Name = "FixedFee"; Fee = 0.0M<Percentage>; MinFee = f
 
 let private ignoreBroker = fixedFeeBroker 0.0M<Currency>
 
-let getBuyingPrice company events = 
+let evaluate company events = 
     let getPrice = Events.LastPriceOf events
     events
     |> (getPosition company >> List.singleton >> PositionsInteractor.evaluateOpenPositions ignoreBroker getPrice)
     |> Seq.head
-    |> fun x -> x.BuyingPrice
-    |> Option.get
 

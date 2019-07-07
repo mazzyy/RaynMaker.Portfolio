@@ -58,6 +58,10 @@ module PositionsInteractor =
         MarketRoiAnnual : decimal<Percentage>
         DividendRoiAnnual : decimal<Percentage> }
         
+    // TODO: core calcs like "ROI" or "DividendROI" should be part of entities - this logic is independent from the API
+    // and is partially part of the UL of DDD
+    // TODO: we should consider ignoring the broker here - it will anyhow be a guess. we do not consider it in BDD tests. 
+    // we just need to make clear in the app / help that it is not considered
     let evaluateOpenPositions broker getLastPrice positions =
         let evaluate (p:Position) =
             let value,pricedAt = 
