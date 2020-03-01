@@ -1,10 +1,24 @@
 
+- do not crash if error in excel events - show helpful error message
+
+- restructure backlog
+  - road map?
+  - issues?
+
+- remove "given-when-then" from scenario description
+- migrate TestAPI to Controller basis
+  - move "presenter" and "controller" independent from frameworks ot "raynmaker.portfolio" lib?
+  - go for explict ViewModel classes? or just work with JSON?
+
+=====================
+
 - buying price is not correctly calculated when some parts of the position got sold
 - errors from Agents cannot be shown as message box in Shell
   - anyhow we should maybe have a "log window" instead with error, warning and info logs
   - or even better: have it in the web page itself
 - we definitively need much more tests!
 
+- migrate "shell" to electron
 
 - total return per year = (total return + 1)^(1/years)-1
 

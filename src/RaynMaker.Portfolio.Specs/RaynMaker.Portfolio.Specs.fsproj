@@ -9,8 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Foundation.fs" />
-    <Content Include="BDD.txt" />
+    <Compile Include="TDK.fs" />
     <Compile Include="Buying stocks.fs" />
     <Compile Include="Selling stocks.fs" />
     <Compile Include="Receiving dividends.fs" />
@@ -18,6 +17,7 @@
     <Compile Include="Calculating a broker fee.fs" />
     <Compile Include="Adding and removing cash.fs" />
     <Compile Include="Evaluate open positions.fs" />
+    <Content Include="BDD.txt" />
   </ItemGroup>
 
   <ItemGroup>

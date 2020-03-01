@@ -1,3 +1,10 @@
+## 1.4 - 2020-03-
+
+- Error handling improved
+- Dependencies updated 
+- migrated to .Net Core
+
+
 ## 1.3 - 2018-06-02 
 
 - Positions table improved
