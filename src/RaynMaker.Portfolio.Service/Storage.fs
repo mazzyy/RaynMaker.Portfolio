@@ -2,7 +2,7 @@
 
 module EventsReader =
     open System
-    open FSharp.ExcelProvider
+    open FSharp.Interop.Excel
     open RaynMaker.Portfolio
     open RaynMaker.Portfolio.Entities
 

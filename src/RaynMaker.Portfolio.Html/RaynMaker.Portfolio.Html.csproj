@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <Target Name="BuildVue" AfterTargets="Build">
+    <Exec Condition="$(Configuration) == 'Debug'" Command="npm run build-dev" />
+    <Exec Condition="$(Configuration) == 'Release'" Command="npm run build-prod" />
+  </Target>
+  
+</Project>

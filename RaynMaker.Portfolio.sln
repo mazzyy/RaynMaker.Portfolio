@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2010
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29806.167
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{DB33407C-7574-4BFC-90F7-30E147C5469B}"
 	ProjectSection(SolutionItems) = preProject
@@ -10,15 +10,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "RaynMaker.Portfolio.Service", "src\RaynMaker.Portfolio.Service\RaynMaker.Portfolio.Service.fsproj", "{343E3582-F5D1-4A99-922A-A8129B4E19FD}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "RaynMaker.Portfolio.Service", "src\RaynMaker.Portfolio.Service\RaynMaker.Portfolio.Service.fsproj", "{343E3582-F5D1-4A99-922A-A8129B4E19FD}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "RaynMaker.Portfolio", "src\RaynMaker.Portfolio\RaynMaker.Portfolio.fsproj", "{FB545EA0-6567-4392-9D68-B19EB27B84DB}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "RaynMaker.Portfolio", "src\RaynMaker.Portfolio\RaynMaker.Portfolio.fsproj", "{FB545EA0-6567-4392-9D68-B19EB27B84DB}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "RaynMaker.Portfolio.Specs", "src\RaynMaker.Portfolio.Specs\RaynMaker.Portfolio.Specs.fsproj", "{94678AC4-8845-4453-B244-E13B62DAC0D4}"
 EndProject
-Project("{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}") = "RaynMaker.Portfolio.Html", "src\RaynMaker.Portfolio.Html\RaynMaker.Portfolio.Html.njsproj", "{5F392859-15C1-41CA-B6AA-E164F24D66B2}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RaynMaker.Portfolio.Shell", "src\RaynMaker.Portfolio.Shell\RaynMaker.Portfolio.Shell.csproj", "{74BABC5A-8261-4C2E-8374-346517C5E6DE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RaynMaker.Portfolio.Html", "src\RaynMaker.Portfolio.Html\RaynMaker.Portfolio.Html.csproj", "{C24E02BE-BCD7-4408-8D20-F0A91299557B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,14 +38,14 @@ Global
 		{94678AC4-8845-4453-B244-E13B62DAC0D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{94678AC4-8845-4453-B244-E13B62DAC0D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{94678AC4-8845-4453-B244-E13B62DAC0D4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5F392859-15C1-41CA-B6AA-E164F24D66B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5F392859-15C1-41CA-B6AA-E164F24D66B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5F392859-15C1-41CA-B6AA-E164F24D66B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5F392859-15C1-41CA-B6AA-E164F24D66B2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{74BABC5A-8261-4C2E-8374-346517C5E6DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{74BABC5A-8261-4C2E-8374-346517C5E6DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{74BABC5A-8261-4C2E-8374-346517C5E6DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{74BABC5A-8261-4C2E-8374-346517C5E6DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C24E02BE-BCD7-4408-8D20-F0A91299557B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C24E02BE-BCD7-4408-8D20-F0A91299557B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C24E02BE-BCD7-4408-8D20-F0A91299557B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C24E02BE-BCD7-4408-8D20-F0A91299557B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
