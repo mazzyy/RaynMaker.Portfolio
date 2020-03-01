@@ -1,14 +1,17 @@
 
 - do not crash if error in excel events - show helpful error message
 
+- remove "given-when-then" from scenario description
+- restructure features more towards end user features
+  - restructure TestAPI accordingly
+
+- migrate TestAPI to Controller basis
+  - move "presenter" and "controller" independent from frameworks ot "raynmaker.portfolio" lib
+  - keep "dictionary" like view model - whenever test fails it shows that protocol to FE is broken
+
 - restructure backlog
   - road map?
   - issues?
-
-- remove "given-when-then" from scenario description
-- migrate TestAPI to Controller basis
-  - move "presenter" and "controller" independent from frameworks ot "raynmaker.portfolio" lib?
-  - go for explict ViewModel classes? or just work with JSON?
 
 =====================
 
