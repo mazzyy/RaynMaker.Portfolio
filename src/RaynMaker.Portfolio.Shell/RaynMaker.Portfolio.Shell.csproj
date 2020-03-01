@@ -5,6 +5,10 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <NoWarn>1591,NU1701</NoWarn>
+    <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>

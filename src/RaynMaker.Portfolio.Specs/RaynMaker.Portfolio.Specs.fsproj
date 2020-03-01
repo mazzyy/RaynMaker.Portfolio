@@ -2,8 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-
     <IsPackable>false</IsPackable>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <NoWarn>1591,NU1701</NoWarn>
+    <WarningsNotAsErrors>NU1701</WarningsNotAsErrors>
   </PropertyGroup>
 
   <ItemGroup>

@@ -2,6 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <NoWarn>1591</NoWarn>
+    <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
 
   <Target Name="BuildVue" AfterTargets="Build">
