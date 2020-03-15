@@ -2,12 +2,21 @@
 - do not crash if error in excel events - show helpful error message
 
 - remove "given-when-then" from scenario description
+
 - restructure features more towards end user features
   - restructure TestAPI accordingly
 
 - migrate TestAPI to Controller basis
   - move "presenter" and "controller" independent from frameworks ot "raynmaker.portfolio" lib
-  - keep "dictionary" like view model - whenever test fails it shows that protocol to FE is broken
+  - create explict ViewModel types to have more safety - nothing forgotten
+
+- add chart of "yield every month in percentage based on actual capital begin of month and end of month"
+  - show the chart on "performance"
+  - calc average of these yields
+  - how to handle "disbursements"?
+
+- find a way to automatically get the prices we need
+  - add a service which collects in background and saves in store
 
 - restructure backlog
   - road map?
