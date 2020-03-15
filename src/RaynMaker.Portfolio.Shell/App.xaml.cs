@@ -1,12 +1,9 @@
 ﻿
+using Plainion;
 using System;
-using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
-using Microsoft.FSharp.Core;
-using Plainion;
 using static RaynMaker.Portfolio.Main;
 
 namespace RaynMaker.Portfolio.Shell

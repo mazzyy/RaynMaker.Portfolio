@@ -81,13 +81,16 @@ module Controllers =
             ])
         |> JSON
     
-    let getPerformanceIndicators (store:EventStore.Api) (depot:Depot.Api) broker lastPriceOf = 
+    let getPerformanceIndicators (store:EventStore.Api) (depot:Depot.Api) broker getCashLimit lastPriceOf = 
         depot.Get()
-        |> PerformanceInteractor.getPerformance (store.Get()) broker lastPriceOf
+        |> PerformanceInteractor.getPerformance (store.Get()) broker getCashLimit lastPriceOf
         |> fun p -> 
             dict [
                 "totalInvestment" => p.TotalInvestment
                 "totalProfit" => p.TotalProfit
+                "totalDividends" => p.TotalDividends
+                "cashLimit" => p.CashLimit
+                "investingTime" => p.InvestingTime.TotalDays / 365.0
             ]
         |> JSON
 

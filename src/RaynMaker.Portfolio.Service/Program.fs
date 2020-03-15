@@ -96,6 +96,8 @@ let start errorHandler projectFile =
     
     let depot = Depot.create (store.Get)
 
+    let getCashLimit() = (project.CashLimit |> decimal) * 1.0M<Currency>
+
     let lastPriceOf isin = 
         let events = store.Get()
         Events.LastPriceOf events isin
@@ -110,7 +112,7 @@ let start errorHandler projectFile =
                     pathScan "/Client/%s" (fun f -> Files.file (sprintf "%s/Client/%s" home f))
                     pathScan "/static/%s" (fun f -> Files.file (sprintf "%s/Client/static/%s" home f))
                     path "/api/positions" >=> warbler (fun _ -> Controllers.listOpenPositions depot broker lastPriceOf)
-                    path "/api/performance" >=> warbler (fun _ -> Controllers.getPerformanceIndicators store depot broker lastPriceOf)
+                    path "/api/performance" >=> warbler (fun _ -> Controllers.getPerformanceIndicators store depot broker getCashLimit lastPriceOf)
                     path "/api/benchmark" >=> warbler (fun _ -> Controllers.getBenchmarkPerformance store broker savingsPlan historicalPrices benchmark)
                     path "/api/diversification" >=> warbler (fun _ -> Controllers.getDiversification depot lastPriceOf)
                     path "/api/cashflow" >=> warbler (fun ctx -> Controllers.listCashflow ctx.request store)

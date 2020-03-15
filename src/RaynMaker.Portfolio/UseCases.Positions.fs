@@ -175,33 +175,6 @@ module PositionsInteractor =
         |> Seq.map evaluate
         |> List.ofSeq
 
-module PerformanceInteractor =
-    open PositionsInteractor
-    open RaynMaker.Portfolio.Entities
-
-    type PerformanceReport = {
-        TotalInvestment : decimal<Currency>
-        TotalProfit : decimal<Currency>
-        }
-
-    let getPerformance store broker getLastPrice positions =
-        let sumInvestment total evt =
-            match evt with
-            | DepositAccounted evt -> printfn "%A - %A = %A" evt.Date evt.Value total; total + evt.Value
-            | DisbursementAccounted evt -> printfn "%A - %A = %A" evt.Date evt.Value total; total - evt.Value
-            | _ -> total
-
-        let investment =
-            store
-            |> List.fold sumInvestment 0.0M<Currency>
-
-        let totalProfit = 
-            positions
-            |> PositionsInteractor.evaluateTotalProfit broker getLastPrice
-
-        { TotalInvestment = investment
-          TotalProfit = totalProfit }
-
 module StatisticsInteractor =
     open PositionsInteractor
     open RaynMaker.Portfolio.Entities

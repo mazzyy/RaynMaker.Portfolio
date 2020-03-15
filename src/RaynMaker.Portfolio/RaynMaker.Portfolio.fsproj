@@ -12,6 +12,7 @@
     <Compile Include="Entities.fs" />
     <Compile Include="UseCases.Repositories.fs" />
     <Compile Include="UseCases.Positions.fs" />
+    <Compile Include="UseCases.Performance.fs" />
     <Compile Include="UseCases.Benchmark.fs" />
     <Compile Include="UseCases.Cashflow.fs" />
   </ItemGroup>

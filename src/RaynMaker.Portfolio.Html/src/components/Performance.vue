@@ -2,10 +2,19 @@
   <div>
     <h1>Performance</h1>
     <p>
+      <label>Investment time: </label> {{ performance.investingTime | formatValue }}
+    </p>
+    <p>
+      <label>Cash limit: </label> {{ performance.cashLimit | formatValue }}
+    </p>
+    <p>
       <label>Total investment: </label> {{ performance.totalInvestment | formatValue }}
     </p>
     <p>
       <label>Total profit: </label> {{ performance.totalProfit | formatValue }}
+    </p>
+    <p>
+      <label>Total dividends: </label> {{ performance.totalDividends | formatValue }}
     </p>
 
     <h1>Benchmark</h1>
