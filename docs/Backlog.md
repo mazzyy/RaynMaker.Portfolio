@@ -1,14 +1,14 @@
 
-- do not crash if error in excel events - show helpful error message
+- fix red tests
 
 - remove "given-when-then" from scenario description
-
-- restructure features more towards end user features
-  - restructure TestAPI accordingly
 
 - migrate TestAPI to Controller basis
   - move "presenter" and "controller" independent from frameworks ot "raynmaker.portfolio" lib
   - create explict ViewModel types to have more safety - nothing forgotten
+
+- restructure features more towards end user features
+  - restructure TestAPI accordingly
 
 - add chart of "yield every month in percentage based on actual capital begin of month and end of month"
   - show the chart on "performance"

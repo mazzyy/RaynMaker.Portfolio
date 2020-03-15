@@ -16,7 +16,7 @@ module EventStore =
         Stop: unit -> unit
     }
 
-    let create init =
+    let create handleLastChanceException init =
         let agent = Agent<Msg>.Start(fun inbox ->
             let rec loop store =
                 async {
@@ -32,7 +32,7 @@ module EventStore =
                 }
             loop [] ) 
 
-        agent.Error.Add(handleLastChanceException)
+        agent.Error.Add(fun ex -> handleLastChanceException "Loading events failed" ex)
         
         agent.Post(init |> Init)
 

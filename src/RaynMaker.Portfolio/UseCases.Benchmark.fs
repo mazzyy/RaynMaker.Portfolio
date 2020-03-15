@@ -13,7 +13,7 @@ module HistoricalPrices =
         Stop: unit -> unit
     }
 
-    let create read =
+    let create handleLastChanceException read =
         let agent = Agent<Msg>.Start(fun inbox ->
             let rec loop store =
                 async {
@@ -34,7 +34,7 @@ module HistoricalPrices =
                 }
             loop Map.empty ) 
 
-        agent.Error.Add(handleLastChanceException)
+        agent.Error.Add(fun ex -> handleLastChanceException "Loading historical prices failed" ex)
         
         { Get = fun isin -> agent.PostAndReply( fun replyChannel -> (isin,replyChannel) |> Get)
           Stop = fun () -> agent.Post Stop }

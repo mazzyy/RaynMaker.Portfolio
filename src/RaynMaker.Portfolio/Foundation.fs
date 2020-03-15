@@ -3,7 +3,6 @@ module RaynMaker.Portfolio.Foundation
 
 open System
 open System.Collections.Generic
-open Plainion
 
 let (|?) = defaultArg
 
@@ -71,10 +70,3 @@ type Agent<'T> private(f:Agent<'T> -> Async<unit>) as self =
         mbox.Start()
         mbox
 
-let dumpException (ex:Exception) = 
-    ex |> ExceptionExtensions.Dump
-
-let handleLastChanceException (ex:Exception) = 
-    Console.Error.WriteLine( "FATAL ERROR: " + ExceptionExtensions.Dump(ex) )
-
-    Environment.Exit(1)

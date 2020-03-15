@@ -16,6 +16,7 @@ open RaynMaker.Portfolio.Entities
 open System.Diagnostics
 open Suave.RequestErrors
 open RaynMaker.Portfolio.UseCases
+open Plainion
 
 type Project = JsonProvider<"../../docs/Samples/Portfolio.json">
 
@@ -63,14 +64,14 @@ let start errorHandler projectFile =
 
     let fromStore path = Path.Combine(storeHome,path)
 
-    let store = EventStore.create (fun () -> 
+    let store = EventStore.create errorHandler (fun () -> 
         printfn "Loading events ..."
 
         let events, errors = "Events.xlsx" |> fromStore |> EventsReader.readExcel
         errors |> Seq.iter (printf "  %s")
         events)
 
-    let historicalPrices = HistoricalPrices.create (fun isin ->
+    let historicalPrices = HistoricalPrices.create errorHandler (fun isin ->
         printfn "Loading historical prices for %s" (Str.ofIsin isin)
 
         isin
@@ -94,7 +95,7 @@ let start errorHandler projectFile =
                    MinFee = project.Broker.MinFee * 1.0M<Currency>
                    MaxFee = project.Broker.MaxFee * 1.0M<Currency> }
     
-    let depot = Depot.create (store.Get)
+    let depot = Depot.create errorHandler (store.Get)
 
     let getCashLimit() = (project.CashLimit |> decimal) * 1.0M<Currency>
 
@@ -148,12 +149,17 @@ let getProjectFileFromCommandLine argv =
     | _ -> Path.Combine(home, "..", "..", "docs", "Samples", "Portfolio.json")
     |> Path.GetFullPath
 
+let handleLastChanceException msg (ex:Exception) = 
+    Console.Error.WriteLine( sprintf "FATAL ERROR: %s%s%s" msg Environment.NewLine (ExceptionExtensions.Dump(ex)) )
+
+    Environment.Exit(1)
+
 [<EntryPoint>]
 let main argv =
     let instance = 
         argv
         |> getProjectFileFromCommandLine
-        |> start (fun _ _ -> ())
+        |> start handleLastChanceException
 
     Browser.start instance.port
 

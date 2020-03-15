@@ -17,8 +17,4 @@
     <Compile Include="UseCases.Cashflow.fs" />
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Plainion.Core" Version="3.5.0" />
-  </ItemGroup>
-
 </Project>
