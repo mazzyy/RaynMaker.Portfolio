@@ -4,7 +4,7 @@ using System;
 using System.Linq;
 using System.Windows;
 using System.Windows.Threading;
-using static RaynMaker.Portfolio.Main;
+using static RaynMaker.Portfolio.Service.Main;
 
 namespace RaynMaker.Portfolio.Shell
 {
@@ -18,8 +18,8 @@ namespace RaynMaker.Portfolio.Shell
         {
             DispatcherUnhandledException += OnUnhandledException;
 
-            var projectFile = RaynMaker.Portfolio.Main.getProjectFileFromCommandLine(Environment.GetCommandLineArgs().Skip(1).ToArray());
-            myInstance = RaynMaker.Portfolio.Main.startCSharp((msg,ex) => MessageBox.Show(msg + Environment.NewLine + ex.Dump(), "Unhandled exception", MessageBoxButton.OK, MessageBoxImage.Error), projectFile);
+            var projectFile = getProjectFileFromCommandLine(Environment.GetCommandLineArgs().Skip(1).ToArray());
+            myInstance = startCSharp((msg,ex) => MessageBox.Show(msg + Environment.NewLine + ex.Dump(), "Unhandled exception", MessageBoxButton.OK, MessageBoxImage.Error), projectFile);
             Port = myInstance.port;
 
             base.OnStartup(e);
@@ -34,7 +34,7 @@ namespace RaynMaker.Portfolio.Shell
 
         protected override void OnExit(ExitEventArgs e)
         {
-            RaynMaker.Portfolio.Main.stop(myInstance);
+            stop(myInstance);
             base.OnExit(e);
         }
     }

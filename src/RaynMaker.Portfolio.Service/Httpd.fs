@@ -1,4 +1,4 @@
-﻿module RaynMaker.Portfolio.Frameworks
+﻿namespace RaynMaker.Portfolio.Service
 
 module Httpd =
     open Suave
@@ -27,10 +27,4 @@ module Httpd =
         Async.Start(server, cts.Token)
 
         port |> int32, cts
-
- module Browser =
-    open System.Diagnostics
-
-    let start port = 
-        Process.Start(sprintf "http://localhost:%i/" port) |> ignore
 

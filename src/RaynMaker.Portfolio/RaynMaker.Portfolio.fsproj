@@ -15,6 +15,7 @@
     <Compile Include="UseCases.Performance.fs" />
     <Compile Include="UseCases.Benchmark.fs" />
     <Compile Include="UseCases.Cashflow.fs" />
+    <Compile Include="Controllers.fs" />
     <Compile Include="TestAPI.fs" />
   </ItemGroup>
 

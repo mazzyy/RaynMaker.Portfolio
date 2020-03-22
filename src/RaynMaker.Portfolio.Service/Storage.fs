@@ -1,4 +1,4 @@
-﻿namespace RaynMaker.Portfolio.Gateways
+﻿namespace RaynMaker.Portfolio.Service
 
 module EventsReader =
     open System

@@ -1,4 +1,4 @@
-﻿module RaynMaker.Portfolio.Main
+﻿module RaynMaker.Portfolio.Service.Main
 
 open System.Threading
 open System
@@ -9,8 +9,6 @@ open Suave
 open Suave.Operators
 open Suave.Filters
 open Suave.Redirection
-open RaynMaker.Portfolio.Frameworks
-open RaynMaker.Portfolio.Gateways
 open RaynMaker.Portfolio.UseCases.BenchmarkInteractor
 open RaynMaker.Portfolio.Entities
 open System.Diagnostics
@@ -112,12 +110,12 @@ let start errorHandler projectFile =
                     path "/" >=> redirect "/Client/index.html"
                     pathScan "/Client/%s" (fun f -> Files.file (sprintf "%s/Client/%s" home f))
                     pathScan "/static/%s" (fun f -> Files.file (sprintf "%s/Client/static/%s" home f))
-                    path "/api/positions" >=> warbler (fun _ -> Controllers.listOpenPositions depot broker lastPriceOf)
-                    path "/api/performance" >=> warbler (fun _ -> Controllers.getPerformanceIndicators store depot broker getCashLimit lastPriceOf)
-                    path "/api/benchmark" >=> warbler (fun _ -> Controllers.getBenchmarkPerformance store broker savingsPlan historicalPrices benchmark)
-                    path "/api/diversification" >=> warbler (fun _ -> Controllers.getDiversification depot lastPriceOf)
-                    path "/api/cashflow" >=> warbler (fun ctx -> Controllers.listCashflow ctx.request store)
-                    path "/api/closedPositions" >=> warbler (fun _ -> Controllers.listClosedPositions depot broker lastPriceOf)
+                    path "/api/positions" >=> warbler (fun _ -> Startup.listOpenPositions depot broker lastPriceOf)
+                    path "/api/performance" >=> warbler (fun _ -> Startup.getPerformanceIndicators store depot broker getCashLimit lastPriceOf)
+                    path "/api/benchmark" >=> warbler (fun _ -> Startup.getBenchmarkPerformance store broker savingsPlan historicalPrices benchmark)
+                    path "/api/diversification" >=> warbler (fun _ -> Startup.getDiversification depot lastPriceOf)
+                    path "/api/cashflow" >=> warbler (fun ctx -> Startup.listCashflow ctx.request store)
+                    path "/api/closedPositions" >=> warbler (fun _ -> Startup.listClosedPositions depot broker lastPriceOf)
                     NOT_FOUND "Resource not found."
                 ]
         ]
@@ -161,7 +159,7 @@ let main argv =
         |> getProjectFileFromCommandLine
         |> start handleLastChanceException
 
-    Browser.start instance.port
+    Process.Start(sprintf "http://localhost:%i/" instance.port) |> ignore
 
     Console.ReadKey true |> ignore
     
