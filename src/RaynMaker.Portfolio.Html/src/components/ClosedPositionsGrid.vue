@@ -54,22 +54,22 @@
         <td>{{ entry.duration }}</td>
         <td :class="entry.totalProfit > 0 ? 'win' : 'loss'">
           <b>
-            {{ entry.totalProfit | formatValue }} <br />
-            {{ entry.totalRoi | formatValue }}
+            {{ entry.totalProfit }} <br />
+            {{ entry.totalRoi }}
           </b>
         </td>
         <td>
-          {{ entry.marketProfitAnnual | formatValue }} <br />
-          {{ entry.marketRoiAnnual | formatValue }}
+          {{ entry.marketProfitAnnual }} <br />
+          {{ entry.marketRoiAnnual }}
         </td>
         <td>
-          {{ entry.dividendProfitAnnual | formatValue }} <br />
-          {{ entry.dividendRoiAnnual | formatValue }}
+          {{ entry.dividendProfitAnnual }} <br />
+          {{ entry.dividendRoiAnnual }}
         </td>
         <td :class="entry.totalProfitAnnual > 0 ? 'win' : 'loss'">
           <b>
-            {{ entry.totalProfitAnnual | formatValue }} <br />
-            {{ entry.totalRoiAnnual | formatValue }}
+            {{ entry.totalProfitAnnual }} <br />
+            {{ entry.totalRoiAnnual }}
           </b>
         </td>
       </tr>
@@ -78,8 +78,6 @@
 </template>
 
 <script>
-  import * as my from '../assets/js/site.js'
-
   export default {
     name: 'closed-positions-grid',
     props: {
@@ -128,9 +126,6 @@
         }
         return data
       }
-    },
-    filters: {
-      formatValue: my.formatValue
     },
     methods: {
       sortBy: function (key) {

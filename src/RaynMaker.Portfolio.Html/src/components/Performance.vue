@@ -2,19 +2,19 @@
   <div>
     <h1>Performance</h1>
     <p>
-      <label>Investment time: </label> {{ performance.investingTime | formatValue }}
+      <label>Investment time: </label> {{ performance.investingTime }}
     </p>
     <p>
-      <label>Cash limit: </label> {{ performance.cashLimit | formatValue }}
+      <label>Cash limit: </label> {{ performance.cashLimit }}
     </p>
     <p>
-      <label>Total investment: </label> {{ performance.totalInvestment | formatValue }}
+      <label>Total investment: </label> {{ performance.totalInvestment }}
     </p>
     <p>
-      <label>Total profit: </label> {{ performance.totalProfit | formatValue }}
+      <label>Total profit: </label> {{ performance.totalProfit }}
     </p>
     <p>
-      <label>Total dividends: </label> {{ performance.totalDividends | formatValue }}
+      <label>Total dividends: </label> {{ performance.totalDividends }}
     </p>
 
     <h1>Benchmark</h1>
@@ -22,26 +22,26 @@
       If you would have bought the benchmark "{{ benchmark.name }}" (Isin: {{ benchmark.isin }}) instead of your stock picks you would have gained:
     </p>
     <p>
-      <label>Total profit: </label> {{ benchmark.buyInstead.totalProfit | formatValue }}
+      <label>Total profit: </label> {{ benchmark.buyInstead.totalProfit }}
     </p>
     <p>
-      <label>Total ROI: </label> {{ benchmark.buyInstead.totalRoi | formatValue }}
+      <label>Total ROI: </label> {{ benchmark.buyInstead.totalRoi }}
     </p>
     <p>
-      <label>Annual ROI: </label> {{ benchmark.buyInstead.totalRoiAnnual | formatValue }}
+      <label>Annual ROI: </label> {{ benchmark.buyInstead.totalRoiAnnual }}
     </p>
 
     <p>
       If you would have bought the benchmark "{{ benchmark.name }}" (Isin: {{ benchmark.isin }}) every month with a rate of {{ benchmark.buyPlan.rate }} you would have gained:
     </p>
     <p>
-      <label>Total profit: </label> {{ benchmark.buyPlan.totalProfit | formatValue }}
+      <label>Total profit: </label> {{ benchmark.buyPlan.totalProfit }}
     </p>
     <p>
-      <label>Total ROI: </label> {{ benchmark.buyPlan.totalRoi | formatValue }}
+      <label>Total ROI: </label> {{ benchmark.buyPlan.totalRoi }}
     </p>
     <p>
-      <label>Annual ROI: </label> {{ benchmark.buyPlan.totalRoiAnnual | formatValue }}
+      <label>Annual ROI: </label> {{ benchmark.buyPlan.totalRoiAnnual }}
     </p>
   </div>
 </template>
@@ -64,9 +64,6 @@
       this.get(this, '/api/benchmark', {}, function (that, response) {
         that.benchmark = response
       })
-    },
-    filters: {
-      formatValue: my.formatValue
     },
     mixins: [my.webApi]
   }

@@ -24,10 +24,10 @@
             {{ t.comment }}
           </td>
           <td class="value">
-            {{ t.value | formatValue }}
+            {{ t.value }}
           </td>
           <td class="value">
-            {{ t.balance | formatValue }}
+            {{ t.balance }}
           </td>
         </tr>
       </tbody>
@@ -60,9 +60,6 @@
       limit: function (value) {
         this.onLimitChanged()
       }
-    },
-    filters: {
-      formatValue: my.formatValue
     },
     mixins: [my.webApi]
   }

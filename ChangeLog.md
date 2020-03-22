@@ -2,8 +2,7 @@
 
 - Error handling improved
 - Dependencies updated 
-- migrated to .Net Core
-
+- migrated to .Net Core 3.x
 
 ## 1.3 - 2018-06-02 
 
