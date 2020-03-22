@@ -9,13 +9,11 @@ open Plainion
 
 type internal Services = {
     suaveCts : CancellationTokenSource
-    shutdown : unit -> unit
-}
+    shutdown : unit -> unit }
 
 type Instance = {
     port : int
-    services : obj 
-}
+    services : obj }
 
 let start errorHandler projectFile =
     let location = Assembly.GetExecutingAssembly().Location
@@ -28,6 +26,8 @@ let start errorHandler projectFile =
 
     let app, shutdown = Startup.build errorHandler projectFile
 
+    printfn "Starting ..."
+    
     let port,cts = Httpd.start errorHandler app
 
     { port = port

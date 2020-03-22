@@ -1,7 +1,6 @@
 ﻿module RaynMaker.Portfolio.Service.Startup
 
 open System.IO
-open System.Reflection
 open FSharp.Data
 open Suave
 open Suave.Filters
@@ -26,43 +25,14 @@ module private Impl =
         JsonConvert.SerializeObject(v, jsonSerializerSettings)
         |> OK
         >=> Writers.setMimeType "application/json; charset=utf-8"
-        
-    let listOpenPositions (depot:Depot.Api) broker lastPriceOf = 
-        Controllers.listOpenPositions depot broker lastPriceOf
-        |> JSON
-        
-    let listClosedPositions (depot:Depot.Api) broker lastPriceOf = 
-        Controllers.listClosedPositions depot
-        |> JSON
-    
-    let getPerformanceIndicators (store:EventStore.Api) (depot:Depot.Api) broker getCashLimit lastPriceOf = 
-        Controllers.getPerformanceIndicators store depot broker getCashLimit lastPriceOf
-        |> JSON
-
-    let getBenchmarkPerformance (store:EventStore.Api) broker savingsPlan (historicalPrices:HistoricalPrices.Api) (benchmark:Benchmark) = 
-        Controllers.getBenchmarkPerformance store broker savingsPlan historicalPrices benchmark
-        |> JSON
-
-    let getDiversification (depot:Depot.Api) lastPriceOf = 
-        Controllers.getDiversification depot lastPriceOf
-        |> JSON
-            
-    let listCashflow (request:HttpRequest) (store:EventStore.Api) = 
-        match request.queryParam "limit" with
-        | Choice1Of2 x -> x |> System.Int32.Parse
-        | Choice2Of2 _ -> 25
-        |> Controllers.listCashflow store
-        |> JSON
-            
+                    
 type Project = JsonProvider<"../../docs/Samples/Portfolio.json">
 
 let build errorHandler projectFile =
     let home = getHome()
     printfn "Home: %s" home
     
-    printfn "Loading project ..."
-
-    printfn "Project: %s" projectFile
+    printfn "Loading project '%s' ..." projectFile
 
     let project = Project.Load(projectFile)
 
@@ -94,8 +64,6 @@ let build errorHandler projectFile =
         |> fromStore 
         |> HistoricalPricesReader.readCsv)
     
-    printfn "Starting ..."
-
     let benchmark = { 
         Isin = project.Benchmark.Isin |> Isin
         Name = project.Benchmark.Name }
@@ -113,12 +81,23 @@ let build errorHandler projectFile =
 
     let getCashLimit() = (project.CashLimit |> decimal) * 1.0M<Currency>
 
-    let lastPriceOf isin = 
-        let events = store.Get()
-        Events.LastPriceOf events isin
+    let lastPriceOf = Events.LastPriceOf (store.Get())
     
     let log = request (fun r -> printfn "%s" r.path; succeed)
 
+    let listOpenPositions _ = Controllers.listOpenPositions depot broker lastPriceOf 
+    let listClosedPositions _ = Controllers.listClosedPositions depot 
+    let getPerformanceIndicators _ = Controllers.getPerformanceIndicators store depot broker getCashLimit lastPriceOf 
+    let getBenchmarkPerformance _ = Controllers.getBenchmarkPerformance store broker savingsPlan historicalPrices benchmark 
+    let getDiversification _ = Controllers.getDiversification depot lastPriceOf 
+    let listCashflow ctx = 
+        match ctx.request.queryParam "limit" with
+        | Choice1Of2 x -> x |> System.Int32.Parse
+        | Choice2Of2 _ -> 25
+        |> Controllers.listCashflow store
+    
+    let jsonApi f = warbler (f >> JSON)
+    
     let app = 
         choose [ 
             GET >=> log >=> choose
@@ -126,12 +105,12 @@ let build errorHandler projectFile =
                     path "/" >=> redirect "/Client/index.html"
                     pathScan "/Client/%s" (fun f -> Files.file (sprintf "%s/Client/%s" home f))
                     pathScan "/static/%s" (fun f -> Files.file (sprintf "%s/Client/static/%s" home f))
-                    path "/api/positions" >=> warbler (fun _ -> listOpenPositions depot broker lastPriceOf)
-                    path "/api/performance" >=> warbler (fun _ -> getPerformanceIndicators store depot broker getCashLimit lastPriceOf)
-                    path "/api/benchmark" >=> warbler (fun _ -> getBenchmarkPerformance store broker savingsPlan historicalPrices benchmark)
-                    path "/api/diversification" >=> warbler (fun _ -> getDiversification depot lastPriceOf)
-                    path "/api/cashflow" >=> warbler (fun ctx -> listCashflow ctx.request store)
-                    path "/api/closedPositions" >=> warbler (fun _ -> listClosedPositions depot broker lastPriceOf)
+                    path "/api/positions" >=> jsonApi listOpenPositions
+                    path "/api/performance" >=> jsonApi getPerformanceIndicators
+                    path "/api/benchmark" >=> jsonApi getBenchmarkPerformance
+                    path "/api/diversification" >=> jsonApi getDiversification
+                    path "/api/cashflow" >=> jsonApi listCashflow
+                    path "/api/closedPositions" >=> jsonApi listClosedPositions
                     NOT_FOUND "Resource not found."
                 ]
         ]
