@@ -1,25 +1,28 @@
 
-- fix red tests
 
-- remove "given-when-then" from scenario description
+- create explict VM types
 
-- migrate TestAPI to Controller basis
-  - move "presenter" and "controller" independent from frameworks ot "raynmaker.portfolio" lib
-  - create explict ViewModel types to have more safety - nothing forgotten
+- move controller/presenter logic without framework dependencies to "portfolio lib"
+
+- improve Test API and test to be based on Controller/Presenter
 
 - restructure features more towards end user features
-  - restructure TestAPI accordingly
+  - remove "given-when-then" from scenario description
+
+- fix red tests
+
+- add missing tests
+
+- find a way to automatically get the prices we need
+  - add a service which collects in background and saves in store
+  - e.g.: http://www.google.com/finance/historical?q=MSFT&output=csv
 
 - add chart of "yield every month in percentage based on actual capital begin of month and end of month"
   - show the chart on "performance"
   - calc average of these yields
   - how to handle "disbursements"?
 
-- find a way to automatically get the prices we need
-  - add a service which collects in background and saves in store
-
 - buying price is not correctly calculated when some parts of the position got sold
-- we definitively need much more tests!
 
 =====================
 
@@ -50,9 +53,6 @@
 - keep the position details
   - at least by and sell activities
   - would also be easier to "get a last price"
-
-- automatically download prices from
-  - http://www.google.com/finance/historical?q=MSFT&output=csv
 
 # References 
 
