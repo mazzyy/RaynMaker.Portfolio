@@ -11,8 +11,7 @@
 
   <ItemGroup>
     <Compile Include="TDK.fs" />
-    <Compile Include="Buying stocks.fs" />
-    <Compile Include="Selling stocks.fs" />
+    <Compile Include="Buying and selling stocks.fs" />
     <Compile Include="Receiving dividends.fs" />
     <Compile Include="Getting most recent price.fs" />
     <Compile Include="Calculating a broker fee.fs" />

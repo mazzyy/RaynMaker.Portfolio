@@ -2,11 +2,11 @@
 
 open NUnit.Framework
 open FsUnit
+open RaynMaker.Portfolio
 open RaynMaker.Portfolio.Entities
 
 [<TestFixture>]
 module ``Feature: Getting most recent price`` =
-    open RaynMaker.Portfolio.TestAPI
 
     [<Test>]
     let ``<Given> no transactions <When> searching for most recent price <Then> no price found``() =
