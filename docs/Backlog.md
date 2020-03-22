@@ -4,7 +4,9 @@
 
 - move controller/presenter logic without framework dependencies to "portfolio lib"
 
-- improve Test API and test to be based on Controller/Presenter
+- improve TestAPI and test to be based on Controller/Presenter
+  - TestAPI only bridges between test and SUT
+  - TDK provides convenience functions
 
 - restructure features more towards end user features
   - remove "given-when-then" from scenario description
