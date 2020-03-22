@@ -13,7 +13,7 @@ module private Format =
         | x when x > 90.0 -> sprintf "%.2f months" (span.TotalDays / 30.0)
         | x -> sprintf "%.0f days" span.TotalDays
     let count = sprintf "%.2f"
-    let price = sprintf "%.2f"
+    let currency = sprintf "%.2f"
 
 let (=>) k v = k,v |> box
 
@@ -26,11 +26,11 @@ let listOpenPositions (depot:Depot.Api) broker lastPriceOf =
             "isin" => (p.Position.Isin |> Str.ofIsin)
             "shares" => (p.Position.Count |> Format.count)
             "duration" => (p.PricedAt - p.Position.OpenedAt |> Format.timespan)
-            "buyingPrice" => (p.BuyingPrice |> Option.map Format.price |> Option.defaultValue "n.a.")
-            "buyingValue" => (p.BuyingValue |> Option.map Format.price |> Option.defaultValue "n.a.")
+            "buyingPrice" => (p.BuyingPrice |> Option.map Format.currency |> Option.defaultValue "n.a.")
+            "buyingValue" => (p.BuyingValue |> Option.map Format.currency |> Option.defaultValue "n.a.")
             "pricedAt" => (p.PricedAt |> Format.date)
-            "currentPrice" => (p.CurrentPrice |> Format.price)
-            "currentValue" => (p.CurrentValue |> Format.price)
+            "currentPrice" => (p.CurrentPrice |> Format.currency)
+            "currentValue" => (p.CurrentValue |> Format.currency)
             "marketProfit" => (p.MarketProfit)
             "dividendProfit" => (p.DividendProfit)
             "totalProfit" => (p.MarketProfit + p.DividendProfit)
@@ -63,17 +63,25 @@ let listClosedPositions (depot:Depot.Api) =
             "totalRoiAnnual" => (p.MarketRoiAnnual + p.DividendRoiAnnual)
         ])
 
+type PerformanceVM = {
+    TotalInvestment : string
+    TotalProfit : string
+    TotalDividends : string
+    CashLimit : string
+    InvestingTime : string
+}
+
 let getPerformanceIndicators (store:EventStore.Api) (depot:Depot.Api) broker getCashLimit lastPriceOf = 
     depot.Get()
     |> PerformanceInteractor.getPerformance (store.Get()) broker getCashLimit lastPriceOf
     |> fun p -> 
-        dict [
-            "totalInvestment" => p.TotalInvestment
-            "totalProfit" => p.TotalProfit
-            "totalDividends" => p.TotalDividends
-            "cashLimit" => p.CashLimit
-            "investingTime" => p.InvestingTime.TotalDays / 365.0
-        ]
+        {
+            TotalInvestment = p.TotalInvestment |> Format.currency
+            TotalProfit = p.TotalProfit |> Format.currency
+            TotalDividends = p.TotalDividends |> Format.currency
+            CashLimit = p.CashLimit |> Format.currency
+            InvestingTime = p.InvestingTime |> Format.timespan
+        }
 
 let getBenchmarkPerformance (store:EventStore.Api) broker savingsPlan (historicalPrices:HistoricalPrices.Api) (benchmark:Benchmark) = 
     benchmark
