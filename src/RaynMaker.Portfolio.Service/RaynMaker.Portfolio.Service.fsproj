@@ -9,8 +9,9 @@
 
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="Startup.fs" />
+    <Compile Include="Core.fs" />
     <Compile Include="Storage.fs" />
+    <Compile Include="Startup.fs" />
     <Compile Include="Httpd.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
