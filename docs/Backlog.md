@@ -18,38 +18,21 @@
 - find a way to automatically get the prices we need
   - add a service which collects in background and saves in store
 
-- restructure backlog
-  - road map?
-  - issues?
+- buying price is not correctly calculated when some parts of the position got sold
+- we definitively need much more tests!
 
 =====================
 
-- buying price is not correctly calculated when some parts of the position got sold
-- errors from Agents cannot be shown as message box in Shell
-  - anyhow we should maybe have a "log window" instead with error, warning and info logs
-  - or even better: have it in the web page itself
-- we definitively need much more tests!
+- restructure backlog
+  - road map?
+  - issues?
 
 - migrate "shell" to electron
 
 - total return per year = (total return + 1)^(1/years)-1
 
-
 - move "formatValue" into controller/presenter
   - but then sorting is difficult ...
-
-document in BDD style
-- vision statement
-- business goals
-- stakeholders
-- features
-- examples/scenarios
-
-- create a website and clearly document how to use it
-
-- separate user and project doc
-
-=====================
 
 - for router link highlighting see vue cookbook page 292
 
@@ -59,46 +42,17 @@ document in BDD style
     // -> what about just inventing an event because it could then be calculated when walking the positions
   - how do we hande cash in general in the system?
 
-
 - over all performance
   - current implementation is too naive (we cannot just substract disbursement - we could have invested it in between ...)
   - TWR
   - MWR
 
-- add tests for performance calculation
-
-=====================
-
-- njsproj: npm install not running automatically with plainion.ci ...
-
-- do we want to introduce an entity called stock? 
-  (or stock id?)
-
-- should we remove StockPriced event and translate it into a "get info from service" activity?
-  - like with historical prices
-  - maybe we first need to read more about event sourcing?
-
 - keep the position details
   - at least by and sell activities
   - would also be easier to "get a last price"
 
-- money accounting
-  - show cash transactions and current cash as sanity check
-    (similar to account report)
-  - add overview on disposals per year
-
-- refactor core positions logic
-  - move to dedicated interactor and make buy and sell methods public so that we can test individually
-
-- annual roi actually is no simple math average ...
-
-- show negative numbers in red
-
-- refactor to EventSourcing and CQRS with agents
-
 - automatically download prices from
   - http://www.google.com/finance/historical?q=MSFT&output=csv
-
 
 # References 
 
