@@ -96,6 +96,7 @@ let build errorHandler projectFile =
         | Choice2Of2 _ -> 25
         |> Controllers.listCashflow store
     
+    let fileApi root path = Files.file (sprintf "%s/%s/%s" home root path)
     let jsonApi f = warbler (f >> JSON)
     
     let app = 
@@ -103,8 +104,8 @@ let build errorHandler projectFile =
             GET >=> log >=> choose
                 [
                     path "/" >=> redirect "/Client/index.html"
-                    pathScan "/Client/%s" (fun f -> Files.file (sprintf "%s/Client/%s" home f))
-                    pathScan "/static/%s" (fun f -> Files.file (sprintf "%s/Client/static/%s" home f))
+                    pathScan "/Client/%s" (fileApi "Client")
+                    pathScan "/static/%s" (fileApi "Client/static")
                     path "/api/positions" >=> jsonApi listOpenPositions
                     path "/api/performance" >=> jsonApi getPerformanceIndicators
                     path "/api/benchmark" >=> jsonApi getBenchmarkPerformance

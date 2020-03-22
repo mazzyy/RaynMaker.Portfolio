@@ -4,7 +4,7 @@
 
     <form id="filter">
       <label>Filter: </label>
-      <input name="query" v-model="filter">
+      <input name="query" v-model="filter"/>
     </form>
 
     <positions-grid :data="positions" :filter-key="filter" style="margin-top:10px"></positions-grid>
@@ -13,7 +13,7 @@
     <p>
       Based on share count and last price
     </p>
-    <pie-chart :width="500" :height="500" :data="diversification.data" :labels="diversification.labels"></pie-chart>
+    <pie-chart :width="500" :height="500" :data="diversification.capital" :labels="diversification.labels"></pie-chart>
   </div>
 </template>
 
@@ -29,7 +29,7 @@
         positions: [],
         filter: '',
         diversification: {
-          data: null,
+          capital: null,
           labels: null
         }
       }
@@ -43,7 +43,7 @@
         that.positions = response
       })
       this.get(this, '/api/diversification', {}, function (that, response) {
-        that.diversification.data = response.data
+        that.diversification.capital = response.capital
         that.diversification.labels = response.labels
       })
     },

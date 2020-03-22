@@ -11,59 +11,97 @@ module private Format =
         match span.TotalDays with
         | x when x > 365.0 -> sprintf "%.2f years" (span.TotalDays / 365.0)
         | x when x > 90.0 -> sprintf "%.2f months" (span.TotalDays / 30.0)
-        | x -> sprintf "%.0f days" span.TotalDays
+        | _ -> sprintf "%.0f days" span.TotalDays
     let count = sprintf "%.2f"
     let currency = sprintf "%.2f"
+    let currencyOpt = Option.map currency >> Option.defaultValue "n.a"
+    let percentage = sprintf "%.2f"
 
-let (=>) k v = k,v |> box
+type OpenPositionVM = {
+    Name : string
+    Isin : string
+    Shares : string
+    Duration : string
+    BuyingPrice : string
+    BuyingValue : string
+    PricedAt : string
+    CurrentPrice : string
+    CurrentValue : string
+    MarketProfit : string
+    DividendProfit : string
+    TotalProfit : string
+    MarketRoi : string
+    DividendRoi : string
+    TotalRoi : string
+    MarketProfitAnnual : string
+    DividendProfitAnnual : string
+    TotalProfitAnnual : string
+    MarketRoiAnnual : string
+    DividendRoiAnnual : string
+    TotalRoiAnnual : string
+}
 
 let listOpenPositions (depot:Depot.Api) broker lastPriceOf = 
     depot.Get() 
     |> PositionsInteractor.evaluateOpenPositions broker lastPriceOf
     |> List.map(fun p -> 
-        dict [
-            "name" => p.Position.Name
-            "isin" => (p.Position.Isin |> Str.ofIsin)
-            "shares" => (p.Position.Count |> Format.count)
-            "duration" => (p.PricedAt - p.Position.OpenedAt |> Format.timespan)
-            "buyingPrice" => (p.BuyingPrice |> Option.map Format.currency |> Option.defaultValue "n.a.")
-            "buyingValue" => (p.BuyingValue |> Option.map Format.currency |> Option.defaultValue "n.a.")
-            "pricedAt" => (p.PricedAt |> Format.date)
-            "currentPrice" => (p.CurrentPrice |> Format.currency)
-            "currentValue" => (p.CurrentValue |> Format.currency)
-            "marketProfit" => (p.MarketProfit)
-            "dividendProfit" => (p.DividendProfit)
-            "totalProfit" => (p.MarketProfit + p.DividendProfit)
-            "marketRoi" => (p.MarketRoi)
-            "dividendRoi" => (p.DividendRoi)
-            "totalRoi" => (p.MarketRoi + p.DividendRoi)
-            "marketProfitAnnual" => (p.MarketProfitAnnual)
-            "dividendProfitAnnual" => (p.DividendProfitAnnual)
-            "totalProfitAnnual" => (p.MarketProfitAnnual + p.DividendProfitAnnual)
-            "marketRoiAnnual" => (p.MarketRoiAnnual)
-            "dividendRoiAnnual" => (p.DividendRoiAnnual)
-            "totalRoiAnnual" => (p.MarketRoiAnnual + p.DividendRoiAnnual)
-        ])
+        {            
+            Name = p.Position.Name
+            Isin = p.Position.Isin |> Str.ofIsin
+            Shares = p.Position.Count |> Format.count
+            Duration = p.PricedAt - p.Position.OpenedAt |> Format.timespan
+            BuyingPrice = p.BuyingPrice |> Format.currencyOpt
+            BuyingValue = p.BuyingValue |> Format.currencyOpt
+            PricedAt = p.PricedAt |> Format.date
+            CurrentPrice = p.CurrentPrice |> Format.currency
+            CurrentValue = p.CurrentValue |> Format.currency
+            MarketProfit = p.MarketProfit |> Format.currency
+            DividendProfit = p.DividendProfit |> Format.currency
+            TotalProfit = p.MarketProfit + p.DividendProfit |> Format.currency
+            MarketRoi = p.MarketRoi |> Format.percentage
+            DividendRoi = p.DividendRoi |> Format.percentage
+            TotalRoi = p.MarketRoi + p.DividendRoi |> Format.percentage
+            MarketProfitAnnual = p.MarketProfitAnnual |> Format.currency
+            DividendProfitAnnual = p.DividendProfitAnnual |> Format.currency
+            TotalProfitAnnual = p.MarketProfitAnnual + p.DividendProfitAnnual |> Format.currency
+            MarketRoiAnnual = p.MarketRoiAnnual |> Format.percentage
+            DividendRoiAnnual = p.DividendRoiAnnual |> Format.percentage
+            TotalRoiAnnual = p.MarketRoiAnnual + p.DividendRoiAnnual |> Format.percentage
+        })
+
+type ClosedPositionVM = {
+    Name : string
+    Isin : string
+    Duration : string
+    TotalProfit : string
+    TotalRoi : string
+    MarketProfitAnnual : string
+    DividendProfitAnnual : string
+    TotalProfitAnnual : string
+    MarketRoiAnnual : string
+    DividendRoiAnnual : string
+    TotalRoiAnnual : string
+}
 
 let listClosedPositions (depot:Depot.Api) = 
     depot.Get() 
     |> PositionsInteractor.evaluateClosedPositions
     |> List.map(fun p -> 
-        dict [
-            "name" => p.Position.Name
-            "isin" => (p.Position.Isin |> Str.ofIsin)
-            "duration" => (p.Duration |> Format.timespan)
-            "totalProfit" => p.TotalProfit
-            "totalRoi" => p.TotalRoi
-            "marketProfitAnnual" => (p.MarketProfitAnnual)
-            "dividendProfitAnnual" => (p.DividendProfitAnnual)
-            "totalProfitAnnual" => (p.MarketProfitAnnual + p.DividendProfitAnnual)
-            "marketRoiAnnual" => (p.MarketRoiAnnual)
-            "dividendRoiAnnual" => (p.DividendRoiAnnual)
-            "totalRoiAnnual" => (p.MarketRoiAnnual + p.DividendRoiAnnual)
-        ])
+        {            
+            Name = p.Position.Name
+            Isin = p.Position.Isin |> Str.ofIsin
+            Duration = p.Duration |> Format.timespan
+            TotalProfit = p.TotalProfit |> Format.currency
+            TotalRoi = p.TotalRoi |> Format.percentage
+            MarketProfitAnnual = p.MarketProfitAnnual |> Format.currency
+            DividendProfitAnnual = p.DividendProfitAnnual |> Format.currency
+            TotalProfitAnnual = p.MarketProfitAnnual + p.DividendProfitAnnual |> Format.currency
+            MarketRoiAnnual = p.MarketRoiAnnual |> Format.percentage
+            DividendRoiAnnual = p.DividendRoiAnnual |> Format.percentage
+            TotalRoiAnnual = p.MarketRoiAnnual + p.DividendRoiAnnual |> Format.percentage
+        })
 
-type PerformanceVM = {
+type PortfolioPerformanceVM = {
     TotalInvestment : string
     TotalProfit : string
     TotalDividends : string
@@ -83,44 +121,77 @@ let getPerformanceIndicators (store:EventStore.Api) (depot:Depot.Api) broker get
             InvestingTime = p.InvestingTime |> Format.timespan
         }
 
+type AssetPerformanceVM = {
+    TotalProfit : string
+    TotalRoi : string
+    TotalRoiAnnual : string
+}
+
+type AssetPerformanceRateVM = {
+    Rate : string
+    TotalProfit : string
+    TotalRoi : string
+    TotalRoiAnnual : string
+}
+
+type BenchmarkVM = {
+    Name : string
+    Isin : string
+    BuyInstead : AssetPerformanceVM
+    BuyPlan : AssetPerformanceRateVM
+}
+
 let getBenchmarkPerformance (store:EventStore.Api) broker savingsPlan (historicalPrices:HistoricalPrices.Api) (benchmark:Benchmark) = 
     benchmark
     |> BenchmarkInteractor.getBenchmarkPerformance store broker savingsPlan historicalPrices
     |> fun r -> 
-        dict [
-            "name" => benchmark.Name
-            "isin" => (benchmark.Isin |> Str.ofIsin)
-            "buyInstead" => dict [
-                "totalProfit" => (r.BuyInstead.Profit)
-                "totalRoi" => (r.BuyInstead.Roi)
-                "totalRoiAnnual" => (r.BuyInstead.RoiAnnual) 
-            ]
-            "buyPlan" => dict [
-                "totalProfit" => (r.BuyPlan.Profit)
-                "totalRoi" => (r.BuyPlan.Roi)
-                "totalRoiAnnual" => (r.BuyPlan.RoiAnnual) 
-                "rate" => savingsPlan.Rate
-            ]
-        ]
+        {
+            Name = benchmark.Name
+            Isin = benchmark.Isin |> Str.ofIsin
+            BuyInstead = {
+                TotalProfit = r.BuyInstead.Profit |> Format.currency
+                TotalRoi = r.BuyInstead.Roi |> Format.percentage
+                TotalRoiAnnual = r.BuyInstead.RoiAnnual |> Format.percentage
+            }
+            BuyPlan = {
+                Rate = savingsPlan.Rate |> Format.currency
+                TotalProfit = r.BuyPlan.Profit |> Format.currency
+                TotalRoi = r.BuyPlan.Roi |> Format.percentage
+                TotalRoiAnnual = r.BuyPlan.RoiAnnual |> Format.percentage
+            }
+        }
+
+type DiversificationVM = {
+    Labels : string list
+    Capital : decimal<Currency> list
+}
 
 let getDiversification (depot:Depot.Api) lastPriceOf = 
     depot.Get() 
     |> StatisticsInteractor.getDiversification lastPriceOf
     |> fun r ->
-        dict [
-            "labels" => (r.Positions |> List.map fst)
-            "data" => (r.Positions |> List.map snd)
-        ]
+        {
+            Labels = r.Positions |> List.map fst
+            Capital = r.Positions |> List.map snd
+        }
+
+type TransactionVM = {
+    Date : string
+    Type : string
+    Comment : string
+    Value : string
+    Balance : string
+}
 
 let listCashflow (store:EventStore.Api) limit = 
     store.Get() 
     |> CashflowInteractor.getTransactions limit
     |> List.map(fun t ->
-        dict [
-            "date" => (t.Date |> Format.date)
-            "type" => t.Type
-            "comment" => t.Comment
-            "value" => t.Value 
-            "balance" => t.Balance 
-        ])
+        {
+            Date = t.Date |> Format.date
+            Type = t.Type
+            Comment = t.Comment
+            Value = t.Value |> Format.currency
+            Balance = t.Balance |> Format.currency
+        })
         
