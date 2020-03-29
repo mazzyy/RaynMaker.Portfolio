@@ -46,7 +46,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr v-for="entry in filteredData">
+      <tr v-for="entry in filteredData" v-bind:key="entry.isin">
         <td>
           {{ entry.name }} <br />
           {{ entry.isin }}

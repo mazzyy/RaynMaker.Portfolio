@@ -1,7 +1,8 @@
 
-- migrate to vue cli 3
-  - https://medium.com/jinweijie/migrate-from-vue-cli-2-to-3-16f14e7febdc
-  - https://suwebdev.github.io/wats-lab-faq/migrate-vue-2-code-from-vue-cli-2-to-vue-cli-3.html
+- Vue
+  - separate between components and views
+  - actual only real component is the pie chart
+
 
 - improve TestAPI and test to be based on Controller/Presenter
   - TestAPI only bridges between test and SUT

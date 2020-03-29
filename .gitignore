@@ -24,6 +24,8 @@ build/.fake/
 /packages/NUnit.*
 /packages/FSharp.Data.*
 /src/RaynMaker.Portfolio.Html/node_modules/**
+/src/RaynMaker.Portfolio.Html/dist/**
 /src/RaynMaker.Portfolio.Service/node_modules/**
 **/npm-debug.log
 /packages/Plainion.*
+package-lock.json

@@ -15,7 +15,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="t in transactions" style="border-top-style:solid;border-top-width:1px">
+        <tr v-for="t in transactions" style="border-top-style:solid;border-top-width:1px" v-bind:key="t.date">
           <td class="date">
             {{ t.date }}
           </td>
@@ -57,7 +57,7 @@
       }
     },
     watch: {
-      limit: function (value) {
+      limit: function () {
         this.onLimitChanged()
       }
     },

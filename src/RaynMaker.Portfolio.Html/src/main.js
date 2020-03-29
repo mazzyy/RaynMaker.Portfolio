@@ -1,11 +1,23 @@
 import Vue from 'vue'
+import Router from 'vue-router'
 import App from './App'
-import router from './router'
 
-$.ajaxSetup({ cache: false })
 Vue.config.productionTip = false
 
-/* eslint-disable no-new */
+Vue.use(Router)
+
+const router = new Router({
+    routes: [
+        { path: '/Positions', alias: '/', component: () => import('@/components/Positions') },
+        { path: '/Performance', component: () => import('@/components/Performance') },
+        { path: '/Cashflow', component: () => import('@/components/Cashflow') },
+        { path: '/ClosedPositions', component: () => import('@/components/ClosedPositions') }
+    ],
+    linkActiveClass: 'active',
+    linkExactActiveClass: 'active'
+})
+
+
 new Vue({
   el: '#app',
   router,
