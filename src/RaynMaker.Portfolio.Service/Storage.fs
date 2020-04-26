@@ -69,12 +69,12 @@ module EventsReader =
         
         (events |> Seq.choose id |> List.ofSeq), errors
 
-module HistoricalPricesReader =
+module CsvPricesReader =
     open System
     open FSharp.Data
     open RaynMaker.Portfolio.Entities
 
-    type private Sheet = CsvProvider<"../../docs/Samples/FR0011079466.history.csv",";">
+    type private Sheet = CsvProvider<"../../docs/Samples/FR0011079466.prices.csv",";">
     
     let readCsv (path:string) =
         let sheet = Sheet.Load(path)

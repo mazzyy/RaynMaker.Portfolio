@@ -141,7 +141,7 @@ type BenchmarkVM = {
     BuyPlan : AssetPerformanceRateVM
 }
 
-let getBenchmarkPerformance (store:EventStore.Api) broker savingsPlan (historicalPrices:HistoricalPrices.Api) (benchmark:Benchmark) = 
+let getBenchmarkPerformance (store:EventStore.Api) broker savingsPlan (historicalPrices:PricesRepository.Api) (benchmark:Benchmark) = 
     benchmark
     |> BenchmarkInteractor.getBenchmarkPerformance store broker savingsPlan historicalPrices
     |> fun r -> 

@@ -46,23 +46,23 @@ let build errorHandler projectFile =
 
     printfn "Store: %s" storeHome
 
-    let fromStore path = Path.Combine(storeHome,path)
+    let fromStore path = Path.Combine(storeHome, path)
 
-    let store = EventStore.create errorHandler (fun () -> 
+    let eventStore = EventStore.create errorHandler (fun () -> 
         printfn "Loading events ..."
 
         let events, errors = "Events.xlsx" |> fromStore |> EventsReader.readExcel
         errors |> Seq.iter (printf "  %s")
         events)
 
-    let historicalPrices = HistoricalPrices.create errorHandler (fun isin ->
-        printfn "Loading historical prices for %s" (Str.ofIsin isin)
+    let pricesRepository = PricesRepository.create errorHandler (fun isin ->
+        printfn "Loading prices for %s" (Str.ofIsin isin)
 
         isin
         |> Str.ofIsin
-        |> sprintf "%s.history.csv" 
+        |> sprintf "%s.prices.csv" 
         |> fromStore 
-        |> HistoricalPricesReader.readCsv)
+        |> CsvPricesReader.readCsv)
     
     let benchmark = { 
         Isin = project.Benchmark.Isin |> Isin
@@ -77,24 +77,24 @@ let build errorHandler projectFile =
                    MinFee = project.Broker.MinFee * 1.0M<Currency>
                    MaxFee = project.Broker.MaxFee * 1.0M<Currency> }
 
-    let depot = Depot.create errorHandler (store.Get)
+    let depot = Depot.create errorHandler (eventStore.Get)
 
     let getCashLimit() = (project.CashLimit |> decimal) * 1.0M<Currency>
 
-    let lastPriceOf = Events.LastPriceOf (store.Get())
+    let lastPriceOf = Events.LastPriceOf (eventStore.Get())
     
     let log = request (fun r -> printfn "%s" r.path; succeed)
 
     let listOpenPositions _ = Controllers.listOpenPositions depot broker lastPriceOf 
     let listClosedPositions _ = Controllers.listClosedPositions depot 
-    let getPerformanceIndicators _ = Controllers.getPerformanceIndicators store depot broker getCashLimit lastPriceOf 
-    let getBenchmarkPerformance _ = Controllers.getBenchmarkPerformance store broker savingsPlan historicalPrices benchmark 
+    let getPerformanceIndicators _ = Controllers.getPerformanceIndicators eventStore depot broker getCashLimit lastPriceOf 
+    let getBenchmarkPerformance _ = Controllers.getBenchmarkPerformance eventStore broker savingsPlan pricesRepository benchmark 
     let getDiversification _ = Controllers.getDiversification depot lastPriceOf 
     let listCashflow ctx = 
         match ctx.request.queryParam "limit" with
         | Choice1Of2 x -> x |> System.Int32.Parse
         | Choice2Of2 _ -> 25
-        |> Controllers.listCashflow store
+        |> Controllers.listCashflow eventStore
     
     let fileApi root path = Files.file (sprintf "%s/%s/%s" home root path)
     let jsonApi f = warbler (f >> JSON)
@@ -117,7 +117,7 @@ let build errorHandler projectFile =
         ]
 
     let shutdown() =
-        store.Stop()
-        historicalPrices.Stop()
+        eventStore.Stop()
+        pricesRepository.Stop()
 
     app, shutdown
