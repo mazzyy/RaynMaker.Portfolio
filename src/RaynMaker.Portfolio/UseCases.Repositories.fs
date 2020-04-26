@@ -54,7 +54,7 @@ module PricesRepository =
         Stop: unit -> unit
     }
 
-    let create handleLastChanceException read =
+    let create handleLastChanceException fetch read =
         let agent = Agent<Msg>.Start(fun inbox ->
             let rec loop store =
                 async {
@@ -77,5 +77,16 @@ module PricesRepository =
 
         agent.Error.Add(fun ex -> handleLastChanceException "Loading prices failed" ex)
         
+        let collector = Agent<Msg>.Start(fun inbox ->
+            let rec loop () = async {
+                //do! Async.Sleep(1000)
+                //return! loop ()
+                fetch()
+                return ()
+            }
+            loop () ) 
+
+        collector.Error.Add(fun ex -> handleLastChanceException "Collecting new prices failed" ex)
+
         { Get = fun isin -> agent.PostAndReply( fun replyChannel -> (isin,replyChannel) |> Get)
           Stop = fun () -> agent.Post Stop }

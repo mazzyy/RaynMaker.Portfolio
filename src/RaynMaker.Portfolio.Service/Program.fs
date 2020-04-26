@@ -46,7 +46,7 @@ let stop instance =
 let getProjectFileFromCommandLine argv =
     let home = getHome()
 
-    argv |> printf "Cmd line: %A"
+    argv |> printfn "Cmd line: %A"
 
     match argv with
     | [| path |] -> path 
@@ -64,8 +64,10 @@ let main argv =
         |> getProjectFileFromCommandLine
         |> start handleLastChanceException
 
-    Process.Start(sprintf "http://localhost:%i/" instance.port) |> ignore
+    printfn "Starting browser ..."
+    Process.Start("cmd", sprintf "/c start http://localhost:%i/" instance.port) |> ignore
 
+    printfn "Press any key to stop ..."
     Console.ReadKey true |> ignore
     
     stop instance

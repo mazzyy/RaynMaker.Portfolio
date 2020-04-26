@@ -85,5 +85,17 @@ module CsvPricesReader =
         |> Seq.sortBy(fun x -> x.Day)
         |> List.ofSeq
 
+module PricesCollector =
+    open System
+    open FSharp.Data
+    open RaynMaker.Portfolio.Entities
+    
+    let execute (path:string) =
+        printfn "Collecting prices"
+        printf "."
+        printf "."
+        printf "."
+        printf "."
+        printf "."
 
 

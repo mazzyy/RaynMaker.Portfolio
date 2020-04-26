@@ -55,7 +55,8 @@ let build errorHandler projectFile =
         errors |> Seq.iter (printf "  %s")
         events)
 
-    let pricesRepository = PricesRepository.create errorHandler (fun isin ->
+    let collectPrices() = PricesCollector.execute storeHome 
+    let pricesRepository = PricesRepository.create errorHandler collectPrices (fun isin ->
         printfn "Loading prices for %s" (Str.ofIsin isin)
 
         isin

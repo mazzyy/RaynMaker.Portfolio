@@ -1,10 +1,8 @@
 
 - find a way to automatically get the prices we need
   - add a service which collects in background and saves in store
+    - e.g. udpate csv file and send message to PricesRepository to refresh
   - e.g.: http://www.google.com/finance/historical?q=MSFT&output=csv
-  - remain core logic independent of "collector" by always work with local DB
-  - what would be good format for mass data? 
-    - 
   
 =====================
 
