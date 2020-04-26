@@ -55,14 +55,14 @@ let build errorHandler projectFile =
         errors |> Seq.iter (printf "  %s")
         events)
 
-    let collectPrices() = PricesCollector.execute storeHome 
+    let getPricesFile = sprintf "%s.prices.csv" >> fromStore 
+    let collectPrices() = PricesCollector.execute getPricesFile 
     let pricesRepository = PricesRepository.create errorHandler collectPrices (fun isin ->
         printfn "Loading prices for %s" (Str.ofIsin isin)
 
         isin
         |> Str.ofIsin
-        |> sprintf "%s.prices.csv" 
-        |> fromStore 
+        |> getPricesFile
         |> CsvPricesReader.readCsv)
     
     let benchmark = { 

@@ -87,15 +87,24 @@ module CsvPricesReader =
 
 module PricesCollector =
     open System
+    open System.Net
     open FSharp.Data
     open RaynMaker.Portfolio.Entities
     
-    let execute (path:string) =
+    let private collect getPricesFile isin =
+        let url = isin |> sprintf "http://%s"
+        let file = isin |> getPricesFile
+
+        printfn "Downloading %s to %s" url file
+        
+        //use wc = new WebClient()
+        //wc.DownloadFile(url, file)
+
+    let execute getPricesFile =
         printfn "Collecting prices"
-        printf "."
-        printf "."
-        printf "."
-        printf "."
-        printf "."
+        [
+            "FR0011079466"
+        ]
+        |> Seq.iter (collect getPricesFile)
 
 
