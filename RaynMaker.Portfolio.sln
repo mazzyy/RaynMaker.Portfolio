@@ -14,11 +14,11 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "RaynMaker.Portfolio.Service
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "RaynMaker.Portfolio", "src\RaynMaker.Portfolio\RaynMaker.Portfolio.fsproj", "{FB545EA0-6567-4392-9D68-B19EB27B84DB}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "RaynMaker.Portfolio.Specs", "src\RaynMaker.Portfolio.Specs\RaynMaker.Portfolio.Specs.fsproj", "{94678AC4-8845-4453-B244-E13B62DAC0D4}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "RaynMaker.Portfolio.Specs", "src\RaynMaker.Portfolio.Specs\RaynMaker.Portfolio.Specs.fsproj", "{94678AC4-8845-4453-B244-E13B62DAC0D4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RaynMaker.Portfolio.Shell", "src\RaynMaker.Portfolio.Shell\RaynMaker.Portfolio.Shell.csproj", "{74BABC5A-8261-4C2E-8374-346517C5E6DE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RaynMaker.Portfolio.Shell", "src\RaynMaker.Portfolio.Shell\RaynMaker.Portfolio.Shell.csproj", "{74BABC5A-8261-4C2E-8374-346517C5E6DE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RaynMaker.Portfolio.Html", "src\RaynMaker.Portfolio.Html\RaynMaker.Portfolio.Html.csproj", "{C24E02BE-BCD7-4408-8D20-F0A91299557B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RaynMaker.Portfolio.WebUI", "src\RaynMaker.Portfolio.WebUI\RaynMaker.Portfolio.WebUI.csproj", "{DB9F44A4-BAD7-4389-A2A9-872330C8C2DE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,10 +42,10 @@ Global
 		{74BABC5A-8261-4C2E-8374-346517C5E6DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{74BABC5A-8261-4C2E-8374-346517C5E6DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{74BABC5A-8261-4C2E-8374-346517C5E6DE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C24E02BE-BCD7-4408-8D20-F0A91299557B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C24E02BE-BCD7-4408-8D20-F0A91299557B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C24E02BE-BCD7-4408-8D20-F0A91299557B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C24E02BE-BCD7-4408-8D20-F0A91299557B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB9F44A4-BAD7-4389-A2A9-872330C8C2DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB9F44A4-BAD7-4389-A2A9-872330C8C2DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB9F44A4-BAD7-4389-A2A9-872330C8C2DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB9F44A4-BAD7-4389-A2A9-872330C8C2DE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
