@@ -1,8 +1,25 @@
 
+- find a way to automatically get the prices we need
+  - add a service which collects in background and saves in store
+  - e.g.: http://www.google.com/finance/historical?q=MSFT&output=csv
+  
+=====================
+
+- Effective Yield
+  - charts to visualize change over time - a good "average" can be found later
+  - absolute win/loss per month based on capital at start and of month
+  - percentage win/loss per month
+  - on "performance" view
+  - how to handle "disbursements"?
+  - precond:
+    - prices of bought stocks at month start and end in correct currency
+    - currency service if prices not available in wanted currency
+  
+=====================
+
 - Vue
   - separate between components and views
   - actual only real component is the pie chart
-
 
 - improve TestAPI and test to be based on Controller/Presenter
   - TestAPI only bridges between test and SUT
@@ -14,15 +31,6 @@
 - fix red tests
 
 - add missing tests
-
-- find a way to automatically get the prices we need
-  - add a service which collects in background and saves in store
-  - e.g.: http://www.google.com/finance/historical?q=MSFT&output=csv
-
-- add chart of "yield every month in percentage based on actual capital begin of month and end of month"
-  - show the chart on "performance"
-  - calc average of these yields
-  - how to handle "disbursements"?
 
 - buying price is not correctly calculated when some parts of the position got sold
 
