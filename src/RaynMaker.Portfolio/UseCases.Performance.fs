@@ -10,38 +10,40 @@ module PerformanceInteractor =
 
     // TODO: yield per month based on actual capital then take average
     type PerformanceReport = {
+        TotalDeposit : decimal<Currency>
+        TotalDisbursement : decimal<Currency>
         TotalInvestment : decimal<Currency>
-        TotalProfit : decimal<Currency>
+        TotalCash : decimal<Currency>
         TotalDividends : decimal<Currency>
+        CurrentPortfolioValue : decimal<Currency>
+        TotalValue : decimal<Currency>
+        TotalProfit : decimal<Currency>
         CashLimit : decimal<Currency>
-        InvestingTime : TimeSpan }
+        InvestingTime : TimeSpan
+    }
 
-    let getPerformance store broker getCashLimit getLastPrice positions =
-        let sumInvestment total evt =
-            match evt with
-            | DepositAccounted evt -> total + evt.Value
-            | DisbursementAccounted evt -> total - evt.Value
-            | _ -> total
-
-        let investment =
-            store
-            |> List.fold sumInvestment 0.0M<Currency>
-
-        let totalProfit = 
+    let getPerformance store getCashLimit getLastPrice positions =
+        let totalDeposit = store |> List.sumBy(function | DepositAccounted evt -> evt.Value | _ -> 0.0M<Currency>)
+        let totalDisbursement = store |> List.sumBy(function | DisbursementAccounted evt -> evt.Value | _ -> 0.0M<Currency>)
+        let totalCash = store |> CashflowInteractor.getTotalCash
+        let totalDividends =  store |> List.sumBy(function | DividendReceived evt -> evt.Value - evt.Fee | _ -> 0.0M<Currency>)
+        // we intentionally ignore the broker fee here
+        let currentPortfolioValue = 
             positions
-            |> PositionsInteractor.evaluateTotalProfit broker getLastPrice
-
-        let totalDividends = 
-            store
-            |> List.fold(fun total evt -> 
-                match evt with
-                | DividendReceived evt -> total + evt.Value - evt.Fee
-                | _ -> total ) 0.0M<Currency>
-
+            |> Seq.filter(fun p -> p.ClosedAt |> Option.isNone)
+            |> Seq.sumBy(fun p -> (p.Isin |> getLastPrice |> Option.get).Value * p.Count)
+        let totalValue = totalCash + currentPortfolioValue
+        let totalInvestment = totalDeposit - totalDisbursement
+        
         { 
-            TotalInvestment = investment
-            TotalProfit = totalProfit
+            TotalDeposit = totalDeposit
+            TotalDisbursement = totalDisbursement
+            TotalInvestment = totalInvestment
+            TotalCash = totalCash
             TotalDividends = totalDividends
+            CurrentPortfolioValue = currentPortfolioValue
+            TotalValue = totalValue
+            TotalProfit = totalValue - totalInvestment
             CashLimit = getCashLimit()
             InvestingTime = DateTime.Today - (store |> Seq.tryHead |> Option.map Events.GetDate |? DateTime.Today) 
         }

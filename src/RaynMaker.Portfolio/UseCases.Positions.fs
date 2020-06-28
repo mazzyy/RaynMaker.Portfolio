@@ -57,7 +57,7 @@ module PositionsInteractor =
         DividendProfitAnnual : decimal<Currency>
         MarketRoiAnnual : decimal<Percentage>
         DividendRoiAnnual : decimal<Percentage> }
-        
+    
     // TODO: core calcs like "ROI" or "DividendROI" should be part of entities - this logic is independent from the API
     // and is partially part of the UL of DDD
     // TODO: we should consider ignoring the broker here - it will anyhow be a guess. we do not consider it in BDD tests. 
@@ -131,20 +131,6 @@ module PositionsInteractor =
         |> Seq.filter(fun p -> p.ClosedAt |> Option.isSome)
         |> Seq.map evaluate
         |> List.ofSeq
-
-    let evaluateTotalProfit broker getLastPrice positions =
-        let evaluate (p:Position) =
-            let value = 
-                match p.ClosedAt with
-                | Some c -> p.Payouts
-                | None -> let price = p.Isin |> getLastPrice |> Option.get // there has to be a price otherwise there would be no position
-                          p.Payouts + p.Count * price.Value - (Broker.getFee broker price.Value)
-            
-            value - p.Invested + p.Dividends
-
-        positions
-        |> Seq.map evaluate
-        |> Seq.sum
 
     type ProfitEvaluation = {
         Profit : decimal<Currency>

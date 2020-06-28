@@ -12,9 +12,9 @@ module CashflowInteractor =
         Value : decimal<Currency> 
         Balance : decimal<Currency> 
         }
-    
-    /// As commonly used in accounting the list is returned in reverse order
-    let getTransactions limit (store:DomainEvent list) =
+
+    [<AutoOpen>]
+    module private Impl =
         let createTransaction =
             let comment name isin = sprintf "%s (Isin: %s)" name (isin |> Str.ofIsin)
             function
@@ -61,8 +61,11 @@ module CashflowInteractor =
                   Balance = 0.0M<Currency> } 
                 |> Some
             | StockPriced e -> None
+        
+    /// As commonly used in accounting the list is returned in reverse order
+    let getTransactions limit (store:DomainEvent list) =
 
-        let transactions,total = 
+        let transactions,_ = 
             store
             |> List.choose createTransaction
             |> List.mapFold (fun balance t -> 
@@ -72,3 +75,9 @@ module CashflowInteractor =
         transactions 
         |> List.rev 
         |> List.take ( Math.Min(transactions.Length, limit)) 
+
+    let getTotalCash (store:DomainEvent list) =
+        store
+        |> List.choose createTransaction
+        |> List.sumBy (fun t -> t.Value) 
+        

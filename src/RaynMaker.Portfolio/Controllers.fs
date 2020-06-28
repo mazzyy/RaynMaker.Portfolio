@@ -102,21 +102,31 @@ let listClosedPositions (depot:Depot.Api) =
         })
 
 type PortfolioPerformanceVM = {
+    TotalDeposit : string
+    TotalDisbursement : string
     TotalInvestment : string
-    TotalProfit : string
+    TotalCash : string
     TotalDividends : string
+    CurrentPortfolioValue : string
+    TotalValue : string
+    TotalProfit : string
     CashLimit : string
     InvestingTime : string
 }
 
 let getPerformanceIndicators (store:EventStore.Api) (depot:Depot.Api) broker getCashLimit lastPriceOf = 
     depot.Get()
-    |> PerformanceInteractor.getPerformance (store.Get()) broker getCashLimit lastPriceOf
+    |> PerformanceInteractor.getPerformance (store.Get()) getCashLimit lastPriceOf
     |> fun p -> 
         {
+            TotalDeposit = p.TotalDeposit |> Format.currency
+            TotalDisbursement = p.TotalDisbursement |> Format.currency
             TotalInvestment = p.TotalInvestment |> Format.currency
-            TotalProfit = p.TotalProfit |> Format.currency
+            TotalCash = p.TotalCash |> Format.currency
             TotalDividends = p.TotalDividends |> Format.currency
+            CurrentPortfolioValue = p.CurrentPortfolioValue |> Format.currency
+            TotalValue = p.TotalValue |> Format.currency
+            TotalProfit = p.TotalProfit |> Format.currency
             CashLimit = p.CashLimit |> Format.currency
             InvestingTime = p.InvestingTime |> Format.timespan
         }

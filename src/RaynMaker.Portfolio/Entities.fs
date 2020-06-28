@@ -167,7 +167,8 @@ module Positions =
         Contract.requires (fun () -> evt.Count > 0.0M) "evt.Count > 0"
         Contract.requires (fun () -> evt.Price > 0.0M<Currency>) "evt.Price > 0"
         Contract.requires (fun () -> evt.Fee >= 0.0M<Currency>) "evt.Fee >= 0"
-        Contract.requires (fun () -> p.ClosedAt |> Option.isNone) "position is closed"
+        // TODO: does not work if i by a position then completely sell it and then open it again and then by some of those 
+        //Contract.requires (fun () -> p.ClosedAt |> Option.isNone) (evt.Isin |> sprintf "%A: position is closed")
 
         let count = p.Count - evt.Count
         let newP =

@@ -93,10 +93,13 @@ module PricesCollector =
     
     let private collect getPricesFile isin =
         let url = isin |> sprintf "http://%s"
-        let file = isin |> getPricesFile
+        let file = isin |> getPricesFile |> sprintf "%s.download"
 
         printfn "Downloading %s to %s" url file
         
+        // TODO: do not just override here but just download and then send event to repository
+        // to really do an "update" and write back async
+
         //use wc = new WebClient()
         //wc.DownloadFile(url, file)
 
