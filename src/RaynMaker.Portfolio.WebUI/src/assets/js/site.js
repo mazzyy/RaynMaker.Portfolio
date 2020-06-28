@@ -2,7 +2,7 @@
 export const webApi = {
   methods: {
     get: (that, url, data, onDone) => {
-      let baseUrl = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:2525'
+      const baseUrl = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:2525'
 
       fetch(baseUrl + url)
         .then(res => res.json())

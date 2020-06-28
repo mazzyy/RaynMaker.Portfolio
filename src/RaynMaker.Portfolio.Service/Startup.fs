@@ -106,7 +106,8 @@ let build errorHandler projectFile =
                 [
                     path "/" >=> redirect "/Client/index.html"
                     pathScan "/Client/%s" (fileApi "Client")
-                    pathScan "/static/%s" (fileApi "Client/static")
+                    pathScan "/js/%s" (fileApi "Client/js")
+                    pathScan "/css/%s" (fileApi "Client/css")
                     path "/api/positions" >=> jsonApi listOpenPositions
                     path "/api/performance" >=> jsonApi getPerformanceIndicators
                     path "/api/benchmark" >=> jsonApi getBenchmarkPerformance

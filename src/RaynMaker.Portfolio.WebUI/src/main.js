@@ -17,13 +17,10 @@ const router = new Router({
     linkExactActiveClass: 'active'
 })
 
-
 new Vue({
-  el: '#app',
   router,
-  template: '<App/>',
-  components: { App }
-})
+  render: h => h(App)
+}).$mount('#app')
 
 require('../node_modules/bootstrap/dist/css/bootstrap.min.css')
 require('./assets/css/site.css')

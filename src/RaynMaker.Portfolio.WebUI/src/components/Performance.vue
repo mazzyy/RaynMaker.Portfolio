@@ -1,46 +1,47 @@
 <template>
     <div>
         <h1>Performance</h1>
-        <p>
-            <label>Investment time: </label> {{ performance.investingTime }}
-        </p>
 
         <table>
+            <tr>
+                <th class="label">Investment time</th>
+                <td class="value">{{ performance.investingTime }}</td>
+            </tr>
             <tr>
                 <th class="label">Cash limit</th>
                 <td class="value">{{ performance.cashLimit }}</td>
             </tr>
             <tr>
                 <th class="label">Total deposit</th>
-                <td class="value">{{ performance.totalDeposit}}</td>
+                <td class="value">{{ performance.totalDeposit }}</td>
             </tr>
             <tr>
                 <th class="label">Total disbursement</th>
-                <td class="value">{{ performance.totalDisbursement}}</td>
+                <td class="value">{{ performance.totalDisbursement }}</td>
             </tr>
             <tr>
                 <th class="label">Total investment</th>
-                <td class="value">{{ performance.totalInvestment}}</td>
+                <td class="value">{{ performance.totalInvestment }}</td>
             </tr>
             <tr>
                 <th class="label">Total cash</th>
-                <td class="value">{{ performance.totalCash}}</td>
+                <td class="value">{{ performance.totalCash }}</td>
             </tr>
             <tr>
                 <th class="label">Total dividends</th>
-                <td class="value">{{ performance.totalDividends}}</td>
+                <td class="value">{{ performance.totalDividends }}</td>
             </tr>
             <tr>
                 <th class="label">Current portfolio value</th>
-                <td class="value">{{ performance.currentPortfolioValue}}</td>
+                <td class="value">{{ performance.currentPortfolioValue }}</td>
             </tr>
             <tr>
                 <th class="label">Total value</th>
-                <td class="value">{{ performance.totalValue}}</td>
+                <td class="value">{{ performance.totalValue }}</td>
             </tr>
             <tr>
                 <th class="label">Total profit</th>
-                <td class="value">{{ performance.totalProfit}}</td>
+                <td class="value">{{ performance.totalProfit }}</td>
             </tr>
         </table>
 
@@ -78,7 +79,7 @@
 
     export default {
         name: 'Performance',
-        data() {
+        data () {
             return {
                 performance: null,
                 benchmark: null
@@ -107,6 +108,6 @@
     }
 
     th, td {
-        padding: 15px;
+        padding: 5px;
     }
 </style>

@@ -6,15 +6,18 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
-  <Target Name="BuildVue" AfterTargets="Build">
-    <Exec Condition="$(Configuration) == 'Debug'" Command="npm run build-dev" />
-    <Exec Condition="$(Configuration) == 'Release'" Command="npm run build-prod" />
-  </Target>
-
   <ItemGroup>
     <Compile Remove="node_modules\**" />
     <EmbeddedResource Remove="node_modules\**" />
     <None Remove="node_modules\**" />
   </ItemGroup>
+
+  <Target Name="BuildWebUI" AfterTargets="AfterBuild">
+    <Exec Command="npm run build-dev" />
+    <ItemGroup>
+      <WebUI Include="dist\**" />
+    </ItemGroup>
+    <Copy SourceFiles="@(WebUI)" DestinationFolder="$(OutputPath)\Client\%(RecursiveDir)" />    
+  </Target>
   
 </Project>

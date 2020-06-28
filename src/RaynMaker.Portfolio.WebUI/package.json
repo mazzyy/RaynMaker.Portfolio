@@ -39,16 +39,19 @@
     },
     "extends": [
       "plugin:vue/essential",
-      "eslint:recommended"
+      "@vue/standard"
     ],
     "parserOptions": {
       "parser": "babel-eslint"
     },
-    "rules": {}
+    "rules": {
+      "template-curly-spacing": "off",
+      "indent": "off"
+    }
   },
   "babel": {
     "presets": [
-      "@vue/app"
+      "@vue/cli-plugin-babel/preset"
     ]
   },
   "browserslist": [
