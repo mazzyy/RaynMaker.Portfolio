@@ -149,7 +149,8 @@ module Positions =
     let accountBuy p (evt:StockBought) =
         Contract.requires (fun () -> p.Isin = evt.Isin) "evt.Isin = p.Isin"
         Contract.requires (fun () -> evt.Count > 0.0M) "evt.Count > 0"
-        Contract.requires (fun () -> evt.Price > 0.0M<Currency>) "evt.Price > 0"
+        // in case of "spin-off" we could get stocks for free
+        // Contract.requires (fun () -> evt.Price > 0.0M<Currency>) "evt.Price > 0"
         Contract.requires (fun () -> evt.Fee >= 0.0M<Currency>) "evt.Fee >= 0"
         
         let newP =
@@ -157,7 +158,8 @@ module Positions =
                      Count = p.Count + evt.Count }
 
         Contract.ensures (fun () -> newP.Count > 0.0M) "new count > 0"
-        Contract.ensures (fun () -> newP.Invested > 0.0M<Currency>) "new invested > 0"
+        // in case of "spin-off" we could get stocks for free
+        // Contract.ensures (fun () -> newP.Invested > 0.0M<Currency>) "new invested > 0"
         Contract.ensures (fun () -> newP.Payouts >= 0.0M<Currency>) "new payouts >= 0"
 
         newP    
