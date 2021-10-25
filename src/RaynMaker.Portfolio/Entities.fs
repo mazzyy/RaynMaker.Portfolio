@@ -217,11 +217,14 @@ module Positions =
             accountDividends p evt
 
         let processEvent positions evt =
-            match evt with
-            | StockBought evt -> positions |> update (buyStock evt)
-            | StockSold evt  -> positions |> update (sellStock evt)
-            | DividendReceived evt -> positions |> update (receiveDividend evt)
-            | _ -> positions
+            try
+                match evt with
+                | StockBought evt -> positions |> update (buyStock evt)
+                | StockSold evt  -> positions |> update (sellStock evt)
+                | DividendReceived evt -> positions |> update (receiveDividend evt)
+                | _ -> positions
+            with
+                | ex -> failwithf "Failed to process event '%A' with %s" evt ex.Message
 
         store
         |> List.fold processEvent Map.empty
