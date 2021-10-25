@@ -1,4 +1,12 @@
 
+- how to handle tax corrections in a proper way?, e.g.:
+
+  // in case of tax corrections dividends could be zero temporarily
+  // TODO: we should probably have dedicated event for that
+  //Contract.ensures (fun () -> newP.Dividends > 0.0M<Currency>) "new Dividends > 0"
+
+=====================
+
 - find a way to automatically get the prices we need
   - add a service which collects in background and saves in store
     - e.g. udpate csv file and send message to PricesRepository to refresh

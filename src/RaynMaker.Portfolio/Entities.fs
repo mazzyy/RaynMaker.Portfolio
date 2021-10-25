@@ -186,14 +186,20 @@ module Positions =
 
     let accountDividends p (evt:DividendReceived) =
         Contract.requires (fun () -> p.Isin = evt.Isin) "evt.Isin = p.Isin"
-        Contract.requires (fun () -> p.ClosedAt |> Option.isNone) "position is closed"
-        Contract.requires (fun () -> evt.Value > 0.0M<Currency>) "evt.Value > 0"
+        // we found cases e.g. from US stocks that even after position is closed some dividend corrections
+        // happened due to tax changes
+        //Contract.requires (fun () -> p.ClosedAt |> Option.isNone) "position is closed"
+        // in case of tax corrections there will be "storno" (negative value) and then the correct 
+        // value will be accounted with subsequent event
+        //Contract.requires (fun () -> evt.Value > 0.0M<Currency>) "evt.Value > 0"
         Contract.requires (fun () -> evt.Fee >= 0.0M<Currency>) "evt.Fee >= 0"
 
         let newP =
             { p with Dividends = p.Dividends + evt.Value - evt.Fee }
     
-        Contract.ensures (fun () -> newP.Dividends > 0.0M<Currency>) "new Dividends > 0"
+        // in case of tax corrections dividends could be zero temporarily
+        // TODO: we should probably have dedicated event for that
+        //Contract.ensures (fun () -> newP.Dividends > 0.0M<Currency>) "new Dividends > 0"
 
         newP
 
