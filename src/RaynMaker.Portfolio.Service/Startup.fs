@@ -7,6 +7,8 @@ open Suave.Filters
 open Suave.Operators
 open Suave.Redirection
 open Suave.RequestErrors
+open Suave.Writers
+open Suave.Successful
 open RaynMaker.Portfolio
 open RaynMaker.Portfolio.Entities
 open RaynMaker.Portfolio.UseCases
@@ -100,9 +102,14 @@ let build errorHandler projectFile =
     let fileApi root path = Files.file (sprintf "%s/%s/%s" home root path)
     let jsonApi f = warbler (f >> JSON)
     
+    let setCORSHeaders =
+        addHeader  "Access-Control-Allow-Origin" "*" 
+            >=> addHeader "Access-Control-Allow-Headers" "content-type" 
+            >=> addHeader "Access-Control-Allow-Methods" "GET,POST,PUT" 
+
     let app = 
         choose [ 
-            GET >=> log >=> choose
+            GET >=> log >=> setCORSHeaders >=> choose
                 [
                     path "/" >=> redirect "/Client/index.html"
                     pathScan "/Client/%s" (fileApi "Client")
