@@ -16,15 +16,15 @@
           </tr>
           <tr>
             <th style="padding-right:20px">Buying Price / Buying Value</th>
-            <td>{{ data.buyingPrice }} / {{ data.buyingValue }}</td>
+            <td>{{ data.buyingPrice }} {{currency}} / {{ data.buyingValue }} {{currency}}</td>
           </tr>
           <tr>
             <th>Price / Value</th>
-            <td>{{ data.currentPrice }} / {{ data.currentValue }}</td>
+            <td>{{ data.currentPrice }} {{currency}} / {{ data.currentValue }} {{currency}}</td>
           </tr>
           <tr>
             <th>Profit</th>
-            <td>{{ data.totalProfit }} ({{ data.totalRoi }} %)</td>
+            <td>{{ data.totalProfit }} {{currency}} ({{ data.totalRoi }} %)</td>
           </tr>
         </table>
       </CCardBody>
@@ -40,6 +40,12 @@
                     :responsive="false"
                     :items-per-page="250"
                     hover>
+          <template #price="{item}">
+            <td>{{ item.price }} {{currency}}</td>
+          </template>
+          <template #value="{item}">
+            <td>{{ item.value }} {{currency}}</td>
+          </template>
         </CDataTable>
       </CCardBody>
     </CCard>
@@ -62,7 +68,8 @@
 
     computed: {
       name () { return this.$route.params.name },
-      isin () { return this.$route.params.isin }
+      isin () { return this.$route.params.isin },
+      currency () { return this.data.currency }
     },
 
     created () {

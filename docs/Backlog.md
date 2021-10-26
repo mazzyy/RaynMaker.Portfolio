@@ -1,4 +1,7 @@
 
+- position details
+  - add devidends + totals (in transactions)
+
 - migrate to axios
 
 - error handling in suave actions

@@ -13,8 +13,7 @@ module private Format =
         | x when x > 90.0 -> sprintf "%.2f months" (span.TotalDays / 30.0)
         | _ -> sprintf "%.0f days" span.TotalDays
     let count = sprintf "%.2f"
-    // TODO: today we do not support different currencies
-    let currency = sprintf "%.2f €"
+    let currency = sprintf "%.2f"
     let currencyOpt = Option.map currency >> Option.defaultValue "n.a"
     let percentage = sprintf "%.2f"
 
@@ -120,6 +119,7 @@ type PositionDetailsVM = {
     CurrentValue : string
     TotalProfit : string
     TotalRoi : string
+    Currency : string
     Transactions : PositionTransactionVM list
 }
 
@@ -140,8 +140,9 @@ let positionDetails (store:EventStore.Api) (depot:Depot.Api) broker lastPriceOf 
         BuyingValue = evaluation.BuyingValue |> Format.currencyOpt
         CurrentPrice = evaluation.CurrentPrice |> Format.currency
         CurrentValue = evaluation.CurrentValue |> Format.currency
-        TotalProfit = evaluation.MarketProfit + evaluation.DividendProfit |> Format.currency
-        TotalRoi = evaluation.MarketRoi + evaluation.DividendRoi |> Format.percentage
+        TotalProfit = evaluation.MarketProfit |> Format.currency
+        TotalRoi = evaluation.MarketRoi |> Format.percentage
+        Currency = "€"
         Transactions = 
             store.Get()
             |> Seq.filter(fun x -> x |> DomainEvent.Isin = Some isin)
