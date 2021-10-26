@@ -47,7 +47,6 @@
         that.diversification.labels = response.labels
       })
     },
-    mixins: [ my.webApi ]
+    mixins: [my.webApi]
   }
 </script>
-

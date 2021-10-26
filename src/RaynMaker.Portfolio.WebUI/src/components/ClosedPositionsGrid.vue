@@ -86,19 +86,19 @@
     },
     data () {
       var sortOrders = {}
-      sortOrders['name'] = 1
-      sortOrders['marketProfit'] = 1
-      sortOrders['dividendProfit'] = 1
-      sortOrders['totalProfit'] = 1
-      sortOrders['marketRoi'] = 1
-      sortOrders['dividendRoi'] = 1
-      sortOrders['totalRoi'] = 1
-      sortOrders['marketProfitAnnual'] = 1
-      sortOrders['dividendProfitAnnual'] = 1
-      sortOrders['totalProfitAnnual'] = 1
-      sortOrders['marketRoiAnnual'] = 1
-      sortOrders['dividendRoiAnnual'] = 1
-      sortOrders['totalRoiAnnual'] = 1
+      sortOrders.name = 1
+      sortOrders.marketProfit = 1
+      sortOrders.dividendProfit = 1
+      sortOrders.totalProfit = 1
+      sortOrders.marketRoi = 1
+      sortOrders.dividendRoi = 1
+      sortOrders.totalRoi = 1
+      sortOrders.marketProfitAnnual = 1
+      sortOrders.dividendProfitAnnual = 1
+      sortOrders.totalProfitAnnual = 1
+      sortOrders.marketRoiAnnual = 1
+      sortOrders.dividendRoiAnnual = 1
+      sortOrders.totalRoiAnnual = 1
       return {
         sortKey: 'name',
         sortOrders: sortOrders

@@ -70,7 +70,7 @@
     <tbody>
       <tr v-for="entry in filteredData" v-bind:key="entry.isin">
         <td>
-          {{ entry.name }} <br />
+          <router-link :to="{ path: '/PositionDetails', params: { isin: entry.isin } }">{{ entry.name }}</router-link> <br />
           {{ entry.isin }}
         </td>
         <td>{{ entry.shares }}</td>

@@ -31,7 +31,6 @@
         that.positions = response
       })
     },
-    mixins: [ my.webApi ]
+    mixins: [my.webApi]
   }
 </script>
-
