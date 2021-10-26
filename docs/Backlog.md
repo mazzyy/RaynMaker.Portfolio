@@ -4,8 +4,6 @@
 
 - migrate to axios
 
-- error handling in suave actions
-
 - can we migrate to coreui tables
   (and remove bootstrap)
 

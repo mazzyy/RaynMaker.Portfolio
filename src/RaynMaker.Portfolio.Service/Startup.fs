@@ -104,8 +104,15 @@ let build errorHandler projectFile =
         | Choice2Of2 _ -> 25
         |> Controllers.listCashflow eventStore
     
+    let withCatch f ctx = 
+        try
+            f ctx
+        with
+            | ex -> 
+                printfn "ERROR: %A" ex
+                ex.Message |> JSON
     let fileApi root path = Files.file (sprintf "%s/%s/%s" home root path)
-    let jsonApi f = warbler (f >> JSON)
+    let jsonApi f = warbler (withCatch (f >> JSON))
     
     let setCORSHeaders =
         addHeader  "Access-Control-Allow-Origin" "*" 

@@ -48,7 +48,7 @@
     <tbody>
       <tr v-for="entry in filteredData" v-bind:key="entry.isin">
         <td>
-          {{ entry.name }} <br />
+          <router-link :to="{ name: 'PositionDetails', params: { isin: entry.isin, name : entry.name   } }">{{ entry.name }}</router-link> <br />
           {{ entry.isin }}
         </td>
         <td>{{ entry.duration }}</td>
