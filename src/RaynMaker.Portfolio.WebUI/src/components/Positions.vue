@@ -3,7 +3,7 @@
     <h1>Positions</h1>
 
     <form id="filter">
-      <label>Filter: </label>
+      <label style="margin-right:10px">Filter: </label>
       <input name="query" v-model="filter"/>
     </form>
 

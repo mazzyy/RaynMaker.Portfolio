@@ -2,6 +2,8 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import App from './App'
 
+require('./assets/js/site.js')
+
 Vue.config.productionTip = false
 
 Vue.use(Router)
@@ -25,4 +27,3 @@ new Vue({
 
 require('../node_modules/bootstrap/dist/css/bootstrap.min.css')
 require('./assets/css/site.css')
-require('./assets/js/site.js')
