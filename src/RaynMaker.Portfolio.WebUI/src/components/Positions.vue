@@ -1,19 +1,30 @@
 <template>
   <div>
-    <h1>Positions</h1>
+    <CCard>
+      <CCardHeader>
+        <CCardTitle>Positions</CCardTitle>
+      </CCardHeader>
+      <CCardBody>
+        <form id="filter">
+          <CLabel>Filter: </CLabel>
+          <input name="query" v-model="filter" />
+        </form>
 
-    <form id="filter">
-      <label style="margin-right:10px">Filter: </label>
-      <input name="query" v-model="filter"/>
-    </form>
+        <positions-grid :data="positions" :filter-key="filter" style="margin-top:10px"></positions-grid>
+      </CCardBody>
+    </CCard>
 
-    <positions-grid :data="positions" :filter-key="filter" style="margin-top:10px"></positions-grid>
-
-    <h2>Diversification</h2>
-    <p>
-      Based on share count and last price
-    </p>
-    <pie-chart :width="500" :height="500" :data="diversification.capital" :labels="diversification.labels"></pie-chart>
+    <CCard>
+      <CCardHeader>
+        <CCardTitle>Diversification</CCardTitle>
+      </CCardHeader>
+      <CCardBody>
+        <p>
+          Based on share count and last price
+        </p>
+        <pie-chart :width="500" :height="500" :data="diversification.capital" :labels="diversification.labels"></pie-chart>
+      </CCardBody>
+    </CCard>
   </div>
 </template>
 

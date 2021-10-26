@@ -1,4 +1,6 @@
 
+- migrate to CoreUI
+
 - how to handle tax corrections in a proper way?, e.g.:
 
   // in case of tax corrections dividends could be zero temporarily

@@ -1,37 +1,42 @@
 <template>
   <div>
-    <h1>Cashflow</h1>
+    <CCard>
+      <CCardHeader>
+        <CCardTitle>Cashflow</CCardTitle>
+      </CCardHeader>
+      <CCardBody>
+        <CLabel>Limit: </CLabel>
+        <input label="Limit" v-model="limit" @keyup.enter="onLimitChanged">
 
-    <label>Limit: </label>
-    <input v-model="limit" @keyup.enter="onLimitChanged">
-
-    <table>
-      <thead>
-        <tr>
-          <th class="date">Date</th>
-          <th class="comment">Type/Comment</th>
-          <th class="value">Value</th>
-          <th class="value">Balance</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="t in transactions" style="border-top-style:solid;border-top-width:1px" v-bind:key="t.date">
-          <td class="date">
-            {{ t.date }}
-          </td>
-          <td class="comment" style="padding-left:100px;padding-right:100px;">
-            <b>{{ t.type }}</b><br />
-            {{ t.comment }}
-          </td>
-          <td class="value">
-            {{ t.value }}
-          </td>
-          <td class="value">
-            {{ t.balance }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
+        <table>
+          <thead>
+            <tr>
+              <th class="date">Date</th>
+              <th class="comment">Type/Comment</th>
+              <th class="value">Value</th>
+              <th class="value">Balance</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="t in transactions" style="border-top-style:solid;border-top-width:1px" v-bind:key="t.date">
+              <td class="date">
+                {{ t.date }}
+              </td>
+              <td class="comment" style="padding-left:100px;padding-right:100px;">
+                <b>{{ t.type }}</b><br />
+                {{ t.comment }}
+              </td>
+              <td class="value">
+                {{ t.value }}
+              </td>
+              <td class="value">
+                {{ t.balance }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </CCardBody>
+    </CCard>
   </div>
 </template>
 

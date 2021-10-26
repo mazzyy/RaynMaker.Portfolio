@@ -1,10 +1,11 @@
 <template>
-  <div>
-    <h1>Position Details</h1>
-
-    <h2>{{ isin }}</h2>
-
-  </div>
+  <CCard>
+    <CCardHeader>
+      <CCardTitle>{{ isin }}</CCardTitle>
+    </CCardHeader>
+    <CCardBody>
+    </CCardBody>
+  </CCard>
 </template>
 
 <script>

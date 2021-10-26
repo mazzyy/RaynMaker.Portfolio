@@ -1,9 +1,11 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import App from './App'
+import CoreuiVue from '@coreui/vue'
 
 require('./assets/js/site.js')
 
+Vue.use(CoreuiVue)
 Vue.config.productionTip = false
 
 Vue.use(Router)

@@ -1,13 +1,18 @@
 <template>
   <div>
-    <h1>Closed Positions</h1>
+    <CCard>
+      <CCardHeader>
+        <CCardTitle>Closed Positions</CCardTitle>
+      </CCardHeader>
+      <CCardBody>
+        <form id="filter">
+          <CLabel>Filter: </CLabel>
+          <input name="query" v-model="filter">
+        </form>
 
-    <form id="filter">
-      <label>Filter: </label>
-      <input name="query" v-model="filter">
-    </form>
-
-    <closed-positions-grid :data="positions" :filter-key="filter" style="margin-top:10px"></closed-positions-grid>
+        <closed-positions-grid :data="positions" :filter-key="filter" style="margin-top:10px"></closed-positions-grid>
+      </CCardBody>
+    </CCard>
   </div>
 </template>
 
