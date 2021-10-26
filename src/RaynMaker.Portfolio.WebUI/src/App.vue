@@ -1,20 +1,20 @@
 <template>
   <div id="app">
     <div class="container-fluid">
-      <nav class="navbar navbar-inverse">
-        <div class="container-fluid">
-          <ul class="nav navbar-nav">
-            <li>
-              <router-link to="/Positions">Home</router-link>
+      <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="collapse navbar-collapse">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+              <router-link class="nav-link" to="/Positions">Home</router-link>
             </li>
-            <li>
-              <router-link to="/Performance">Performance</router-link>
+            <li class="nav-item">
+              <router-link class="nav-link" to="/Performance">Performance</router-link>
             </li>
-            <li>
-              <router-link to="/Cashflow">Cashflow</router-link>
+            <li class="nav-item">
+              <router-link class="nav-link" to="/Cashflow">Cashflow</router-link>
             </li>
-            <li>
-              <router-link to="/ClosedPositions">History</router-link>
+            <li class="nav-item">
+              <router-link class="nav-link" to="/ClosedPositions">History</router-link>
             </li>
           </ul>
         </div>
