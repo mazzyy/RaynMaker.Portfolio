@@ -1,5 +1,5 @@
 
-- migrate to CoreUI
+- migrate to axios
 
 - how to handle tax corrections in a proper way?, e.g.:
 

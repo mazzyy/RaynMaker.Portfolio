@@ -5,7 +5,7 @@
         <CCardTitle>Cashflow</CCardTitle>
       </CCardHeader>
       <CCardBody>
-        <CLabel>Limit: </CLabel>
+        <label>Limit: </label>
         <input label="Limit" v-model="limit" @keyup.enter="onLimitChanged">
 
         <table>

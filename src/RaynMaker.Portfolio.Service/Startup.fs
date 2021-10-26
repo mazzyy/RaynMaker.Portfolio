@@ -90,6 +90,11 @@ let build errorHandler projectFile =
 
     let listOpenPositions _ = Controllers.listOpenPositions depot broker lastPriceOf 
     let listClosedPositions _ = Controllers.listClosedPositions depot 
+    let positionDetails (ctx:HttpContext) = 
+        match ctx.request.queryParam "isin" with
+        | Choice1Of2 x -> x
+        | Choice2Of2 msg -> failwithf "Invalid request: %s" msg
+        |> Controllers.positionDetails depot broker lastPriceOf
     let getPerformanceIndicators _ = Controllers.getPerformanceIndicators eventStore depot broker getCashLimit lastPriceOf 
     let getBenchmarkPerformance _ = Controllers.getBenchmarkPerformance eventStore broker savingsPlan pricesRepository benchmark 
     let getDiversification _ = Controllers.getDiversification depot lastPriceOf 
@@ -121,6 +126,7 @@ let build errorHandler projectFile =
                     path "/api/diversification" >=> jsonApi getDiversification
                     path "/api/cashflow" >=> jsonApi listCashflow
                     path "/api/closedPositions" >=> jsonApi listClosedPositions
+                    path "/api/positionDetails" >=> jsonApi positionDetails
                     NOT_FOUND "Resource not found."
                 ]
         ]

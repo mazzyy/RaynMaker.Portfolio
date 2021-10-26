@@ -16,7 +16,11 @@ const router = new Router({
     { path: '/Performance', component: () => import('@/components/Performance') },
     { path: '/Cashflow', component: () => import('@/components/Cashflow') },
     { path: '/ClosedPositions', component: () => import('@/components/ClosedPositions') },
-    { path: '/PositionDetails', component: () => import('@/components/PositionDetails') }
+    {
+      path: '/PositionDetails',
+      name: 'PositionDetails',
+      component: () => import('@/components/PositionDetails')
+    }
   ],
   linkActiveClass: 'active',
   linkExactActiveClass: 'active'

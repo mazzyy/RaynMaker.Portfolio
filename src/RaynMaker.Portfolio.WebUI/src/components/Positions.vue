@@ -6,7 +6,7 @@
       </CCardHeader>
       <CCardBody>
         <form id="filter">
-          <CLabel>Filter: </CLabel>
+          <label style="margin-right:10px">Filter: </label>
           <input name="query" v-model="filter" />
         </form>
 
@@ -49,7 +49,7 @@
       'positions-grid': PositionsGrid,
       'pie-chart': PieChart
     },
-    created: function () {
+    created () {
       this.get(this, '/api/positions', {}, function (that, response) {
         that.positions = response
       })

@@ -6,7 +6,7 @@
       </CCardHeader>
       <CCardBody>
         <form id="filter">
-          <CLabel>Filter: </CLabel>
+          <label>Filter: </label>
           <input name="query" v-model="filter">
         </form>
 
@@ -31,7 +31,7 @@
     components: {
       'closed-positions-grid': ClosedPositionsGrid
     },
-    created: function () {
+    created () {
       this.get(this, '/api/closedPositions', {}, function (that, response) {
         that.positions = response
       })

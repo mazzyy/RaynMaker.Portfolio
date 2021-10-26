@@ -13,7 +13,8 @@ module private Format =
         | x when x > 90.0 -> sprintf "%.2f months" (span.TotalDays / 30.0)
         | _ -> sprintf "%.0f days" span.TotalDays
     let count = sprintf "%.2f"
-    let currency = sprintf "%.2f"
+    // TODO: today we do not support different currencies
+    let currency = sprintf "%.2f €"
     let currencyOpt = Option.map currency >> Option.defaultValue "n.a"
     let percentage = sprintf "%.2f"
 
@@ -100,6 +101,41 @@ let listClosedPositions (depot:Depot.Api) =
             DividendRoiAnnual = p.DividendRoiAnnual |> Format.percentage
             TotalRoiAnnual = p.MarketRoiAnnual + p.DividendRoiAnnual |> Format.percentage
         })
+
+type PositionDetailsVM = {
+    Name : string
+    Isin : string
+    Shares : string
+    BuyingPrice : string
+    BuyingValue : string
+    CurrentPrice : string
+    CurrentValue : string
+    TotalProfit : string
+    TotalRoi : string
+}
+
+let positionDetails (depot:Depot.Api) broker lastPriceOf isin = 
+    let isin = isin |> Isin
+    let position = depot.Get() |> Seq.find(fun x -> x.Isin = isin)
+    let evaluation = 
+        position 
+        |> List.singleton 
+        |> PositionsInteractor.evaluateOpenPositions broker lastPriceOf
+        |> List.exactlyOne
+
+    {
+        Name = position.Name
+        Isin = position.Isin |> Str.ofIsin
+        Shares = position.Count |> Format.count
+        BuyingPrice = evaluation.BuyingPrice |> Format.currencyOpt
+        BuyingValue = evaluation.BuyingValue |> Format.currencyOpt
+        CurrentPrice = evaluation.CurrentPrice |> Format.currency
+        CurrentValue = evaluation.CurrentValue |> Format.currency
+        TotalProfit = evaluation.MarketProfit + evaluation.DividendProfit |> Format.currency
+        TotalRoi = evaluation.MarketRoi + evaluation.DividendRoi |> Format.percentage
+    }
+
+
 
 type PortfolioPerformanceVM = {
     TotalDeposit : string
