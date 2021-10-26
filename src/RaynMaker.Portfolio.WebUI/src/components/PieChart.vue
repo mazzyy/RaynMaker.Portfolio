@@ -25,7 +25,7 @@
     },
     methods: {
       render () {
-        var backgrounds = []
+        let backgrounds = []
         if (this.chartData) {
           backgrounds = pl.palette('tol', this.chartData.length).map(function (hex) {
             return '#' + hex

@@ -85,7 +85,7 @@
       filterKey: String
     },
     data () {
-      var sortOrders = {}
+      const sortOrders = {}
       sortOrders.name = 1
       sortOrders.marketProfit = 1
       sortOrders.dividendProfit = 1
@@ -106,10 +106,10 @@
     },
     computed: {
       filteredData: function () {
-        var sortKey = this.sortKey
-        var filterKey = this.filterKey && this.filterKey.toLowerCase()
-        var order = this.sortOrders[sortKey] || 1
-        var data = this.data
+        const sortKey = this.sortKey
+        const filterKey = this.filterKey && this.filterKey.toLowerCase()
+        const order = this.sortOrders[sortKey] || 1
+        let data = this.data
         if (filterKey) {
           data = data.filter(function (row) {
             return Object.keys(row).some(function (key) {
