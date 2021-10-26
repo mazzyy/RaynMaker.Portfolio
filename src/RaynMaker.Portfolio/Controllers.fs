@@ -51,7 +51,7 @@ let listOpenPositions (depot:Depot.Api) broker lastPriceOf =
             Shares = p.Position.Count |> Format.count
             Duration = p.PricedAt - p.Position.OpenedAt |> Format.timespan
             BuyingPrice = p.BuyingPrice |> Format.currencyOpt
-            BuyingValue = p.BuyingValue |> Format.currencyOpt
+            BuyingValue = p.BuyingValue |> Format.currency
             PricedAt = p.PricedAt |> Format.date
             CurrentPrice = p.CurrentPrice |> Format.currency
             CurrentValue = p.CurrentValue |> Format.currency
@@ -83,23 +83,40 @@ type ClosedPositionVM = {
     TotalRoiAnnual : string
 }
 
+type ClosedPositionsVM = {
+    Currency : string
+
+    TotalProfit : string
+    TotalDividends : string
+
+    Positions : ClosedPositionVM list
+}
+
 let listClosedPositions (depot:Depot.Api) = 
-    depot.Get() 
-    |> PositionsInteractor.evaluateClosedPositions
-    |> List.map(fun p -> 
-        {            
-            Name = p.Position.Name
-            Isin = p.Position.Isin |> Str.ofIsin
-            Duration = p.Duration |> Format.timespan
-            TotalProfit = p.TotalProfit |> Format.currency
-            TotalRoi = p.TotalRoi |> Format.percentage
-            MarketProfitAnnual = p.MarketProfitAnnual |> Format.currency
-            DividendProfitAnnual = p.DividendProfitAnnual |> Format.currency
-            TotalProfitAnnual = p.MarketProfitAnnual + p.DividendProfitAnnual |> Format.currency
-            MarketRoiAnnual = p.MarketRoiAnnual |> Format.percentage
-            DividendRoiAnnual = p.DividendRoiAnnual |> Format.percentage
-            TotalRoiAnnual = p.MarketRoiAnnual + p.DividendRoiAnnual |> Format.percentage
-        })
+    let positions = depot.Get() |> PositionsInteractor.evaluateClosedPositions
+
+    {
+        Currency = "€"
+
+        TotalProfit = positions |> Seq.sumBy(fun x -> x.MarketProfit) |> Format.currency
+        TotalDividends = positions |> Seq.sumBy(fun x -> x.DividendProfit) |> Format.currency
+
+        Positions = positions
+            |> List.map(fun p -> 
+                {            
+                    Name = p.Position.Name
+                    Isin = p.Position.Isin |> Str.ofIsin
+                    Duration = p.Duration |> Format.timespan
+                    TotalProfit = p.TotalProfit |> Format.currency
+                    TotalRoi = p.TotalRoi |> Format.percentage
+                    MarketProfitAnnual = p.MarketProfitAnnual |> Format.currency
+                    DividendProfitAnnual = p.DividendProfitAnnual |> Format.currency
+                    TotalProfitAnnual = p.MarketProfitAnnual + p.DividendProfitAnnual |> Format.currency
+                    MarketRoiAnnual = p.MarketRoiAnnual |> Format.percentage
+                    DividendRoiAnnual = p.DividendRoiAnnual |> Format.percentage
+                    TotalRoiAnnual = p.MarketRoiAnnual + p.DividendRoiAnnual |> Format.percentage
+                })
+    }
 
 type PositionTransactionVM = {
     Date : string
@@ -136,11 +153,13 @@ type PositionDetailsVM = {
 let positionDetails (store:EventStore.Api) (depot:Depot.Api) broker lastPriceOf isin = 
     let isin = isin |> Isin
     let position = depot.Get() |> Seq.find(fun x -> x.Isin = isin)
-    let evaluation = 
-        position 
-        |> List.singleton 
-        |> PositionsInteractor.evaluateOpenPositions broker lastPriceOf
-        |> List.exactlyOne
+    let evaluation = position |> PositionsInteractor.evaluate broker lastPriceOf
+
+    let transactions = 
+            store.Get()
+            |> Seq.filter(fun x -> x |> DomainEvent.Isin = Some isin)
+            |> Seq.sortByDescending DomainEvent.Date
+            |> List.ofSeq
 
     {
         Name = position.Name
@@ -149,15 +168,23 @@ let positionDetails (store:EventStore.Api) (depot:Depot.Api) broker lastPriceOf 
         Currency = "€"
 
         BuyingPrice = evaluation.BuyingPrice |> Format.currencyOpt
-        BuyingValue = evaluation.BuyingValue |> Format.currencyOpt
+        BuyingValue = 
+            if position.ClosedAt |> Option.isSome then
+                // simplification: substract last sell to get remaining investment which was there before the sell
+                let closeValue = 
+                    transactions 
+                    |> Seq.choose(function | StockSold e -> e.Price * e.Count - e.Fee |> Some | _ -> None ) 
+                    |> Seq.head
+                evaluation.BuyingValue + closeValue
+            else
+                evaluation.BuyingValue
+            |> Format.currency
         CurrentPrice = evaluation.CurrentPrice |> Format.currency
         CurrentValue = evaluation.CurrentValue |> Format.currency
         TotalProfit = evaluation.MarketProfit |> Format.currency
         TotalRoi = evaluation.MarketRoi |> Format.percentage
         Transactions = 
-            store.Get()
-            |> Seq.filter(fun x -> x |> DomainEvent.Isin = Some isin)
-            |> Seq.sortByDescending DomainEvent.Date
+            transactions
             |> Seq.choose(function
                 | StockBought e -> 
                     {

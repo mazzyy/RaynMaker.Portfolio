@@ -50,7 +50,10 @@ let getProjectFileFromCommandLine argv =
 
     match argv with
     | [| path |] -> path 
-    | _ -> Path.Combine(home, "..", "..", "docs", "Samples", "Portfolio.json")
+    | _ -> 
+        if @"x:\Investment\Portfolio.json" |> File.Exists then @"x:\Investment\Portfolio.json"
+        else Path.Combine(home, "..", "..", "docs", "Samples", "Portfolio.json")
+        
     |> Path.GetFullPath
 
 let handleLastChanceException msg (ex:Exception) = 
@@ -64,8 +67,8 @@ let main argv =
         |> getProjectFileFromCommandLine
         |> start handleLastChanceException
 
-    printfn "Starting browser ..."
-    Process.Start("cmd", sprintf "/c start http://localhost:%i/" instance.port) |> ignore
+    //printfn "Starting browser ..."
+    //Process.Start("cmd", sprintf "/c start http://localhost:%i/" instance.port) |> ignore
 
     printfn "Press any key to stop ..."
     Console.ReadKey true |> ignore

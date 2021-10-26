@@ -22,7 +22,6 @@ module ``Feature: Evaluate open positions`` =
         |> should equal 12.7M<Currency>
 
         eval.BuyingValue
-        |> Option.get
         |> should equal 127M<Currency>
 
     // buyingPrice: average of individual buying prices. Sold shares are subtracted from previous buying count
