@@ -24,6 +24,3 @@ new Vue({
   router,
   render: h => h(App)
 }).$mount('#app')
-
-require('../node_modules/bootstrap/dist/css/bootstrap.min.css')
-require('./assets/css/site.css')
