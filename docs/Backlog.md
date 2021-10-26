@@ -1,6 +1,16 @@
 
 - migrate to axios
 
+- error handling in suave actions
+
+- migrate to coreui tables
+
+- remove bootstrap
+
+- separate events for
+  - "wertpapiereinang"
+  - "Kapitalmassnahme"
+
 - how to handle tax corrections in a proper way?, e.g.:
 
   // in case of tax corrections dividends could be zero temporarily

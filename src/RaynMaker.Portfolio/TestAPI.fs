@@ -25,7 +25,7 @@ let getNettoDividend company = getPosition company >> fun x -> x.Dividends
 
 let getMostRecentPrice events isin = 
     isin
-    |> Events.LastPriceOf events
+    |> DomainEvent.LastPriceOf events
     |> Option.map(fun x -> x.Value)
 
 let getFee broker = Broker.getFee broker
@@ -33,7 +33,7 @@ let getFee broker = Broker.getFee broker
 let fixedFeeBroker fee = { Name = "FixedFee"; Fee = 0.0M<Percentage>; MinFee = fee; MaxFee = fee }
 
 let evaluate company events = 
-    let getPrice = Events.LastPriceOf events
+    let getPrice = DomainEvent.LastPriceOf events
     let ignoreBroker = fixedFeeBroker 0.0M<Currency>
     
     events

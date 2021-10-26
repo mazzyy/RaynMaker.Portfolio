@@ -35,8 +35,12 @@
         <CCardTitle>Transactions</CCardTitle>
       </CCardHeader>
       <CCardBody>
-        <table>
-        </table>
+        <CDataTable :items="data.transactions"
+                    column-filter
+                    :responsive="false"
+                    :items-per-page="250"
+                    hover>
+        </CDataTable>
       </CCardBody>
     </CCard>
   </div>
@@ -64,6 +68,7 @@
     created () {
       this.get(this, `/api/positionDetails?isin=${this.isin}`, { }, function (that, response) {
         that.data = response
+        console.log(that.data)
       })
     }
   }

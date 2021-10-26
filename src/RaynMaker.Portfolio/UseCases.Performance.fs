@@ -45,5 +45,5 @@ module PerformanceInteractor =
             TotalValue = totalValue
             TotalProfit = totalValue - totalInvestment
             CashLimit = getCashLimit()
-            InvestingTime = DateTime.Today - (store |> Seq.tryHead |> Option.map Events.GetDate |? DateTime.Today) 
+            InvestingTime = DateTime.Today - (store |> Seq.tryHead |> Option.map DomainEvent.Date |? DateTime.Today) 
         }

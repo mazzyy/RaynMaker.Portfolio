@@ -102,6 +102,14 @@ let listClosedPositions (depot:Depot.Api) =
             TotalRoiAnnual = p.MarketRoiAnnual + p.DividendRoiAnnual |> Format.percentage
         })
 
+type PositionTransactionVM = {
+    Date : string
+    Action : string
+    Shares : string
+    Price : string
+    Value : string
+}
+
 type PositionDetailsVM = {
     Name : string
     Isin : string
@@ -112,9 +120,10 @@ type PositionDetailsVM = {
     CurrentValue : string
     TotalProfit : string
     TotalRoi : string
+    Transactions : PositionTransactionVM list
 }
 
-let positionDetails (depot:Depot.Api) broker lastPriceOf isin = 
+let positionDetails (store:EventStore.Api) (depot:Depot.Api) broker lastPriceOf isin = 
     let isin = isin |> Isin
     let position = depot.Get() |> Seq.find(fun x -> x.Isin = isin)
     let evaluation = 
@@ -133,6 +142,33 @@ let positionDetails (depot:Depot.Api) broker lastPriceOf isin =
         CurrentValue = evaluation.CurrentValue |> Format.currency
         TotalProfit = evaluation.MarketProfit + evaluation.DividendProfit |> Format.currency
         TotalRoi = evaluation.MarketRoi + evaluation.DividendRoi |> Format.percentage
+        Transactions = 
+            store.Get()
+            |> Seq.filter(fun x -> x |> DomainEvent.Isin = Some isin)
+            |> Seq.sortByDescending DomainEvent.Date
+            |> Seq.choose(function
+                | StockBought e -> 
+                    {
+                        Date = e.Date |> Format.date
+                        Action = "Buy"
+                        Shares = e.Count |> Format.count
+                        Price = e.Price - e.Fee |> Format.currency
+                        Value = (e.Price - e.Fee) * e.Count |> Format.currency
+                    } |> Some
+                | StockSold e -> 
+                    {
+                        Date = e.Date |> Format.date
+                        Action = "Sell"
+                        Shares = e.Count |> Format.count
+                        Price = e.Price - e.Fee |> Format.currency
+                        Value = (e.Price - e.Fee) * e.Count |> Format.currency
+                    } |> Some
+                | DividendReceived _ -> None
+                | DepositAccounted _ -> None
+                | DisbursementAccounted _ -> None
+                | InterestReceived _ -> None
+                | StockPriced _ -> None)
+            |> List.ofSeq
     }
 
 
@@ -221,7 +257,7 @@ let getDiversification (depot:Depot.Api) lastPriceOf =
             Capital = r.Positions |> List.map snd
         }
 
-type TransactionVM = {
+type CashflowTransactionVM = {
     Date : string
     Type : string
     Comment : string

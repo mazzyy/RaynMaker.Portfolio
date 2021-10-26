@@ -84,7 +84,7 @@ let build errorHandler projectFile =
 
     let getCashLimit() = (project.CashLimit |> decimal) * 1.0M<Currency>
 
-    let lastPriceOf = Events.LastPriceOf (eventStore.Get())
+    let lastPriceOf = DomainEvent.LastPriceOf (eventStore.Get())
     
     let log = request (fun r -> printfn "%s" r.path; succeed)
 
@@ -94,7 +94,7 @@ let build errorHandler projectFile =
         match ctx.request.queryParam "isin" with
         | Choice1Of2 x -> x
         | Choice2Of2 msg -> failwithf "Invalid request: %s" msg
-        |> Controllers.positionDetails depot broker lastPriceOf
+        |> Controllers.positionDetails eventStore depot broker lastPriceOf
     let getPerformanceIndicators _ = Controllers.getPerformanceIndicators eventStore depot broker getCashLimit lastPriceOf 
     let getBenchmarkPerformance _ = Controllers.getBenchmarkPerformance eventStore broker savingsPlan pricesRepository benchmark 
     let getDiversification _ = Controllers.getDiversification depot lastPriceOf 

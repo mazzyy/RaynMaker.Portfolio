@@ -71,8 +71,18 @@ type Price = {
     Value : decimal<Currency>
 }
 
-module Events =
-    let GetDate event =
+module DomainEvent =
+    let Isin event =
+        match event with
+        | StockBought e -> e.Isin |> Some
+        | StockSold e -> e.Isin |> Some
+        | DividendReceived e -> e.Isin |> Some
+        | DepositAccounted _ -> None
+        | DisbursementAccounted _ -> None
+        | InterestReceived _ -> None
+        | StockPriced e -> e.Isin |> Some
+
+    let Date event =
         match event with
         | StockBought e -> e.Date
         | StockSold e -> e.Date

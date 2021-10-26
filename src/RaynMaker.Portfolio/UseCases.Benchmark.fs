@@ -53,7 +53,7 @@ module BenchmarkInteractor =
                   Price = price
                   Count = count })
         
-        let lastDay = store |> List.last |> Events.GetDate
+        let lastDay = store |> List.last |> DomainEvent.Date
         seq {
             yield! store
                     |> Seq.choose (function
@@ -109,7 +109,7 @@ module BenchmarkInteractor =
         let eval events = 
             events
             |> Positions.create
-            |> PositionsInteractor.evaluateProfit broker (Events.LastPriceOf events)
+            |> PositionsInteractor.evaluateProfit broker (DomainEvent.LastPriceOf events)
             |> Seq.head
 
         let events = store.Get()
@@ -117,7 +117,7 @@ module BenchmarkInteractor =
         {
             BuyInstead = events |> buyBenchmarkInstead broker benchmark getPrice |> eval
             BuyPlan = 
-                let start = events.Head |> Events.GetDate
-                let stop = events |> List.last |> Events.GetDate
+                let start = events.Head |> DomainEvent.Date
+                let stop = events |> List.last |> DomainEvent.Date
                 buyBenchmarkByPlan savingsPlan benchmark getPrice start stop |> eval
         }
