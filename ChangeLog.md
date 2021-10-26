@@ -1,5 +1,7 @@
-## 1.4 - 2020-03-
+## 1.4 - 2021
 
+- UI made more modern
+- Position Details Added
 - Error handling improved
 - Dependencies updated 
 - migrated to .Net Core 3.x

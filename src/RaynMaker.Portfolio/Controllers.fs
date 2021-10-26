@@ -109,18 +109,28 @@ type PositionTransactionVM = {
     Value : string
 }
 
+type DividendsVM = {
+    Date : string
+    Value : string
+}
+
 type PositionDetailsVM = {
     Name : string
     Isin : string
     Shares : string
+    Currency : string
+
     BuyingPrice : string
     BuyingValue : string
     CurrentPrice : string
     CurrentValue : string
     TotalProfit : string
     TotalRoi : string
-    Currency : string
     Transactions : PositionTransactionVM list
+
+    TotalDividends : string
+    DividendsRoi : string
+    Dividends : DividendsVM list
 }
 
 let positionDetails (store:EventStore.Api) (depot:Depot.Api) broker lastPriceOf isin = 
@@ -136,13 +146,14 @@ let positionDetails (store:EventStore.Api) (depot:Depot.Api) broker lastPriceOf 
         Name = position.Name
         Isin = position.Isin |> Str.ofIsin
         Shares = position.Count |> Format.count
+        Currency = "€"
+
         BuyingPrice = evaluation.BuyingPrice |> Format.currencyOpt
         BuyingValue = evaluation.BuyingValue |> Format.currencyOpt
         CurrentPrice = evaluation.CurrentPrice |> Format.currency
         CurrentValue = evaluation.CurrentValue |> Format.currency
         TotalProfit = evaluation.MarketProfit |> Format.currency
         TotalRoi = evaluation.MarketRoi |> Format.percentage
-        Currency = "€"
         Transactions = 
             store.Get()
             |> Seq.filter(fun x -> x |> DomainEvent.Isin = Some isin)
@@ -166,11 +177,22 @@ let positionDetails (store:EventStore.Api) (depot:Depot.Api) broker lastPriceOf 
                         // effective value including fees & taxes
                         Value = e.Price * e.Count - e.Fee |> Format.currency
                     } |> Some
-                | DividendReceived _ -> None
-                | DepositAccounted _ -> None
-                | DisbursementAccounted _ -> None
-                | InterestReceived _ -> None
-                | StockPriced _ -> None)
+                | DividendReceived _ | DepositAccounted _ | DisbursementAccounted _ | InterestReceived _ | StockPriced _ -> None)
+            |> List.ofSeq
+
+        TotalDividends = evaluation.DividendProfit |> Format.currency
+        DividendsRoi = evaluation.DividendRoi |> Format.percentage
+        Dividends = 
+            store.Get()
+            |> Seq.filter(fun x -> x |> DomainEvent.Isin = Some isin)
+            |> Seq.sortByDescending DomainEvent.Date
+            |> Seq.choose(function
+                | DividendReceived e -> 
+                    {
+                        Date = e.Date |> Format.date
+                        Value = e.Value - e.Fee |> Format.currency
+                    } |> Some
+                | StockBought _ | StockSold _  | DepositAccounted _  | DisbursementAccounted _ | InterestReceived _ | StockPriced _ -> None)
             |> List.ofSeq
     }
 

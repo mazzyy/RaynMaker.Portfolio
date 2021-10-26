@@ -26,6 +26,10 @@
             <th>Profit</th>
             <td>{{ data.totalProfit }} {{currency}} ({{ data.totalRoi }} %)</td>
           </tr>
+          <tr>
+            <th>Dividends</th>
+            <td>{{ data.totalDividends}} {{currency}} ({{ data.dividendsRoi }} %)</td>
+          </tr>
         </table>
       </CCardBody>
     </CCard>
@@ -43,6 +47,23 @@
           <template #price="{item}">
             <td>{{ item.price }} {{currency}}</td>
           </template>
+          <template #value="{item}">
+            <td>{{ item.value }} {{currency}}</td>
+          </template>
+        </CDataTable>
+      </CCardBody>
+    </CCard>
+
+    <CCard>
+      <CCardHeader>
+        <CCardTitle>Dividends</CCardTitle>
+      </CCardHeader>
+      <CCardBody>
+        <CDataTable :items="data.dividends"
+                    column-filter
+                    :responsive="false"
+                    :items-per-page="250"
+                    hover>
           <template #value="{item}">
             <td>{{ item.value }} {{currency}}</td>
           </template>

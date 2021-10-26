@@ -1,14 +1,13 @@
 
 - position details
-  - add devidends + totals (in transactions)
+  - show for history
 
 - migrate to axios
 
 - error handling in suave actions
 
-- migrate to coreui tables
-
-- remove bootstrap
+- can we migrate to coreui tables
+  (and remove bootstrap)
 
 - separate events for
   - "wertpapiereinang"
