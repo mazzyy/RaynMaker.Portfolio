@@ -152,16 +152,18 @@ let positionDetails (store:EventStore.Api) (depot:Depot.Api) broker lastPriceOf 
                         Date = e.Date |> Format.date
                         Action = "Buy"
                         Shares = e.Count |> Format.count
-                        Price = e.Price - e.Fee |> Format.currency
-                        Value = (e.Price - e.Fee) * e.Count |> Format.currency
+                        Price = e.Price |> Format.currency
+                        // effective value including fees
+                        Value = e.Price * e.Count + e.Fee |> Format.currency
                     } |> Some
                 | StockSold e -> 
                     {
                         Date = e.Date |> Format.date
                         Action = "Sell"
                         Shares = e.Count |> Format.count
-                        Price = e.Price - e.Fee |> Format.currency
-                        Value = (e.Price - e.Fee) * e.Count |> Format.currency
+                        Price = e.Price |> Format.currency
+                        // effective value including fees & taxes
+                        Value = e.Price * e.Count - e.Fee |> Format.currency
                     } |> Some
                 | DividendReceived _ -> None
                 | DepositAccounted _ -> None
