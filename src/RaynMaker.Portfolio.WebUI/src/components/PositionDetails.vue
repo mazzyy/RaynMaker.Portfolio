@@ -74,12 +74,10 @@
 </template>
 
 <script>
-  import * as my from '../assets/js/site.js'
+  import API from '@/api'
 
   export default {
     name: 'PositionDetails',
-
-    mixins: [my.webApi],
 
     data () {
       return {
@@ -93,11 +91,9 @@
       currency () { return this.data.currency }
     },
 
-    created () {
-      this.get(this, `/api/positionDetails?isin=${this.isin}`, { }, function (that, response) {
-        that.data = response
-        console.log(that.data)
-      })
+    async created () {
+      const response = await API.get(`/positionDetails?isin=${this.isin}`)
+      this.data = response.data
     }
   }
 </script>

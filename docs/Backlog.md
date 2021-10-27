@@ -1,7 +1,5 @@
 
 
-- migrate to axios
-
 - can we migrate to coreui tables
   (and remove bootstrap)
 

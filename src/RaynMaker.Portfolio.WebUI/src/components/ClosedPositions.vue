@@ -35,7 +35,7 @@
 </template>
 
 <script>
-  import * as my from '../assets/js/site.js'
+  import API from '@/api'
   import ClosedPositionsGrid from '@/components/ClosedPositionsGrid'
 
   export default {
@@ -49,11 +49,9 @@
     components: {
       'closed-positions-grid': ClosedPositionsGrid
     },
-    created () {
-      this.get(this, '/api/closedPositions', {}, function (that, response) {
-        that.data = response
-      })
-    },
-    mixins: [my.webApi]
+    async created () {
+      const response = await API.get('/closedPositions')
+      this.data = response.data
+    }
   }
 </script>

@@ -5,7 +5,7 @@
         <CCardTitle>Performance</CCardTitle>
       </CCardHeader>
       <CCardBody>
-        <table>
+        <table v-if="performance">
           <tr>
             <th class="label">Investment time</th>
             <td class="value">{{ performance.investingTime }}</td>
@@ -54,7 +54,7 @@
       <CCardHeader>
         <CCardTitle>Benchmark</CCardTitle>
       </CCardHeader>
-      <CCardBody>
+      <CCardBody v-if="benchmark">
         <p>
           If you would have bought the benchmark "{{ benchmark.name }}" (Isin: {{ benchmark.isin }}) instead of your stock picks you would have gained:
         </p>
@@ -86,7 +86,7 @@
 </template>
 
 <script>
-  import * as my from '../assets/js/site.js'
+  import API from '@/api'
 
   export default {
     name: 'Performance',
@@ -96,15 +96,13 @@
         benchmark: null
       }
     },
-    created: function () {
-      this.get(this, '/api/performance', {}, function (that, response) {
-        that.performance = response
-      })
-      this.get(this, '/api/benchmark', {}, function (that, response) {
-        that.benchmark = response
-      })
-    },
-    mixins: [my.webApi]
+    async created () {
+      let response = await API.get('/performance')
+      this.performance = response.data
+
+      response = await API.get('/benchmark')
+      this.benchmark = response.data
+    }
   }
 </script>
 

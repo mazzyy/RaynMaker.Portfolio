@@ -18,7 +18,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="t in transactions" style="border-top-style:solid;border-top-width:1px" v-bind:key="t.date">
+            <tr v-for="t in transactions" style="border-top-style:solid;border-top-width:1px" v-bind:key="t.date + Math.random()">
               <td class="date">
                 {{ t.date }}
               </td>
@@ -41,7 +41,7 @@
 </template>
 
 <script>
-  import * as my from '../assets/js/site.js'
+  import API from '@/api'
 
   export default {
     name: 'Cashflow',
@@ -51,22 +51,21 @@
         limit: 25
       }
     },
-    created: function () {
+    created () {
       this.onLimitChanged()
     },
     methods: {
-      onLimitChanged: function () {
-        this.get(this, '/api/cashflow', { limit: this.limit }, function (that, response) {
-          that.transactions = response
-        })
+      async onLimitChanged () {
+        const response = await API.get(`/cashflow?limit=${this.limit}`)
+
+        this.transactions = response.data
       }
     },
     watch: {
-      limit: function () {
+      limit () {
         this.onLimitChanged()
       }
-    },
-    mixins: [my.webApi]
+    }
   }
 </script>
 

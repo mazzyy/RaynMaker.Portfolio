@@ -29,7 +29,7 @@
 </template>
 
 <script>
-  import * as my from '../assets/js/site.js'
+  import API from '@/api'
   import PositionsGrid from '@/components/PositionsGrid'
   import PieChart from '@/components/PieChart'
 
@@ -49,15 +49,13 @@
       'positions-grid': PositionsGrid,
       'pie-chart': PieChart
     },
-    created () {
-      this.get(this, '/api/positions', {}, function (that, response) {
-        that.positions = response
-      })
-      this.get(this, '/api/diversification', {}, function (that, response) {
-        that.diversification.capital = response.capital
-        that.diversification.labels = response.labels
-      })
-    },
-    mixins: [my.webApi]
+    async created () {
+      let response = await API.get('/positions')
+      this.positions = response.data
+
+      response = await API.get('/diversification')
+      this.diversification.capital = response.data.capital
+      this.diversification.labels = response.data.labels
+    }
   }
 </script>
