@@ -1,8 +1,5 @@
 
 
-- can we migrate to coreui tables
-  (and remove bootstrap)
-
 - what is the buying price?
   - sliding window?
   - remaining investment before final sell?

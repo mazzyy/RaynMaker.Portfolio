@@ -1,5 +1,5 @@
 <template>
-  <table class="table table-bordered table-sm">
+  <table class="table table-bordered table-sm table-hover">
     <thead>
       <tr>
         <th @click="sortBy('name')" :class="{ sortedBy: sortKey == 'name' }">

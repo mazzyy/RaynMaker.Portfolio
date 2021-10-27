@@ -8,7 +8,7 @@
         <label>Limit: </label>
         <input label="Limit" v-model="limit" @keyup.enter="onLimitChanged">
 
-        <table>
+        <table class="table-hover">
           <thead>
             <tr>
               <th class="date">Date</th>
