@@ -35,9 +35,6 @@
   
 =====================
 
-- Vue
-  - separate between components and views
-  - actual only real component is the pie chart
 
 - improve TestAPI and test to be based on Controller/Presenter
   - TestAPI only bridges between test and SUT
