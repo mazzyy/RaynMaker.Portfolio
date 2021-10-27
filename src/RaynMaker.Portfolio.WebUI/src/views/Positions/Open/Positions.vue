@@ -30,8 +30,8 @@
 
 <script>
   import API from '@/api'
-  import PositionsGrid from '@/components/PositionsGrid'
   import PieChart from '@/components/PieChart'
+  import PositionsGrid from './PositionsGrid'
 
   export default {
     name: 'Positions',

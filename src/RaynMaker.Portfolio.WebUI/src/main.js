@@ -10,14 +10,14 @@ Vue.use(Router)
 
 const router = new Router({
   routes: [
-    { path: '/Positions', alias: '/', component: () => import('@/components/Positions') },
-    { path: '/Performance', component: () => import('@/components/Performance') },
-    { path: '/Cashflow', component: () => import('@/components/Cashflow') },
-    { path: '/ClosedPositions', component: () => import('@/components/ClosedPositions') },
+    { path: '/Positions', alias: '/', component: () => import('@/views//Positions/Open/Positions.vue') },
+    { path: '/Performance', component: () => import('@/views/Performance/Performance.vue') },
+    { path: '/Cashflow', component: () => import('@/views/Cashflow/Cashflow.vue') },
+    { path: '/ClosedPositions', component: () => import('@/views/Positions/Closed/ClosedPositions.vue') },
     {
       path: '/PositionDetails',
       name: 'PositionDetails',
-      component: () => import('@/components/PositionDetails')
+      component: () => import('@/views/Positions/Details/PositionDetails.vue')
     }
   ],
   linkActiveClass: 'active',

@@ -36,7 +36,7 @@
 
 <script>
   import API from '@/api'
-  import ClosedPositionsGrid from '@/components/ClosedPositionsGrid'
+  import ClosedPositionsGrid from './ClosedPositionsGrid'
 
   export default {
     name: 'ClosedPositions',
