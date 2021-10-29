@@ -1,5 +1,6 @@
 ## 1.4 - 2021
 
+- basic support for crypto coins added
 - UI made more modern
 - Position Details Added
 - Error handling improved

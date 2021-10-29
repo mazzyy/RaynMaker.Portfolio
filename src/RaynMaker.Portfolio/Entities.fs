@@ -128,7 +128,6 @@ type Broker = {
     MinFee : decimal<Currency>
     MaxFee : decimal<Currency> }
 
-[<CompilationRepresentation(CompilationRepresentationFlags.ModuleSuffix)>]
 module Broker =
     let getFee broker value =
         match value |> percent broker.Fee with

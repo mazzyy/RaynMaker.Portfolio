@@ -59,9 +59,13 @@ module PositionsInteractor =
         DividendRoiAnnual : decimal<Percentage> }
     
     let evaluate broker getLastPrice (p:Position) =
+        let getFee = p.AssetId |> function
+            | Isin _ -> Broker.getFee broker
+            | Coin _ -> fun _ -> 1.0M<Currency> // TODO: workaround for missing support of mutltiple brokers
+
         let value,pricedAt = 
             let price = p.AssetId |> getLastPrice |> Option.get // there has to be a price otherwise there would be no position
-            p.Payouts + p.Count * price.Value - (Broker.getFee broker price.Value), price.Day
+            p.Payouts + p.Count * price.Value - (getFee price.Value), price.Day
 
         let investedYears = (pricedAt - p.OpenedAt).TotalDays / 365.0 |> decimal
         let marketRoi = (value - p.Invested) / p.Invested * 100.0M<Percentage>

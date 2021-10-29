@@ -4,6 +4,11 @@
   - rename "isin" -> assetid
   - how can we diff in UI whether it is isin or coin? on controller request we have to diff
 
+- support for multiple brokers (diba + binance)
+  - or should we just ignore the broker when simulating sell?
+  - we also ignore taxes ...
+  - we could later added as optional feature but then we would also have to ask for taxes
+
 - separate events for
   - "wertpapiereinang"
   - "Kapitalmassnahme"
