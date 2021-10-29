@@ -43,33 +43,46 @@ type OpenPositionVM = {
     TotalRoiAnnual : string
 }
 
+type OpenPositionsVM = {
+    TotalInvestment : string
+    TotalProfit : string
+    Positions : OpenPositionVM list
+}
+
 let listOpenPositions (depot:Depot.Api) broker lastPriceOf = 
-    depot.Get() 
-    |> PositionsInteractor.evaluateOpenPositions broker lastPriceOf
-    |> List.map(fun p -> 
-        {            
-            Name = p.Position.Name
-            Isin = p.Position.AssetId |> Str.ofAssetId
-            Shares = p.Position.Count |> Format.count p.Position.AssetId
-            Duration = p.PricedAt - p.Position.OpenedAt |> Format.timespan
-            BuyingPrice = p.BuyingPrice |> Format.currencyOpt
-            BuyingValue = p.BuyingValue |> Format.currency
-            PricedAt = p.PricedAt |> Format.date
-            CurrentPrice = p.CurrentPrice |> Format.currency
-            CurrentValue = p.CurrentValue |> Format.currency
-            MarketProfit = p.MarketProfit |> Format.currency
-            DividendProfit = p.DividendProfit |> Format.currency
-            TotalProfit = p.MarketProfit + p.DividendProfit |> Format.currency
-            MarketRoi = p.MarketRoi |> Format.percentage
-            DividendRoi = p.DividendRoi |> Format.percentage
-            TotalRoi = p.MarketRoi + p.DividendRoi |> Format.percentage
-            MarketProfitAnnual = p.MarketProfitAnnual |> Format.currency
-            DividendProfitAnnual = p.DividendProfitAnnual |> Format.currency
-            TotalProfitAnnual = p.MarketProfitAnnual + p.DividendProfitAnnual |> Format.currency
-            MarketRoiAnnual = p.MarketRoiAnnual |> Format.percentage
-            DividendRoiAnnual = p.DividendRoiAnnual |> Format.percentage
-            TotalRoiAnnual = p.MarketRoiAnnual + p.DividendRoiAnnual |> Format.percentage
-        })
+    let positions = 
+        depot.Get() 
+        |> PositionsInteractor.evaluateOpenPositions broker lastPriceOf
+    {
+        TotalInvestment = positions |> List.sumBy(fun x -> x.BuyingValue) |> Format.currency
+        TotalProfit = positions |> List.sumBy(fun x -> x.MarketProfit + x.DividendProfit) |> Format.currency
+        Positions =
+            positions
+            |> List.map(fun p -> 
+                {            
+                    Name = p.Position.Name
+                    Isin = p.Position.AssetId |> Str.ofAssetId
+                    Shares = p.Position.Count |> Format.count p.Position.AssetId
+                    Duration = p.PricedAt - p.Position.OpenedAt |> Format.timespan
+                    BuyingPrice = p.BuyingPrice |> Format.currencyOpt
+                    BuyingValue = p.BuyingValue |> Format.currency
+                    PricedAt = p.PricedAt |> Format.date
+                    CurrentPrice = p.CurrentPrice |> Format.currency
+                    CurrentValue = p.CurrentValue |> Format.currency
+                    MarketProfit = p.MarketProfit |> Format.currency
+                    DividendProfit = p.DividendProfit |> Format.currency
+                    TotalProfit = p.MarketProfit + p.DividendProfit |> Format.currency
+                    MarketRoi = p.MarketRoi |> Format.percentage
+                    DividendRoi = p.DividendRoi |> Format.percentage
+                    TotalRoi = p.MarketRoi + p.DividendRoi |> Format.percentage
+                    MarketProfitAnnual = p.MarketProfitAnnual |> Format.currency
+                    DividendProfitAnnual = p.DividendProfitAnnual |> Format.currency
+                    TotalProfitAnnual = p.MarketProfitAnnual + p.DividendProfitAnnual |> Format.currency
+                    MarketRoiAnnual = p.MarketRoiAnnual |> Format.percentage
+                    DividendRoiAnnual = p.DividendRoiAnnual |> Format.percentage
+                    TotalRoiAnnual = p.MarketRoiAnnual + p.DividendRoiAnnual |> Format.percentage
+                })
+        }
 
 type ClosedPositionVM = {
     Name : string

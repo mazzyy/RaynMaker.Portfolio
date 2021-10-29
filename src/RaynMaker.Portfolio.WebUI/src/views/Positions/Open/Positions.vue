@@ -8,6 +8,11 @@
         <form id="filter">
           <label style="margin-right:10px">Filter: </label>
           <input name="query" v-model="filter" />
+          <span style="float: right">
+            <label>Total investment: </label> {{ summary.totalInvestment }}
+            <span style="margin-left: 20px"></span>
+            <label>Total profit: </label> {{ summary.totalProfit }}
+          </span>
         </form>
 
         <positions-grid :data="positions" :filter-key="filter" style="margin-top:10px"></positions-grid>
@@ -38,6 +43,7 @@
     data () {
       return {
         positions: [],
+        summary: {},
         filter: '',
         diversification: {
           capital: null,
@@ -51,7 +57,11 @@
     },
     async created () {
       let response = await API.get('/positions')
-      this.positions = response.data
+      this.positions = response.data.positions
+      this.summary = {
+        totalInvestment: response.data.totalInvestment,
+        totalProfit: response.data.totalProfit
+      }
 
       response = await API.get('/diversification')
       this.diversification.capital = response.data.capital
@@ -59,3 +69,9 @@
     }
   }
 </script>
+
+<style>
+  label {
+    font-weight: bold
+  }
+</style>
