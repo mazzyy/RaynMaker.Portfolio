@@ -19,21 +19,21 @@ module EventsReader =
             match r.Event with
             | EqualsI "StockBought" _ -> 
                 { Date = r.Date
-                  Isin = r.ID |> Isin
+                  AssetId = r.ID |> AssetId.Isin 
                   Name = r.Name
                   Count = r.Count |> decimal
                   Price = (r.Value |> decimal) * 1.0M<Currency>
                   Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> StockBought |> Some
             | EqualsI "StockSold" _ -> 
                 { Date = r.Date
-                  Isin = r.ID |> Isin
+                  AssetId = r.ID |> AssetId.Isin
                   Name = r.Name
                   Count = r.Count |> decimal
                   Price = (r.Value |> decimal) * 1.0M<Currency>
                   Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> StockSold |> Some
             | EqualsI "DividendReceived" _ -> 
                 { DividendReceived.Date = r.Date
-                  Isin = r.ID |> Isin
+                  Isin = r.ID |> Isin.Isin
                   Name = r.Name
                   Value = (r.Value |> decimal) * 1.0M<Currency>
                   Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> DividendReceived |> Some
@@ -48,8 +48,8 @@ module EventsReader =
                   Value = (r.Value |> decimal) * 1.0M<Currency>} |> InterestReceived |> Some
             | EqualsI "PositionClosed" _
             | EqualsI "StockPriced" _ -> 
-                { StockPriced.Date = if r.Date = DateTime.MinValue then DateTime.Today else r.Date
-                  Isin = r.ID |> Isin
+                { Date = if r.Date = DateTime.MinValue then DateTime.Today else r.Date
+                  AssetId = r.ID |> AssetId.Isin
                   Name = r.Name
                   Price = (r.Value |> decimal) * 1.0M<Currency> } |> StockPriced |> Some
             | x -> None

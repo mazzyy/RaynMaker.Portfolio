@@ -59,16 +59,16 @@ let build errorHandler projectFile =
 
     let getPricesFile = sprintf "%s.prices.csv" >> fromStore 
     let collectPrices() = PricesCollector.execute getPricesFile 
-    let pricesRepository = PricesRepository.create errorHandler collectPrices (fun isin ->
-        printfn "Loading prices for %s" (Str.ofIsin isin)
+    let pricesRepository = PricesRepository.create errorHandler collectPrices (fun assetId ->
+        printfn "Loading prices for %s" (Str.ofAssetId assetId)
 
-        isin
-        |> Str.ofIsin
+        assetId
+        |> Str.ofAssetId
         |> getPricesFile
         |> CsvPricesReader.readCsv)
     
     let benchmark = { 
-        Isin = project.Benchmark.Isin |> Isin
+        Isin = project.Benchmark.Isin |> AssetId.Isin
         Name = project.Benchmark.Name }
 
     let savingsPlan = { SavingsPlan.Fee = project.Benchmark.SavingsPlan.Fee * 1.0M<Percentage>

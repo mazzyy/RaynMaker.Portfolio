@@ -5,10 +5,23 @@ open System
 [<Measure>] type Currency
 [<Measure>] type Percentage
 
-type AssetId = Isin of string
+type Isin = Isin of string
+type Coin = Coin of string 
+
+type AssetId = 
+    | Isin of Isin
+    | Coin of Coin
+
+module AssetId = 
+    let Isin = Isin.Isin >> AssetId.Isin
+    let Coin = Coin.Coin >> AssetId.Coin
 
 module Str = 
-    let ofIsin (Isin x) = x
+    let ofIsin (Isin.Isin x) = x
+    let ofCoin (Coin.Coin x) = x
+    let ofAssetId = function
+        | Isin(Isin.Isin x) -> x
+        | Coin(Coin.Coin x) -> x
 
 [<AutoOpen>]
 module Finance =
@@ -17,7 +30,7 @@ module Finance =
 
 type AssetTransaction = {
     Date : DateTime
-    Isin : AssetId
+    AssetId : AssetId
     Name : string
     Count : decimal
     Price : decimal<Currency>
@@ -25,7 +38,7 @@ type AssetTransaction = {
 
 type DividendReceived = {
     Date : DateTime
-    Isin : AssetId
+    Isin : Isin
     Name : string
     Value : decimal<Currency>
     Fee : decimal<Currency> }
@@ -43,9 +56,9 @@ type InterestReceived = {
     Value : decimal<Currency> }
 
 /// notifies the (final) price of a stock at a given date
-type StockPriced = {
+type AssetPriced = {
     Date : DateTime
-    Isin : AssetId
+    AssetId : AssetId
     Name : string
     Price : decimal<Currency> }
 
@@ -56,7 +69,7 @@ type DomainEvent =
     | DepositAccounted of DepositAccounted
     | DisbursementAccounted of DisbursementAccounted
     | InterestReceived of InterestReceived
-    | StockPriced of StockPriced
+    | StockPriced of AssetPriced
 
 type Price = {
     Day : DateTime
@@ -64,15 +77,15 @@ type Price = {
 }
 
 module DomainEvent =
-    let Isin event =
+    let AssetId event =
         match event with
-        | StockBought e -> e.Isin |> Some
-        | StockSold e -> e.Isin |> Some
-        | DividendReceived e -> e.Isin |> Some
+        | StockBought e -> e.AssetId |> Some
+        | StockSold e -> e.AssetId |> Some
+        | DividendReceived e -> e.Isin |> Isin |> Some
         | DepositAccounted _ -> None
         | DisbursementAccounted _ -> None
         | InterestReceived _ -> None
-        | StockPriced e -> e.Isin |> Some
+        | StockPriced e -> e.AssetId |> Some
 
     let Date event =
         match event with
@@ -85,13 +98,13 @@ module DomainEvent =
         | StockPriced e -> e.Date
 
     /// searches for the last price information available
-    let LastPriceOf events isin =
+    let LastPriceOf events assetId =
         events
         |> List.rev
         |> Seq.tryPick (function 
-            | StockBought e when e.Isin = isin -> { Day = e.Date; Value = e.Price } |> Some 
-            | StockSold e when e.Isin = isin -> { Day = e.Date; Value = e.Price } |> Some 
-            | StockPriced e when e.Isin = isin -> { Day = e.Date; Value = e.Price } |> Some 
+            | StockBought e when e.AssetId = assetId -> { Day = e.Date; Value = e.Price } |> Some 
+            | StockSold e when e.AssetId = assetId -> { Day = e.Date; Value = e.Price } |> Some 
+            | StockPriced e when e.AssetId = assetId -> { Day = e.Date; Value = e.Price } |> Some 
             | _ -> None)
 
 module Prices = 
@@ -126,7 +139,7 @@ module Broker =
 type Position = {
     OpenedAt : DateTime 
     ClosedAt : DateTime option
-    Isin : AssetId
+    AssetId : AssetId
     Name : string
     Count : decimal
     /// All the money ever invested into this position
@@ -140,7 +153,7 @@ module Positions =
         { 
             OpenedAt = date
             ClosedAt = None
-            Isin = isin
+            AssetId = isin
             Name = name
             Count = 0.0M
             Invested = 0.0M<Currency>
@@ -149,7 +162,7 @@ module Positions =
         }
 
     let accountBuy p (evt:AssetTransaction) =
-        Contract.requires (fun () -> p.Isin = evt.Isin) "evt.Isin = p.Isin"
+        Contract.requires (fun () -> p.AssetId = evt.AssetId) "evt.Isin = p.Isin"
         Contract.requires (fun () -> evt.Count > 0.0M) "evt.Count > 0"
         // in case of "spin-off" we could get stocks for free
         // Contract.requires (fun () -> evt.Price > 0.0M<Currency>) "evt.Price > 0"
@@ -167,7 +180,7 @@ module Positions =
         newP    
     
     let accountSell p (evt:AssetTransaction) =
-        Contract.requires (fun () -> p.Isin = evt.Isin) "evt.Isin = p.Isin"
+        Contract.requires (fun () -> p.AssetId = evt.AssetId) "evt.Isin = p.Isin"
         Contract.requires (fun () -> evt.Count > 0.0M) "evt.Count > 0"
         Contract.requires (fun () -> evt.Price > 0.0M<Currency>) "evt.Price > 0"
         Contract.requires (fun () -> evt.Fee >= 0.0M<Currency>) "evt.Fee >= 0"
@@ -189,7 +202,7 @@ module Positions =
         newP
 
     let accountDividends p (evt:DividendReceived) =
-        Contract.requires (fun () -> p.Isin = evt.Isin) "evt.Isin = p.Isin"
+        Contract.requires (fun () -> p.AssetId = Isin(evt.Isin)) "evt.Isin = p.Isin"
         // we found cases e.g. from US stocks that even after position is closed some dividend corrections
         // happened due to tax changes
         //Contract.requires (fun () -> p.ClosedAt |> Option.isNone) "position is closed"
@@ -211,19 +224,19 @@ module Positions =
         let update f positions =
             let p = positions |> f
             positions
-            |> Map.remove p.Isin
-            |> Map.add p.Isin p
+            |> Map.remove p.AssetId
+            |> Map.add p.AssetId p
 
         let buyStock (evt:AssetTransaction) positions =
-            let p = positions |> Map.tryFind evt.Isin |? openNew evt.Date evt.Isin evt.Name
+            let p = positions |> Map.tryFind evt.AssetId |? openNew evt.Date evt.AssetId evt.Name
             accountBuy p evt
             
         let sellStock (evt:AssetTransaction) positions =
-            let p = positions |> Map.tryFind evt.Isin |! (sprintf "Cannot sell stock %s (Isin: %s). No position exists" evt.Name (Str.ofIsin evt.Isin))
+            let p = positions |> Map.tryFind evt.AssetId |! (sprintf "Cannot sell asset %s (AssetId: %s). No position exists" evt.Name (Str.ofAssetId evt.AssetId))
             accountSell p evt
 
         let receiveDividend (evt:DividendReceived) positions =
-            let p = positions |> Map.tryFind evt.Isin |!(sprintf "Cannot get dividends for stock %s (Isin: %s). No position exists" evt.Name (Str.ofIsin evt.Isin))
+            let p = positions |> Map.tryFind (Isin(evt.Isin)) |!(sprintf "Cannot get dividends for stock %s (Isin: %s). No position exists" evt.Name (Str.ofIsin evt.Isin))
             accountDividends p evt
 
         let processEvent positions evt =

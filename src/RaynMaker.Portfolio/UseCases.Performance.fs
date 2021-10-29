@@ -31,7 +31,7 @@ module PerformanceInteractor =
         let currentPortfolioValue = 
             positions
             |> Seq.filter(fun p -> p.ClosedAt |> Option.isNone)
-            |> Seq.sumBy(fun p -> (p.Isin |> getLastPrice |> Option.get).Value * p.Count)
+            |> Seq.sumBy(fun p -> (p.AssetId |> getLastPrice |> Option.get).Value * p.Count)
         let totalValue = totalCash + currentPortfolioValue
         let totalInvestment = totalDeposit - totalDisbursement
         

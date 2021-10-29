@@ -19,9 +19,9 @@ module BenchmarkInteractor =
         day
         |> getPrice
         |> Option.map(fun price ->
-            { StockPriced.Date = day
+            { Date = day
               Name = benchmark.Name
-              Isin = benchmark.Isin
+              AssetId = benchmark.Isin
               Price = price } )
 
     /// Based on the original buy & sell events new benchmarking events are generated which simulate 
@@ -33,7 +33,7 @@ module BenchmarkInteractor =
             |> Option.map(fun price ->
                 let fee = value |> Broker.getFee broker
                 let count = (value - fee) / price
-                { Isin = benchmark.Isin
+                { AssetId = benchmark.Isin
                   Name = benchmark.Name
                   Date = day
                   Fee = fee
@@ -46,7 +46,7 @@ module BenchmarkInteractor =
             |> Option.map(fun price ->
                 let fee = value |> Broker.getFee broker
                 let count = value / price
-                { Isin = benchmark.Isin
+                { AssetId = benchmark.Isin
                   Name = benchmark.Name
                   Date = day
                   Fee = fee
@@ -75,7 +75,7 @@ module BenchmarkInteractor =
                 let value = savingsPlan.Rate
                 let fee = value |> percent savingsPlan.Fee
                 let count = (value - fee) / price
-                { Isin = benchmark.Isin
+                { AssetId = benchmark.Isin
                   Name = benchmark.Name
                   Date = day
                   Fee = fee

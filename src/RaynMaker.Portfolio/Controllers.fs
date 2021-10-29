@@ -47,7 +47,7 @@ let listOpenPositions (depot:Depot.Api) broker lastPriceOf =
     |> List.map(fun p -> 
         {            
             Name = p.Position.Name
-            Isin = p.Position.Isin |> Str.ofIsin
+            Isin = p.Position.AssetId |> Str.ofAssetId
             Shares = p.Position.Count |> Format.count
             Duration = p.PricedAt - p.Position.OpenedAt |> Format.timespan
             BuyingPrice = p.BuyingPrice |> Format.currencyOpt
@@ -105,7 +105,7 @@ let listClosedPositions (depot:Depot.Api) =
             |> List.map(fun p -> 
                 {            
                     Name = p.Position.Name
-                    Isin = p.Position.Isin |> Str.ofIsin
+                    Isin = p.Position.AssetId |> Str.ofAssetId
                     Duration = p.Duration |> Format.timespan
                     TotalProfit = p.TotalProfit |> Format.currency
                     TotalRoi = p.TotalRoi |> Format.percentage
@@ -151,19 +151,19 @@ type PositionDetailsVM = {
 }
 
 let positionDetails (store:EventStore.Api) (depot:Depot.Api) broker lastPriceOf isin = 
-    let isin = isin |> Isin
-    let position = depot.Get() |> Seq.find(fun x -> x.Isin = isin)
+    let isin = isin |> AssetId.Isin
+    let position = depot.Get() |> Seq.find(fun x -> x.AssetId = isin)
     let evaluation = position |> PositionsInteractor.evaluate broker lastPriceOf
 
     let transactions = 
             store.Get()
-            |> Seq.filter(fun x -> x |> DomainEvent.Isin = Some isin)
+            |> Seq.filter(fun x -> x |> DomainEvent.AssetId = Some isin)
             |> Seq.sortByDescending DomainEvent.Date
             |> List.ofSeq
 
     {
         Name = position.Name
-        Isin = position.Isin |> Str.ofIsin
+        Isin = position.AssetId |> Str.ofAssetId
         Shares = position.Count |> Format.count
         Currency = "€"
 
@@ -211,7 +211,7 @@ let positionDetails (store:EventStore.Api) (depot:Depot.Api) broker lastPriceOf 
         DividendsRoi = evaluation.DividendRoi |> Format.percentage
         Dividends = 
             store.Get()
-            |> Seq.filter(fun x -> x |> DomainEvent.Isin = Some isin)
+            |> Seq.filter(fun x -> x |> DomainEvent.AssetId = Some isin)
             |> Seq.sortByDescending DomainEvent.Date
             |> Seq.choose(function
                 | DividendReceived e -> 
@@ -281,7 +281,7 @@ let getBenchmarkPerformance (store:EventStore.Api) broker savingsPlan (historica
     |> fun r -> 
         {
             Name = benchmark.Name
-            Isin = benchmark.Isin |> Str.ofIsin
+            Isin = benchmark.Isin |> Str.ofAssetId
             BuyInstead = {
                 TotalProfit = r.BuyInstead.Profit |> Format.currency
                 TotalRoi = r.BuyInstead.Roi |> Format.percentage

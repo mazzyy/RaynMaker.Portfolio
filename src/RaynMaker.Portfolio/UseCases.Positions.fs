@@ -60,7 +60,7 @@ module PositionsInteractor =
     
     let evaluate broker getLastPrice (p:Position) =
         let value,pricedAt = 
-            let price = p.Isin |> getLastPrice |> Option.get // there has to be a price otherwise there would be no position
+            let price = p.AssetId |> getLastPrice |> Option.get // there has to be a price otherwise there would be no position
             p.Payouts + p.Count * price.Value - (Broker.getFee broker price.Value), price.Day
 
         let investedYears = (pricedAt - p.OpenedAt).TotalDays / 365.0 |> decimal
@@ -74,8 +74,8 @@ module PositionsInteractor =
             PricedAt = pricedAt
             BuyingPrice = if p.Count > 0.0M then (p.Invested - p.Payouts) / p.Count |> Some else None
             BuyingValue = p.Invested - p.Payouts
-            CurrentPrice = (p.Isin |> getLastPrice |> Option.get).Value
-            CurrentValue = (p.Isin |> getLastPrice |> Option.get).Value * p.Count
+            CurrentPrice = (p.AssetId |> getLastPrice |> Option.get).Value
+            CurrentValue = (p.AssetId |> getLastPrice |> Option.get).Value * p.Count
             MarketProfit = value - p.Invested
             DividendProfit = p.Dividends
             MarketRoi = marketRoi
@@ -146,7 +146,7 @@ module PositionsInteractor =
             let value,pricedAt = 
                 match p.ClosedAt with
                 | Some c -> p.Payouts,c
-                | None -> let price = p.Isin |> getLastPrice |> Option.get // there has to be a price otherwise there would be no position
+                | None -> let price = p.AssetId |> getLastPrice |> Option.get // there has to be a price otherwise there would be no position
                           p.Payouts + p.Count * price.Value - (Broker.getFee broker price.Value),price.Day
 
             let investedYears = (pricedAt - p.OpenedAt).TotalDays / 365.0 |> decimal
@@ -180,7 +180,7 @@ module StatisticsInteractor =
             positions
             |> Seq.filter(fun p -> p.ClosedAt |> Option.isNone)        
             |> Seq.map(fun p -> 
-                let price = p.Isin |> getLastPrice |> Option.get // there has to be a price otherwise there would be no position
+                let price = p.AssetId |> getLastPrice |> Option.get // there has to be a price otherwise there would be no position
                 p.Name, p.Count * price.Value)  
             |> List.ofSeq
         

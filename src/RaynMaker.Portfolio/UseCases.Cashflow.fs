@@ -16,26 +16,26 @@ module CashflowInteractor =
     [<AutoOpen>]
     module private Impl =
         let createTransaction =
-            let comment name isin = sprintf "%s (Isin: %s)" name (isin |> Str.ofIsin)
+            let comment name assetId = sprintf "%s (AssetId: %s)" name (assetId |> Str.ofAssetId)
             function
             | StockBought e -> 
                 { Date = e.Date
                   Type = "Stock bought"
-                  Comment = comment e.Name e.Isin
+                  Comment = comment e.Name e.AssetId
                   Value = -1.0M * (e.Count * e.Price + e.Fee)
                   Balance = 0.0M<Currency> } 
                 |> Some
             | StockSold e ->
                 { Date = e.Date
                   Type = "Stock sold"
-                  Comment = comment e.Name e.Isin
+                  Comment = comment e.Name e.AssetId
                   Value = e.Count * e.Price - e.Fee
                   Balance = 0.0M<Currency> } 
                 |> Some
             | DividendReceived e ->
                 { Date = e.Date
                   Type = "Dividend"
-                  Comment = comment e.Name e.Isin
+                  Comment = comment e.Name (Isin e.Isin)
                   Value = e.Value - e.Fee
                   Balance = 0.0M<Currency> } 
                 |> Some
