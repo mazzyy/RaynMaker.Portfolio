@@ -15,22 +15,34 @@ module EventsReader =
             let payload : obj list = [r.Date;r.ID; r.Name; r.Value; r.Fee; r.Count; r.Comment]
             sprintf "%s: Event=%s Payload=%A" msg r.Event payload
 
+        let assetBought id (r:Sheet.Row) =
+            {   Date = r.Date
+                AssetId = id
+                Name = r.Name
+                Count = r.Count |> decimal
+                Price = (r.Value |> decimal) * 1.0M<Currency>
+                Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> AssetBought |> Some
+
+        let assetSold id (r:Sheet.Row) =
+            {   Date = r.Date
+                AssetId = id
+                Name = r.Name
+                Count = r.Count |> decimal
+                Price = (r.Value |> decimal) * 1.0M<Currency>
+                Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> AssetSold |> Some
+
+        let assetPriced id (r:Sheet.Row) =
+            {   Date = if r.Date = DateTime.MinValue then DateTime.Today else r.Date
+                AssetId = id
+                Name = r.Name
+                Price = (r.Value |> decimal) * 1.0M<Currency> } |> AssetPriced |> Some
+
         let tryRead (r:Sheet.Row) =
             match r.Event with
-            | EqualsI "StockBought" _ -> 
-                { Date = r.Date
-                  AssetId = r.ID |> AssetId.Isin 
-                  Name = r.Name
-                  Count = r.Count |> decimal
-                  Price = (r.Value |> decimal) * 1.0M<Currency>
-                  Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> StockBought |> Some
-            | EqualsI "StockSold" _ -> 
-                { Date = r.Date
-                  AssetId = r.ID |> AssetId.Isin
-                  Name = r.Name
-                  Count = r.Count |> decimal
-                  Price = (r.Value |> decimal) * 1.0M<Currency>
-                  Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> StockSold |> Some
+            | EqualsI "CryptoCoinBought" _ -> r |> assetBought (r.ID |> AssetId.Coin)
+            | EqualsI "StockBought" _ -> r |> assetBought (r.ID |> AssetId.Isin) 
+            | EqualsI "CryptoCoinSold" _ -> r |> assetSold (r.ID |> AssetId.Coin) 
+            | EqualsI "StockSold" _ -> r |> assetSold (r.ID |> AssetId.Isin) 
             | EqualsI "DividendReceived" _ -> 
                 { DividendReceived.Date = r.Date
                   Isin = r.ID |> Isin.Isin
@@ -46,12 +58,8 @@ module EventsReader =
             | EqualsI "InterestReceived" _ -> 
                 { InterestReceived.Date = r.Date
                   Value = (r.Value |> decimal) * 1.0M<Currency>} |> InterestReceived |> Some
-            | EqualsI "PositionClosed" _
-            | EqualsI "StockPriced" _ -> 
-                { Date = if r.Date = DateTime.MinValue then DateTime.Today else r.Date
-                  AssetId = r.ID |> AssetId.Isin
-                  Name = r.Name
-                  Price = (r.Value |> decimal) * 1.0M<Currency> } |> StockPriced |> Some
+            | EqualsI "StockPriced" _ -> r |> assetPriced (r.ID |> AssetId.Isin)
+            | EqualsI "CryptoCoinPriced" _ -> r |> assetPriced (r.ID |> AssetId.Coin)
             | x -> None
 
         let tryParseEvent errors (r:Sheet.Row) =

@@ -18,16 +18,16 @@ module CashflowInteractor =
         let createTransaction =
             let comment name assetId = sprintf "%s (AssetId: %s)" name (assetId |> Str.ofAssetId)
             function
-            | StockBought e -> 
+            | AssetBought e -> 
                 { Date = e.Date
-                  Type = "Stock bought"
+                  Type = "Asset bought"
                   Comment = comment e.Name e.AssetId
                   Value = -1.0M * (e.Count * e.Price + e.Fee)
                   Balance = 0.0M<Currency> } 
                 |> Some
-            | StockSold e ->
+            | AssetSold e ->
                 { Date = e.Date
-                  Type = "Stock sold"
+                  Type = "Asset sold"
                   Comment = comment e.Name e.AssetId
                   Value = e.Count * e.Price - e.Fee
                   Balance = 0.0M<Currency> } 
@@ -60,7 +60,7 @@ module CashflowInteractor =
                   Value = e.Value 
                   Balance = 0.0M<Currency> } 
                 |> Some
-            | StockPriced e -> None
+            | AssetPriced e -> None
         
     /// As commonly used in accounting the list is returned in reverse order
     let getTransactions limit (store:DomainEvent list) =

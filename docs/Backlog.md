@@ -1,5 +1,8 @@
 
-
+- in VM
+  - rename "shares" -> Count
+  - rename "isin" -> assetid
+  - how can we diff in UI whether it is isin or coin? on controller request we have to diff
 
 - separate events for
   - "wertpapiereinang"

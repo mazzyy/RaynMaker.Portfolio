@@ -22,7 +22,7 @@ let buy company count price fee date =
         Count = count
         Price = price
         Fee = fee } 
-    |> StockBought
+    |> AssetBought
 
 let sell company count price fee date =
     {   Date = date 
@@ -31,7 +31,7 @@ let sell company count price fee date =
         Count = count
         Price = price
         Fee = fee } 
-    |> StockSold
+    |> AssetSold
 
 let dividend company value fee date =
     {   DividendReceived.Date = date 
@@ -56,7 +56,7 @@ let priced company price date =
         Name = company
         AssetId = company |> AssetId.Isin
         Price = price}
-    |> StockPriced
+    |> AssetPriced
 
 let getMostRecentPrice company events = 
     TestAPI.getMostRecentPrice events (isin company)

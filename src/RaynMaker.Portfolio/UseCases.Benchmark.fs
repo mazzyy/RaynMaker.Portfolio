@@ -57,10 +57,10 @@ module BenchmarkInteractor =
         seq {
             yield! store
                     |> Seq.choose (function
-                        | StockBought e -> buy e.Date (e.Price * e.Count + e.Fee) |> Option.map StockBought 
-                        | StockSold e -> sell e.Date (e.Price * e.Count) |> Option.map StockSold
+                        | AssetBought e -> buy e.Date (e.Price * e.Count + e.Fee) |> Option.map AssetBought 
+                        | AssetSold e -> sell e.Date (e.Price * e.Count) |> Option.map AssetSold
                         | _ -> None)
-            let lastEvent = lastDay |> pricePosition benchmark getPrice |> Option.map StockPriced
+            let lastEvent = lastDay |> pricePosition benchmark getPrice |> Option.map AssetPriced
             if lastEvent |> Option.isSome then
                 yield lastEvent |> Option.get
         }
@@ -90,8 +90,8 @@ module BenchmarkInteractor =
         seq {
             yield!  [0 .. numMonths]
                     |> Seq.map(fun m -> (new DateTime(start.Year, start.Month, 1)).AddMonths(m))
-                    |> Seq.choose(fun day -> day |> buy |> Option.map StockBought)
-            let lastEvent = stop |> pricePosition benchmark getPrice |> Option.map StockPriced
+                    |> Seq.choose(fun day -> day |> buy |> Option.map AssetBought)
+            let lastEvent = stop |> pricePosition benchmark getPrice |> Option.map AssetPriced
             if lastEvent |> Option.isSome then
                 yield lastEvent |> Option.get
         }

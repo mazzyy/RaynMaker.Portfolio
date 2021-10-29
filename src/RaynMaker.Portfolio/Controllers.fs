@@ -12,7 +12,9 @@ module private Format =
         | x when x > 365.0 -> sprintf "%.2f years" (span.TotalDays / 365.0)
         | x when x > 90.0 -> sprintf "%.2f months" (span.TotalDays / 30.0)
         | _ -> sprintf "%.0f days" span.TotalDays
-    let count = sprintf "%.2f"
+    let count = function
+        | Isin _ -> sprintf "%.2f"
+        | Coin _ -> sprintf "%.6f"
     let currency = sprintf "%.2f"
     let currencyOpt = Option.map currency >> Option.defaultValue "n.a"
     let percentage = sprintf "%.2f"
@@ -48,7 +50,7 @@ let listOpenPositions (depot:Depot.Api) broker lastPriceOf =
         {            
             Name = p.Position.Name
             Isin = p.Position.AssetId |> Str.ofAssetId
-            Shares = p.Position.Count |> Format.count
+            Shares = p.Position.Count |> Format.count p.Position.AssetId
             Duration = p.PricedAt - p.Position.OpenedAt |> Format.timespan
             BuyingPrice = p.BuyingPrice |> Format.currencyOpt
             BuyingValue = p.BuyingValue |> Format.currency
@@ -150,21 +152,24 @@ type PositionDetailsVM = {
     Dividends : DividendsVM list
 }
 
-let positionDetails (store:EventStore.Api) (depot:Depot.Api) broker lastPriceOf isin = 
-    let isin = isin |> AssetId.Isin
-    let position = depot.Get() |> Seq.find(fun x -> x.AssetId = isin)
+let positionDetails (store:EventStore.Api) (depot:Depot.Api) broker lastPriceOf (assetId:string) = 
+    // TODO: workaround - we need to send AssetId type to FE
+    let position = 
+        depot.Get() 
+        |> Seq.tryFind(fun x -> x.AssetId = (AssetId.Isin assetId))
+        |> Option.defaultWith(fun () -> depot.Get() |> Seq.find(fun x -> x.AssetId = (AssetId.Coin assetId)))
     let evaluation = position |> PositionsInteractor.evaluate broker lastPriceOf
 
     let transactions = 
-            store.Get()
-            |> Seq.filter(fun x -> x |> DomainEvent.AssetId = Some isin)
-            |> Seq.sortByDescending DomainEvent.Date
-            |> List.ofSeq
+        store.Get()
+        |> Seq.filter(fun x -> x |> DomainEvent.AssetId = Some position.AssetId)
+        |> Seq.sortByDescending DomainEvent.Date
+        |> List.ofSeq
 
     {
         Name = position.Name
         Isin = position.AssetId |> Str.ofAssetId
-        Shares = position.Count |> Format.count
+        Shares = position.Count |> Format.count position.AssetId
         Currency = "€"
 
         BuyingPrice = evaluation.BuyingPrice |> Format.currencyOpt
@@ -173,7 +178,7 @@ let positionDetails (store:EventStore.Api) (depot:Depot.Api) broker lastPriceOf 
                 // simplification: substract last sell to get remaining investment which was there before the sell
                 let closeValue = 
                     transactions 
-                    |> Seq.choose(function | StockSold e -> e.Price * e.Count - e.Fee |> Some | _ -> None ) 
+                    |> Seq.choose(function | AssetSold e -> e.Price * e.Count - e.Fee |> Some | _ -> None ) 
                     |> Seq.head
                 evaluation.BuyingValue + closeValue
             else
@@ -186,32 +191,32 @@ let positionDetails (store:EventStore.Api) (depot:Depot.Api) broker lastPriceOf 
         Transactions = 
             transactions
             |> Seq.choose(function
-                | StockBought e -> 
+                | AssetBought e -> 
                     {
                         Date = e.Date |> Format.date
                         Action = "Buy"
-                        Shares = e.Count |> Format.count
+                        Shares = e.Count |> Format.count position.AssetId
                         Price = e.Price |> Format.currency
                         // effective value including fees
                         Value = e.Price * e.Count + e.Fee |> Format.currency
                     } |> Some
-                | StockSold e -> 
+                | AssetSold e -> 
                     {
                         Date = e.Date |> Format.date
                         Action = "Sell"
-                        Shares = e.Count |> Format.count
+                        Shares = e.Count |> Format.count position.AssetId
                         Price = e.Price |> Format.currency
                         // effective value including fees & taxes
                         Value = e.Price * e.Count - e.Fee |> Format.currency
                     } |> Some
-                | DividendReceived _ | DepositAccounted _ | DisbursementAccounted _ | InterestReceived _ | StockPriced _ -> None)
+                | DividendReceived _ | DepositAccounted _ | DisbursementAccounted _ | InterestReceived _ | AssetPriced _ -> None)
             |> List.ofSeq
 
         TotalDividends = evaluation.DividendProfit |> Format.currency
         DividendsRoi = evaluation.DividendRoi |> Format.percentage
         Dividends = 
             store.Get()
-            |> Seq.filter(fun x -> x |> DomainEvent.AssetId = Some isin)
+            |> Seq.filter(fun x -> x |> DomainEvent.AssetId = Some position.AssetId)
             |> Seq.sortByDescending DomainEvent.Date
             |> Seq.choose(function
                 | DividendReceived e -> 
@@ -219,7 +224,7 @@ let positionDetails (store:EventStore.Api) (depot:Depot.Api) broker lastPriceOf 
                         Date = e.Date |> Format.date
                         Value = e.Value - e.Fee |> Format.currency
                     } |> Some
-                | StockBought _ | StockSold _  | DepositAccounted _  | DisbursementAccounted _ | InterestReceived _ | StockPriced _ -> None)
+                | AssetBought _ | AssetSold _  | DepositAccounted _  | DisbursementAccounted _ | InterestReceived _ | AssetPriced _ -> None)
             |> List.ofSeq
     }
 

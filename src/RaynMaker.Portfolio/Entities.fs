@@ -63,13 +63,13 @@ type AssetPriced = {
     Price : decimal<Currency> }
 
 type DomainEvent = 
-    | StockBought of AssetTransaction
-    | StockSold of AssetTransaction
+    | AssetBought of AssetTransaction
+    | AssetSold of AssetTransaction
+    | AssetPriced of AssetPriced
     | DividendReceived of DividendReceived
     | DepositAccounted of DepositAccounted
     | DisbursementAccounted of DisbursementAccounted
     | InterestReceived of InterestReceived
-    | StockPriced of AssetPriced
 
 type Price = {
     Day : DateTime
@@ -79,32 +79,32 @@ type Price = {
 module DomainEvent =
     let AssetId event =
         match event with
-        | StockBought e -> e.AssetId |> Some
-        | StockSold e -> e.AssetId |> Some
+        | AssetBought e -> e.AssetId |> Some
+        | AssetSold e -> e.AssetId |> Some
         | DividendReceived e -> e.Isin |> Isin |> Some
         | DepositAccounted _ -> None
         | DisbursementAccounted _ -> None
         | InterestReceived _ -> None
-        | StockPriced e -> e.AssetId |> Some
+        | AssetPriced e -> e.AssetId |> Some
 
     let Date event =
         match event with
-        | StockBought e -> e.Date
-        | StockSold e -> e.Date
+        | AssetBought e -> e.Date
+        | AssetSold e -> e.Date
         | DividendReceived e -> e.Date
         | DepositAccounted e -> e.Date
         | DisbursementAccounted e -> e.Date
         | InterestReceived e -> e.Date
-        | StockPriced e -> e.Date
+        | AssetPriced e -> e.Date
 
     /// searches for the last price information available
     let LastPriceOf events assetId =
         events
         |> List.rev
         |> Seq.tryPick (function 
-            | StockBought e when e.AssetId = assetId -> { Day = e.Date; Value = e.Price } |> Some 
-            | StockSold e when e.AssetId = assetId -> { Day = e.Date; Value = e.Price } |> Some 
-            | StockPriced e when e.AssetId = assetId -> { Day = e.Date; Value = e.Price } |> Some 
+            | AssetBought e when e.AssetId = assetId -> { Day = e.Date; Value = e.Price } |> Some 
+            | AssetSold e when e.AssetId = assetId -> { Day = e.Date; Value = e.Price } |> Some 
+            | AssetPriced e when e.AssetId = assetId -> { Day = e.Date; Value = e.Price } |> Some 
             | _ -> None)
 
 module Prices = 
@@ -227,11 +227,11 @@ module Positions =
             |> Map.remove p.AssetId
             |> Map.add p.AssetId p
 
-        let buyStock (evt:AssetTransaction) positions =
+        let buyAsset (evt:AssetTransaction) positions =
             let p = positions |> Map.tryFind evt.AssetId |? openNew evt.Date evt.AssetId evt.Name
             accountBuy p evt
             
-        let sellStock (evt:AssetTransaction) positions =
+        let sellAsset (evt:AssetTransaction) positions =
             let p = positions |> Map.tryFind evt.AssetId |! (sprintf "Cannot sell asset %s (AssetId: %s). No position exists" evt.Name (Str.ofAssetId evt.AssetId))
             accountSell p evt
 
@@ -242,8 +242,8 @@ module Positions =
         let processEvent positions evt =
             try
                 match evt with
-                | StockBought evt -> positions |> update (buyStock evt)
-                | StockSold evt  -> positions |> update (sellStock evt)
+                | AssetBought evt -> positions |> update (buyAsset evt)
+                | AssetSold evt  -> positions |> update (sellAsset evt)
                 | DividendReceived evt -> positions |> update (receiveDividend evt)
                 | _ -> positions
             with
