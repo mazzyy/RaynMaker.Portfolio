@@ -18,14 +18,14 @@ module EventsReader =
         let tryRead (r:Sheet.Row) =
             match r.Event with
             | EqualsI "StockBought" _ -> 
-                { StockBought.Date = r.Date
+                { Date = r.Date
                   Isin = r.ID |> Isin
                   Name = r.Name
                   Count = r.Count |> decimal
                   Price = (r.Value |> decimal) * 1.0M<Currency>
                   Fee = (r.Fee |> decimal) * 1.0M<Currency>} |> StockBought |> Some
             | EqualsI "StockSold" _ -> 
-                { StockSold.Date = r.Date
+                { Date = r.Date
                   Isin = r.ID |> Isin
                   Name = r.Name
                   Count = r.Count |> decimal

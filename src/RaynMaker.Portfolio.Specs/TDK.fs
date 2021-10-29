@@ -16,7 +16,7 @@ let price (v:float) = (v |> decimal) * 1.0M<Currency>
 let fee = price
 
 let buy company count price fee date =
-    {   StockBought.Date = date 
+    {   Date = date 
         Name = company
         Isin = company |> isin
         Count = count
@@ -25,7 +25,7 @@ let buy company count price fee date =
     |> StockBought
 
 let sell company count price fee date =
-    {   StockSold.Date = date 
+    {   Date = date 
         Name = company
         Isin = company |> isin
         Count = count

@@ -33,7 +33,7 @@ module BenchmarkInteractor =
             |> Option.map(fun price ->
                 let fee = value |> Broker.getFee broker
                 let count = (value - fee) / price
-                { StockBought.Isin = benchmark.Isin
+                { Isin = benchmark.Isin
                   Name = benchmark.Name
                   Date = day
                   Fee = fee
@@ -46,7 +46,7 @@ module BenchmarkInteractor =
             |> Option.map(fun price ->
                 let fee = value |> Broker.getFee broker
                 let count = value / price
-                { StockSold.Isin = benchmark.Isin
+                { Isin = benchmark.Isin
                   Name = benchmark.Name
                   Date = day
                   Fee = fee
@@ -75,7 +75,7 @@ module BenchmarkInteractor =
                 let value = savingsPlan.Rate
                 let fee = value |> percent savingsPlan.Fee
                 let count = (value - fee) / price
-                { StockBought.Isin = benchmark.Isin
+                { Isin = benchmark.Isin
                   Name = benchmark.Name
                   Date = day
                   Fee = fee

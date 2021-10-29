@@ -1,8 +1,5 @@
 
 
-- what is the buying price?
-  - sliding window?
-  - remaining investment before final sell?
 
 - separate events for
   - "wertpapiereinang"

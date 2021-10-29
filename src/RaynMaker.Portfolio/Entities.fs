@@ -15,15 +15,7 @@ module Finance =
     let percent (p:decimal<Percentage>) (v:decimal<_>) =
         v * p / 100.0M<Percentage>
 
-type StockBought = {
-    Date : DateTime
-    Isin : Isin
-    Name : string
-    Count : decimal
-    Price : decimal<Currency>
-    Fee : decimal<Currency> }
-
-type StockSold = {
+type AssetTransaction = {
     Date : DateTime
     Isin : Isin
     Name : string
@@ -58,8 +50,8 @@ type StockPriced = {
     Price : decimal<Currency> }
 
 type DomainEvent = 
-    | StockBought of StockBought
-    | StockSold of StockSold
+    | StockBought of AssetTransaction
+    | StockSold of AssetTransaction
     | DividendReceived of DividendReceived
     | DepositAccounted of DepositAccounted
     | DisbursementAccounted of DisbursementAccounted
@@ -156,7 +148,7 @@ module Positions =
             Dividends = 0.0M<Currency>
         }
 
-    let accountBuy p (evt:StockBought) =
+    let accountBuy p (evt:AssetTransaction) =
         Contract.requires (fun () -> p.Isin = evt.Isin) "evt.Isin = p.Isin"
         Contract.requires (fun () -> evt.Count > 0.0M) "evt.Count > 0"
         // in case of "spin-off" we could get stocks for free
@@ -174,7 +166,7 @@ module Positions =
 
         newP    
     
-    let accountSell p (evt:StockSold) =
+    let accountSell p (evt:AssetTransaction) =
         Contract.requires (fun () -> p.Isin = evt.Isin) "evt.Isin = p.Isin"
         Contract.requires (fun () -> evt.Count > 0.0M) "evt.Count > 0"
         Contract.requires (fun () -> evt.Price > 0.0M<Currency>) "evt.Price > 0"
@@ -222,11 +214,11 @@ module Positions =
             |> Map.remove p.Isin
             |> Map.add p.Isin p
 
-        let buyStock (evt:StockBought) positions =
+        let buyStock (evt:AssetTransaction) positions =
             let p = positions |> Map.tryFind evt.Isin |? openNew evt.Date evt.Isin evt.Name
             accountBuy p evt
             
-        let sellStock (evt:StockSold) positions =
+        let sellStock (evt:AssetTransaction) positions =
             let p = positions |> Map.tryFind evt.Isin |! (sprintf "Cannot sell stock %s (Isin: %s). No position exists" evt.Name (Str.ofIsin evt.Isin))
             accountSell p evt
 
