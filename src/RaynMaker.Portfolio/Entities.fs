@@ -5,7 +5,7 @@ open System
 [<Measure>] type Currency
 [<Measure>] type Percentage
 
-type Isin = Isin of string
+type AssetId = Isin of string
 
 module Str = 
     let ofIsin (Isin x) = x
@@ -17,7 +17,7 @@ module Finance =
 
 type AssetTransaction = {
     Date : DateTime
-    Isin : Isin
+    Isin : AssetId
     Name : string
     Count : decimal
     Price : decimal<Currency>
@@ -25,7 +25,7 @@ type AssetTransaction = {
 
 type DividendReceived = {
     Date : DateTime
-    Isin : Isin
+    Isin : AssetId
     Name : string
     Value : decimal<Currency>
     Fee : decimal<Currency> }
@@ -45,7 +45,7 @@ type InterestReceived = {
 /// notifies the (final) price of a stock at a given date
 type StockPriced = {
     Date : DateTime
-    Isin : Isin
+    Isin : AssetId
     Name : string
     Price : decimal<Currency> }
 
@@ -126,7 +126,7 @@ module Broker =
 type Position = {
     OpenedAt : DateTime 
     ClosedAt : DateTime option
-    Isin : Isin
+    Isin : AssetId
     Name : string
     Count : decimal
     /// All the money ever invested into this position

@@ -46,11 +46,11 @@ module PricesRepository =
     open RaynMaker.Portfolio.Entities
 
     type private Msg = 
-        | Get of Isin * AsyncReplyChannel<Price list>
+        | Get of AssetId * AsyncReplyChannel<Price list>
         | Stop 
 
     type Api = {
-        Get: Isin -> Price list
+        Get: AssetId -> Price list
         Stop: unit -> unit
     }
 

@@ -12,7 +12,7 @@ module BenchmarkInteractor =
         Rate : decimal<Currency> }
     
     type Benchmark = {
-        Isin : Isin
+        Isin : AssetId
         Name : string }
 
     let private pricePosition benchmark getPrice day =
