@@ -7,14 +7,17 @@ open System
 
 type Isin = Isin of string
 type Coin = Coin of string 
+type Commodity = Commodity of string 
 
 type AssetId = 
     | Isin of Isin
     | Coin of Coin
+    | Commodity of Commodity
 
 module AssetId = 
     let Isin = Isin.Isin >> AssetId.Isin
     let Coin = Coin.Coin >> AssetId.Coin
+    let Commodity = Commodity.Commodity >> AssetId.Commodity
 
 module Str = 
     let ofIsin (Isin.Isin x) = x
@@ -22,6 +25,7 @@ module Str =
     let ofAssetId = function
         | Isin(Isin.Isin x) -> x
         | Coin(Coin.Coin x) -> x
+        | Commodity(Commodity.Commodity x) -> x
 
 [<AutoOpen>]
 module Finance =

@@ -61,6 +61,7 @@ module PositionsInteractor =
     let evaluate broker getLastPrice (p:Position) =
         let getFee = p.AssetId |> function
             | Isin _ -> Broker.getFee broker
+            | Commodity _ -> Broker.getFee broker // TODO: to be analyzed what fees would be realistic
             | Coin _ -> fun _ -> 1.0M<Currency> // TODO: workaround for missing support of mutltiple brokers
 
         let value,pricedAt = 

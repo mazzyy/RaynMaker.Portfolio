@@ -11,6 +11,8 @@
           <span style="float: right">
             <label>Total investment: </label> {{ summary.totalInvestment }}
             <span style="margin-left: 20px"></span>
+            <label>Current Value: </label> {{ summary.currentValue}}
+            <span style="margin-left: 20px"></span>
             <label>Total profit: </label> {{ summary.totalProfit }}
           </span>
         </form>
@@ -60,6 +62,7 @@
       this.positions = response.data.positions
       this.summary = {
         totalInvestment: response.data.totalInvestment,
+        currentValue: response.data.currentValue,
         totalProfit: response.data.totalProfit
       }
 

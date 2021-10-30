@@ -14,6 +14,7 @@ module private Format =
         | _ -> sprintf "%.0f days" span.TotalDays
     let count = function
         | Isin _ -> sprintf "%.2f"
+        | Commodity _ -> sprintf "%.2f"
         | Coin _ -> sprintf "%.6f"
     let currency = sprintf "%.2f"
     let currencyOpt = Option.map currency >> Option.defaultValue "n.a"
@@ -45,6 +46,7 @@ type OpenPositionVM = {
 
 type OpenPositionsVM = {
     TotalInvestment : string
+    CurrentValue : string
     TotalProfit : string
     Positions : OpenPositionVM list
 }
@@ -55,6 +57,7 @@ let listOpenPositions (depot:Depot.Api) broker lastPriceOf =
         |> PositionsInteractor.evaluateOpenPositions broker lastPriceOf
     {
         TotalInvestment = positions |> List.sumBy(fun x -> x.BuyingValue) |> Format.currency
+        CurrentValue = positions |> List.sumBy(fun x -> x.CurrentValue) |> Format.currency
         TotalProfit = positions |> List.sumBy(fun x -> x.MarketProfit + x.DividendProfit) |> Format.currency
         Positions =
             positions

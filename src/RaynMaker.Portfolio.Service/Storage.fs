@@ -41,8 +41,10 @@ module EventsReader =
             match r.Event with
             | EqualsI "CryptoCoinBought" _ -> r |> assetBought (r.ID |> AssetId.Coin)
             | EqualsI "StockBought" _ -> r |> assetBought (r.ID |> AssetId.Isin) 
+            | EqualsI "CommodityBought" _ -> r |> assetBought (r.ID |> AssetId.Commodity) 
             | EqualsI "CryptoCoinSold" _ -> r |> assetSold (r.ID |> AssetId.Coin) 
             | EqualsI "StockSold" _ -> r |> assetSold (r.ID |> AssetId.Isin) 
+            | EqualsI "CommoditySold" _ -> r |> assetSold (r.ID |> AssetId.Commodity) 
             | EqualsI "DividendReceived" _ -> 
                 { DividendReceived.Date = r.Date
                   Isin = r.ID |> Isin.Isin
@@ -60,6 +62,7 @@ module EventsReader =
                   Value = (r.Value |> decimal) * 1.0M<Currency>} |> InterestReceived |> Some
             | EqualsI "StockPriced" _ -> r |> assetPriced (r.ID |> AssetId.Isin)
             | EqualsI "CryptoCoinPriced" _ -> r |> assetPriced (r.ID |> AssetId.Coin)
+            | EqualsI "CommodityPriced" _ -> r |> assetPriced (r.ID |> AssetId.Coin)
             | x -> None
 
         let tryParseEvent errors (r:Sheet.Row) =
