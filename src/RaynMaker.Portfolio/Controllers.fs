@@ -173,7 +173,10 @@ let positionDetails (store:EventStore.Api) (depot:Depot.Api) broker lastPriceOf 
     let position = 
         depot.Get() 
         |> Seq.tryFind(fun x -> x.AssetId = (AssetId.Isin assetId))
-        |> Option.defaultWith(fun () -> depot.Get() |> Seq.find(fun x -> x.AssetId = (AssetId.Coin assetId)))
+        |> Option.defaultWith(fun () -> 
+            depot.Get() 
+            |> Seq.tryFind(fun x -> x.AssetId = (AssetId.Coin assetId))
+            |> Option.defaultWith(fun () -> depot.Get() |> Seq.find(fun x -> x.AssetId = (AssetId.Commodity assetId))))
     let evaluation = position |> PositionsInteractor.evaluate broker lastPriceOf
 
     let transactions = 
@@ -325,9 +328,10 @@ let getDiversification (depot:Depot.Api) lastPriceOf =
     depot.Get() 
     |> StatisticsInteractor.getDiversification lastPriceOf
     |> fun r ->
+        let positions = r.Positions |> List.sortByDescending snd
         {
-            Labels = r.Positions |> List.map fst
-            Capital = r.Positions |> List.map snd
+            Labels = positions |> List.map fst
+            Capital = positions |> List.map snd
         }
 
 type CashflowTransactionVM = {

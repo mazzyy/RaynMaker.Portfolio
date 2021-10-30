@@ -27,7 +27,7 @@
       </CCardHeader>
       <CCardBody>
         <p>
-          Based on share count and last price
+          Current value
         </p>
         <pie-chart :width="500" :height="500" :data="diversification.capital" :labels="diversification.labels"></pie-chart>
       </CCardBody>

@@ -62,7 +62,7 @@ module EventsReader =
                   Value = (r.Value |> decimal) * 1.0M<Currency>} |> InterestReceived |> Some
             | EqualsI "StockPriced" _ -> r |> assetPriced (r.ID |> AssetId.Isin)
             | EqualsI "CryptoCoinPriced" _ -> r |> assetPriced (r.ID |> AssetId.Coin)
-            | EqualsI "CommodityPriced" _ -> r |> assetPriced (r.ID |> AssetId.Coin)
+            | EqualsI "CommodityPriced" _ -> r |> assetPriced (r.ID |> AssetId.Commodity)
             | x -> None
 
         let tryParseEvent errors (r:Sheet.Row) =
