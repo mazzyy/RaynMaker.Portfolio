@@ -1,4 +1,15 @@
 
+- in table sorting by percentage does not work
+
+- computation of market profit does not fit to computation 
+  of buying price if sell and rebuy transactions happened
+  - add tests
+  - we could separately show "current profit" based on "remaining investment"
+    additionally to already "cashed out" money and "total profit"
+  - OR we could keep "total profit" calculation but then change way of
+    "buying price" computation
+
+
 - in VM
   - rename "shares" -> Count
   - rename "isin" -> assetid
