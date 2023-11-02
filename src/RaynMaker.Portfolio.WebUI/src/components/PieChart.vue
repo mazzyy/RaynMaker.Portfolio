@@ -1,7 +1,7 @@
 
 <script>
   import { Pie } from 'vue-chartjs'
-  import * as pl from '../../../../packages/GooglePaletteJs/palette.js'
+  import * as pl from '../../packages/GooglePaletteJs/palette.js'
 
   export default {
     extends: Pie,

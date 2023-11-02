@@ -1,0 +1,15 @@
+
+version: "3"
+services:
+  backend:
+    build: .
+    # expose:
+    #   - 2525
+    ports:
+      - 2525:2525
+  # frontend:
+  #   build: ./src/RaynMaker.Portfolio.WebUI
+  #   # expose:
+  #   #   - 8080
+  #   ports:
+  #     - 8080:8080

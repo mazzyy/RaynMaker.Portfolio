@@ -71,8 +71,11 @@ let main argv =
     //Process.Start("cmd", sprintf "/c start http://localhost:%i/" instance.port) |> ignore
 
     printfn "Press any key to stop ..."
-    Console.ReadKey true |> ignore
+    // Console.ReadKey true |> ignore
+    System.Console.In.Read() |> ignore
+
     
     stop instance
+
 
     0

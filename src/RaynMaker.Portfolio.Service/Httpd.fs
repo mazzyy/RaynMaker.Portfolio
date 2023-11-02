@@ -9,7 +9,7 @@ module Httpd =
     
     let start errorHandler app =
         let port = 2525us
-        let local = HttpBinding.create HTTP IPAddress.Loopback port
+        let local = HttpBinding.create HTTP IPAddress.Any port
                 
         let cts = new CancellationTokenSource()
         let customErrorHandler ex msg ctx =

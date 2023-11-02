@@ -1,0 +1,22 @@
+﻿{
+    "overrides": [
+      {
+        "files": ["palette.js"], 
+        "rules": {
+          // Turn off all ESLint rules for the specific file
+          "no-var": "off",
+          "padded-blocks": "off",
+          "camelcase": "off",
+          "no-multi-spaces": "off",
+          "no-multiple-empty-lines": "off",
+          "eqeqeq": "off",
+          "valid-typeof": "off",
+          "no-unused-vars": "off",
+          "no-void": "off",
+          "no-unused-expressions": "off",
+          "one-var": "off"
+        }
+      }
+    ]
+  }
+  
