@@ -1,5 +1,4 @@
-Backend Documentation:
-Based on the information you provided, here is a simple documentation outline for both the backend and frontend aspects of your project:
+
 
 ### Backend Documentation:
 
@@ -26,7 +25,7 @@ Based on the information you provided, here is a simple documentation outline fo
 ### Docker Compose:
 - A Docker Compose file was created to orchestrate the deployment of the entire application. However, there is an issue with the `System.Console.In.Read() |> ignore` line in the backend code, which generates an error during the Docker Compose process. It is recommended to consult with a developer or an experienced person to review and modify this line while preserving the intended functionality.
 
-This documentation provides an overview of the changes and configurations made to the backend and frontend parts of your project. It can serve as a reference for team members or anyone working with the project, helping them understand the setup and adjustments made during development.
+
 
 
 
